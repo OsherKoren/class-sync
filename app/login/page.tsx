@@ -77,7 +77,7 @@ export default function LoginPage() {
             variant="outline"
             className="w-full"
             onClick={() =>
-              signIn("google", { callbackUrl: "/teacher/dashboard" })
+              signIn("google", { callbackUrl: "/" })
             }
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" aria-hidden>
