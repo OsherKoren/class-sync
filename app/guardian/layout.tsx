@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
-export default async function FamilyLayout({
+export default async function GuardianLayout({
   children,
 }: {
   children: ReactNode;
@@ -13,7 +13,7 @@ export default async function FamilyLayout({
     redirect("/login");
   }
 
-  if (session.user.role !== "FAMILY") {
+  if (session.user.role !== "GUARDIAN") {
     redirect("/");
   }
 

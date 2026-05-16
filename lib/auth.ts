@@ -37,7 +37,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       profile(profile) {
         const role =
-          profile.email === process.env.TEACHER_EMAIL ? "TEACHER" : "FAMILY";
+          profile.email === process.env.TEACHER_EMAIL ? "TEACHER" : "GUARDIAN";
         return {
           id: profile.sub,
           name: profile.name,
@@ -88,7 +88,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
-        token.role = (user as { role?: string }).role ?? "FAMILY";
+        token.role = (user as { role?: string }).role ?? "GUARDIAN";
       }
       if (account?.provider === "google") {
         token.googleAccessToken = account.access_token ?? undefined;

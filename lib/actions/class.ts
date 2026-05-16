@@ -232,14 +232,20 @@ export async function getClassById(classId: string): Promise<
 
   return {
     data: {
-      ...classRecord,
+      id: classRecord.id,
+      name: classRecord.name,
+      subject: classRecord.subject,
+      type: classRecord.type,
+      dayOfWeek: classRecord.dayOfWeek,
+      startTime: classRecord.startTime,
+      duration: classRecord.duration,
+      isOpen: classRecord.isOpen,
       enrollments: classRecord.enrollments.map((e) => ({
         id: e.id,
         studentId: e.student.id,
         studentName: e.student.name,
         status: e.status,
       })),
-      teacherId: undefined,
     },
   };
 }

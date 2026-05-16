@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import bcrypt from "bcryptjs";
 
-const familySchema = z.object({
+const guardianSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
 });
@@ -14,15 +14,15 @@ const studentSchema = z.object({
   name: z.string().min(2, "Student name must be at least 2 characters"),
 });
 
-export async function createFamily(
+export async function createGuardian(
   input: unknown
-): Promise<{ error: string } | { data: { userId: string; familyId: string } }> {
+): Promise<{ error: string } | { data: { userId: string } }> {
   const session = await auth();
   if (!session?.user?.id || session.user.role !== "TEACHER") {
     return { error: "Unauthorized" };
   }
 
-  const parsed = familySchema.safeParse(input);
+  const parsed = guardianSchema.safeParse(input);
   if (!parsed.success) {
     return { error: parsed.error.issues[0].message };
   }
@@ -42,27 +42,15 @@ export async function createFamily(
   const passwordHash = await bcrypt.hash(tempPassword, 12);
 
   const user = await db.user.create({
-    data: {
-      name,
-      email,
-      passwordHash,
-      role: "FAMILY",
-    },
+    data: { name, email, passwordHash, role: "GUARDIAN" },
     select: { id: true },
   });
 
-  const family = await db.family.create({
-    data: { userId: user.id },
-    select: { id: true },
-  });
-
-  // TODO: Send email with temporary password to family
-
-  return { data: { userId: user.id, familyId: family.id } };
+  return { data: { userId: user.id } };
 }
 
 export async function addStudent(
-  familyId: string,
+  guardianId: string,
   input: unknown
 ): Promise<{ error: string } | { data: { id: string } }> {
   const session = await auth();
@@ -78,11 +66,12 @@ export async function addStudent(
   const { name } = parsed.data;
 
   const student = await db.student.create({
-    data: {
-      name,
-      familyId,
-    },
+    data: { name },
     select: { id: true },
+  });
+
+  await db.studentGuardian.create({
+    data: { studentId: student.id, guardianId },
   });
 
   return { data: { id: student.id } };
@@ -125,13 +114,7 @@ export async function findStudentByEmail(
   email: string
 ): Promise<
   | { error: string }
-  | {
-      data: {
-        studentId: string;
-        name: string;
-        email: string;
-      };
-    }
+  | { data: { studentId: string; name: string; email: string } }
 > {
   const session = await auth();
   if (!session?.user?.id || session.user.role !== "TEACHER") {
@@ -189,9 +172,7 @@ export async function enrollStudentByEmail(
   }
 
   const existing = await db.enrollment.findUnique({
-    where: {
-      studentId_classId: { studentId: user.student.id, classId },
-    },
+    where: { studentId_classId: { studentId: user.student.id, classId } },
   });
 
   if (existing) {
@@ -199,11 +180,7 @@ export async function enrollStudentByEmail(
   }
 
   await db.enrollment.create({
-    data: {
-      studentId: user.student.id,
-      classId,
-      status: "ACTIVE",
-    },
+    data: { studentId: user.student.id, classId, status: "ACTIVE" },
   });
 
   return { data: { success: true } };
@@ -259,15 +236,14 @@ export async function rejectEnrollment(
   return { data: { success: true } };
 }
 
-export async function getTeacherFamilies(): Promise<
+export async function getTeacherStudents(): Promise<
   | { error: string }
   | {
       data: Array<{
-        id: string;
-        userId: string;
-        userName: string;
-        userEmail: string;
-        studentCount: number;
+        guardianId: string;
+        guardianName: string;
+        guardianEmail: string;
+        students: Array<{ id: string; name: string }>;
       }>;
     }
 > {
@@ -276,38 +252,38 @@ export async function getTeacherFamilies(): Promise<
     return { error: "Unauthorized" };
   }
 
-  const families = await db.family.findMany({
+  const guardians = await db.user.findMany({
+    where: { role: "GUARDIAN" },
     select: {
       id: true,
-      user: { select: { id: true, name: true, email: true } },
-      _count: { select: { students: true } },
+      name: true,
+      email: true,
+      guardianOf: {
+        select: { student: { select: { id: true, name: true } } },
+        orderBy: { createdAt: "asc" },
+      },
     },
     orderBy: { createdAt: "desc" },
   });
 
   return {
-    data: families.map((f) => ({
-      id: f.id,
-      userId: f.user.id,
-      userName: f.user.name || "Unnamed",
-      userEmail: f.user.email,
-      studentCount: f._count.students,
+    data: guardians.map((g) => ({
+      guardianId: g.id,
+      guardianName: g.name || "Unnamed",
+      guardianEmail: g.email,
+      students: g.guardianOf.map((sg) => sg.student),
     })),
   };
 }
 
-export async function getFamilyById(familyId: string): Promise<
+export async function getGuardianStudents(guardianId: string): Promise<
   | { error: string }
   | {
       data: {
-        id: string;
-        userId: string;
-        userName: string;
-        userEmail: string;
-        students: Array<{
-          id: string;
-          name: string;
-        }>;
+        guardianId: string;
+        guardianName: string;
+        guardianEmail: string;
+        students: Array<{ id: string; name: string }>;
       };
     }
 > {
@@ -316,26 +292,30 @@ export async function getFamilyById(familyId: string): Promise<
     return { error: "Unauthorized" };
   }
 
-  const family = await db.family.findUnique({
-    where: { id: familyId },
+  const guardian = await db.user.findUnique({
+    where: { id: guardianId },
     select: {
       id: true,
-      user: { select: { id: true, name: true, email: true } },
-      students: { select: { id: true, name: true }, orderBy: { createdAt: "asc" } },
+      name: true,
+      email: true,
+      role: true,
+      guardianOf: {
+        select: { student: { select: { id: true, name: true } } },
+        orderBy: { createdAt: "asc" },
+      },
     },
   });
 
-  if (!family) {
-    return { error: "Family not found" };
+  if (!guardian || guardian.role !== "GUARDIAN") {
+    return { error: "Guardian not found" };
   }
 
   return {
     data: {
-      id: family.id,
-      userId: family.user.id,
-      userName: family.user.name || "Unnamed",
-      userEmail: family.user.email,
-      students: family.students,
+      guardianId: guardian.id,
+      guardianName: guardian.name || "Unnamed",
+      guardianEmail: guardian.email,
+      students: guardian.guardianOf.map((sg) => sg.student),
     },
   };
 }

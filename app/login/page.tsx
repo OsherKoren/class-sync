@@ -56,9 +56,9 @@ export default function LoginPage() {
         return "/teacher/dashboard";
       case "STUDENT":
         return "/student/dashboard";
-      case "FAMILY":
+      case "GUARDIAN":
       default:
-        return "/family/dashboard";
+        return "/guardian/dashboard";
     }
   }
 

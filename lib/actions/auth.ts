@@ -41,7 +41,7 @@ export async function createAccountWithEmail(
 }
 
 export async function completeRegistration(
-  role: "FAMILY" | "STUDENT" | "TEACHER"
+  role: "GUARDIAN" | "STUDENT" | "TEACHER"
 ): Promise<{ error: string } | { data: { success: true } }> {
   try {
     const session = await auth();
@@ -52,32 +52,22 @@ export async function completeRegistration(
 
     const user = await db.user.findUnique({
       where: { id: session.user.id },
-      select: { id: true, name: true, role: true, family: true, student: true },
+      select: { id: true, name: true, student: true },
     });
 
     if (!user) {
       return { error: "User not found" };
     }
 
-    // Check if already set up
-    if (user.family || user.student) {
-      return { error: "Profile already set up" };
-    }
-
-    if (role === "FAMILY") {
-      try {
-        await db.family.create({
-          data: { userId: user.id },
-        });
-      } catch (err) {
-        console.error("Error creating family:", err);
-        return { error: "Failed to create family profile" };
-      }
+    if (role === "GUARDIAN") {
       await db.user.update({
         where: { id: user.id },
-        data: { role: "FAMILY" },
+        data: { role: "GUARDIAN" },
       });
     } else if (role === "STUDENT") {
+      if (user.student) {
+        return { error: "Profile already set up" };
+      }
       try {
         await db.student.create({
           data: { name: user.name || "Student", userId: user.id },
@@ -104,7 +94,7 @@ export async function completeRegistration(
   }
 }
 
-export async function registerFamily(
+export async function registerGuardian(
   input: unknown
 ): Promise<{ error: string } | { data: { success: true } }> {
   const parsed = registerSchema.safeParse(input);
@@ -125,13 +115,9 @@ export async function registerFamily(
 
   const passwordHash = await bcrypt.hash(password, 12);
 
-  const user = await db.user.create({
-    data: { name, email, passwordHash, role: "FAMILY" },
+  await db.user.create({
+    data: { name, email, passwordHash, role: "GUARDIAN" },
     select: { id: true },
-  });
-
-  await db.family.create({
-    data: { userId: user.id },
   });
 
   return { data: { success: true } };

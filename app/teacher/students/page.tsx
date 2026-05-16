@@ -7,10 +7,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getTeacherFamilies } from "@/lib/actions/family";
+import { getTeacherStudents } from "@/lib/actions/guardian";
 
 export default async function StudentsPage() {
-  const result = await getTeacherFamilies();
+  const result = await getTeacherStudents();
 
   if ("error" in result) {
     return (
@@ -20,54 +20,54 @@ export default async function StudentsPage() {
     );
   }
 
-  const families = result.data;
+  const guardians = result.data;
 
   return (
     <div className="p-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Families & Students</h1>
+            <h1 className="text-3xl font-bold mb-2">Students</h1>
             <p className="text-muted-foreground">
-              Manage families and their students
+              Manage students and their guardians
             </p>
           </div>
           <Link href="/teacher/students/new">
-            <Button>Add family</Button>
+            <Button>Add guardian &amp; student</Button>
           </Link>
         </div>
 
-        {families.length === 0 ? (
+        {guardians.length === 0 ? (
           <Card>
             <CardContent className="pt-6">
               <p className="text-center text-muted-foreground">
-                No families yet.{" "}
+                No guardians yet.{" "}
                 <Link
                   href="/teacher/students/new"
                   className="underline underline-offset-4"
                 >
-                  Add your first family
+                  Add your first guardian
                 </Link>
               </p>
             </CardContent>
           </Card>
         ) : (
           <div className="grid gap-4">
-            {families.map((family) => (
+            {guardians.map((guardian) => (
               <Link
-                key={family.id}
-                href={`/teacher/students/${family.id}`}
+                key={guardian.guardianId}
+                href={`/teacher/students/${guardian.guardianId}`}
               >
                 <Card className="hover:bg-accent transition-colors cursor-pointer">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle>{family.userName}</CardTitle>
-                        <CardDescription>{family.userEmail}</CardDescription>
+                        <CardTitle>{guardian.guardianName}</CardTitle>
+                        <CardDescription>{guardian.guardianEmail}</CardDescription>
                       </div>
                       <div className="text-right text-sm font-medium">
-                        {family.studentCount}{" "}
-                        {family.studentCount === 1 ? "student" : "students"}
+                        {guardian.students.length}{" "}
+                        {guardian.students.length === 1 ? "student" : "students"}
                       </div>
                     </div>
                   </CardHeader>

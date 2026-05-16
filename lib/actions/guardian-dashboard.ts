@@ -1,0 +1,108 @@
+"use server";
+
+import { db } from "@/lib/db";
+import { auth } from "@/lib/auth";
+import { canActOnStudent } from "@/lib/auth-helpers";
+
+type StudentWithEnrollments = {
+  id: string;
+  name: string;
+  hasAccount: boolean;
+  enrollments: Array<{
+    status: string;
+    class: {
+      id: string;
+      name: string;
+      subject: string;
+      dayOfWeek: number;
+      startTime: string;
+      duration: number;
+    };
+  }>;
+};
+
+export async function getMyStudents(): Promise<
+  { error: string } | { data: StudentWithEnrollments[] }
+> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "GUARDIAN") {
+    return { error: "Unauthorized" };
+  }
+
+  const rows = await db.studentGuardian.findMany({
+    where: { guardianId: session.user.id },
+    select: {
+      student: {
+        select: {
+          id: true,
+          name: true,
+          userId: true,
+          enrollments: {
+            select: {
+              status: true,
+              class: {
+                select: {
+                  id: true,
+                  name: true,
+                  subject: true,
+                  dayOfWeek: true,
+                  startTime: true,
+                  duration: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const data = rows.map(({ student }) => ({
+    id: student.id,
+    name: student.name,
+    hasAccount: student.userId !== null,
+    enrollments: student.enrollments,
+  }));
+
+  return { data };
+}
+
+export async function getStudentForGuardian(studentId: string): Promise<
+  { error: string } | { data: { id: string; name: string; hasAccount: boolean } }
+> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "GUARDIAN") {
+    return { error: "Unauthorized" };
+  }
+
+  const allowed = await canActOnStudent(studentId, session.user.id);
+  if (!allowed) return { error: "Unauthorized" };
+
+  const student = await db.student.findUnique({
+    where: { id: studentId },
+    select: { id: true, name: true, userId: true },
+  });
+
+  if (!student) return { error: "Student not found" };
+
+  return { data: { id: student.id, name: student.name, hasAccount: student.userId !== null } };
+}
+
+export async function createStudentForSelf(input: {
+  name: string;
+}): Promise<{ error: string } | { data: { id: string } }> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "GUARDIAN") {
+    return { error: "Unauthorized" };
+  }
+
+  const student = await db.student.create({
+    data: {
+      name: input.name,
+      guardians: { create: { guardianId: session.user.id } },
+    },
+    select: { id: true },
+  });
+
+  return { data: student };
+}

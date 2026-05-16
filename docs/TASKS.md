@@ -30,13 +30,15 @@ Set up Next.js with all dependencies and base configuration.
 
 ## Phase 1 — Database, Auth & Rate Limiting
 
-Prisma schema live on Neon; teacher and family login working; abuse protection in place.
+Prisma schema live on Neon; teacher, guardian, and student login working; abuse protection in place.
 
 **Design decisions:**
 - Teacher signs in with Google only (identified by `TEACHER_EMAIL` env var)
-- Families self-register with Google OR email + password — no teacher setup required
-- Young children share a parent's account; parents manage scheduling on their behalf
-- Independent students (13+) can self-register with their own Google OR email + password
+- Guardians self-register with Google OR email + password — no teacher setup required
+- Students self-register with Google OR email + password (independent teens, 13+)
+- Young children have no login of their own — one or more guardians act on their behalf via `StudentGuardian` links
+- A Student record can be linked to multiple guardians (mother + father, parent + grandparent, etc.) and may *also* have its own login — both child and guardian(s) can act on the same record
+- Guardian–student linking happens via in-app **link codes** (6-char, single-use, 24h expiry, QR-renderable) — no email service required
 - Two-way enrollment: teachers can enroll students directly (auto-confirmed) OR students request to join open classes (teacher approves/rejects)
 
 **Prerequisites before starting:**
@@ -52,8 +54,8 @@ Prisma schema live on Neon; teacher and family login working; abuse protection i
 - [x] `lib/auth.ts` — NextAuth v5 config (Google provider + credentials provider)
 - [x] `app/api/auth/[...nextauth]/route.ts`
 - [x] `app/login/page.tsx` — Google button + email/password form + register link
-- [x] `lib/actions/auth.ts` — `registerFamily` server action
-- [x] `app/register/page.tsx` — self-registration form for families
+- [x] `lib/actions/auth.ts` — `registerFamily` server action *(to be renamed `registerGuardian` in Phase 2 refactor)*
+- [x] `app/register/page.tsx` — self-registration form for guardians
 - [x] Install `@upstash/ratelimit @upstash/redis`
 - [x] Add `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` to `.env.local`
 - [x] `lib/rate-limit.ts` — shared rate limiter helpers
@@ -62,8 +64,9 @@ Prisma schema live on Neon; teacher and family login working; abuse protection i
 
 ### ✅ Phase 1 Success — check each after testing manually
 - [ ] Teacher logs in with Google → session exists → lands on `/teacher/dashboard`
-- [ ] Family self-registers with email + password → lands on `/family/dashboard`
-- [ ] Family logs in with Google → lands on `/family/dashboard`
+- [ ] Guardian self-registers with email + password → lands on `/guardian/dashboard`
+- [ ] Guardian logs in with Google → lands on `/guardian/dashboard`
+- [ ] Student self-registers (independent teen) → lands on `/student/dashboard`
 - [ ] Visiting `/teacher/dashboard` without a session → redirects to `/login`
 - [ ] Tables visible in Neon dashboard (check via `npx prisma studio`)
 - [ ] Hitting login 11+ times/min from same IP → receives 429 response
@@ -74,25 +77,31 @@ Prisma schema live on Neon; teacher and family login working; abuse protection i
 
 ## Phase 2 — Class & Student Management
 
-Teacher can create classes and manage both family-linked students and independent students. Independent students can self-register.
+Teacher can create classes and manage guardian-linked students and independent students. Guardians and students can also link to each other via link codes.
 
-**Core schema changes:**
-- [ ] Add `STUDENT` to `Role` enum
-- [ ] Make `Student.familyId` nullable → `String?`
-- [ ] Add `Student.userId String? @unique` → link independent students
-- [ ] Add `EnrollmentStatus` enum: `PENDING | ACTIVE | REJECTED`
-- [ ] Update `Enrollment` model: add `status` field
-- [ ] Add `Class.isOpen Boolean @default(false)` — toggle for student self-enrollment
-- [ ] `npx prisma db push` + `npx prisma generate`
+**Core schema changes (multi-guardian + link-code model):**
+- [ ] Rename `Role.FAMILY` → `Role.GUARDIAN` (and update `User.role` default)
+- [ ] Drop the `Family` model entirely (no longer needed — guardians link directly to students)
+- [ ] Drop `Student.familyId` and the `Student.family` relation
+- [ ] Keep `Student.userId String? @unique` (child's own login, optional)
+- [ ] Change `Student.user` relation to `onDelete: SetNull` — deleting a student's User keeps the Student row for any linked guardians
+- [ ] Add `STUDENT` to `Role` enum (already present in current schema — verify)
+- [ ] Add `StudentGuardian` join model: `(studentId, guardianId)` composite PK, optional `relationship String?`, `@@index([guardianId])`
+- [ ] Add `LinkCodeKind` enum: `CLAIM_STUDENT | CLAIM_GUARDIAN`
+- [ ] Add `LinkCode` model: `code` (6-char PK), `kind`, `studentId`, `createdById`, `expiresAt`, `usedAt`, `usedById`, `@@index([studentId])`
+- [ ] Add `EnrollmentStatus` enum: `PENDING | ACTIVE | REJECTED` (already present — verify)
+- [ ] Update `Enrollment` model: ensure `status` field present (already in current schema — verify)
+- [ ] Add `Class.isOpen Boolean @default(false)` — toggle for student self-enrollment (already in current schema — verify)
+- [ ] `npx prisma db push --force-reset` (dev only — no prod data yet) + `npx prisma generate`
 
 **Teacher class/enrollment features:**
 - [x] `app/teacher/classes/new/page.tsx` — form: name, subject, type, day, time
 - [x] `app/teacher/classes/[id]/page.tsx` — detail + enrolled students
 - [x] `app/teacher/classes/page.tsx` — class list
 - [x] `app/teacher/dashboard/page.tsx` — quick-access cards
-- [x] `app/teacher/students/page.tsx` — families list
-- [x] `app/teacher/students/new/page.tsx` — add family form
-- [x] `app/teacher/students/[id]/page.tsx` — family detail + add student form
+- [x] `app/teacher/students/page.tsx` — students list (currently grouped by family — to be regrouped by Student with guardian column in refactor)
+- [x] `app/teacher/students/new/page.tsx` — add student + initial guardian form (currently "add family" — to be renamed in refactor)
+- [x] `app/teacher/students/[id]/page.tsx` — student detail + linked guardians + enroll button (currently "family detail" — to be renamed in refactor)
 - [x] `app/teacher/students/[id]/[studentId]/enroll/page.tsx` — enroll into class
 
 **Student management features (new):**
@@ -104,18 +113,32 @@ Teacher can create classes and manage both family-linked students and independen
 - [ ] Server Action: `rejectEnrollment(enrollmentId)` — change PENDING → REJECTED
 - [ ] Update `enrollStudent()` to set `status: ACTIVE` (teacher-enrolled always confirmed)
 
-**Student registration/auth features (new):**
+**Student/Guardian registration/auth features (new):**
 - [ ] Update `lib/auth.ts` — handle post-OAuth role selection
 - [ ] `lib/actions/auth.ts` — add `registerStudent(name, email, password)` server action
+- [ ] `lib/actions/auth.ts` — add `registerGuardian(name, email, password)` server action (replaces `registerFamily`)
 - [ ] `lib/actions/auth.ts` — add `completeOAuthRegistration(role)` for Google post-signup
-- [ ] `app/register/page.tsx` — add "Parent / Student" toggle
+- [ ] `app/register/page.tsx` — add "Guardian / Student" toggle
 - [ ] `app/register/complete/page.tsx` (new) — post-Google role selection page
-- [ ] `app/login/page.tsx` — role-based redirect (TEACHER → `/teacher/dashboard`, FAMILY → `/family/dashboard`, STUDENT → `/student/dashboard`)
-- [ ] `proxy.ts` — add `/student/*` protection, add `/register/complete` to public routes
+- [ ] `app/login/page.tsx` — role-based redirect (TEACHER → `/teacher/dashboard`, GUARDIAN → `/guardian/dashboard`, STUDENT → `/student/dashboard`)
+- [ ] `proxy.ts` — add `/student/*` and `/guardian/*` protection, add `/register/complete` to public routes
 
-### ✅ Phase 2 Success (Family-linked students)
+**Link-code features (new):**
+- [ ] `lib/link-code.ts` — `generateCode()` (6-char from `ABCDEFGHJKLMNPQRSTUVWXYZ23456789`), `normalizeCode(input)` (uppercase + strip whitespace), `consumeCode(code, redeemerUserId)` (single transaction)
+- [ ] Server Action: `createLinkCode(studentId, kind)` — creates LinkCode row for Guardian inviting Student or Student inviting Guardian; enforces max 5 active per Student
+- [ ] Server Action: `redeemLinkCode(code)` — validates kind/role match, atomically sets `Student.userId` OR creates `StudentGuardian` row, marks code used
+- [ ] Server Action: `revokeLinkCode(code)` — generator can cancel before redemption
+- [ ] `app/guardian/students/new/page.tsx` — add child (creates Student row, optionally generates a CLAIM_STUDENT code on the spot)
+- [ ] `app/guardian/students/[id]/link/page.tsx` — generate CLAIM_STUDENT or CLAIM_GUARDIAN code, show as large text + QR
+- [ ] `app/guardian/link/page.tsx` — enter a CLAIM_GUARDIAN code received from a student
+- [ ] `app/student/link/page.tsx` — enter a CLAIM_STUDENT code received from a guardian
+- [ ] Optional `?code=XXXXXX` query param on `/register` to pre-fill link code during signup
+- [ ] Install `qrcode` npm package for server-side QR rendering
+- [ ] Per-route rate limit: 10/min on code generation, 20/min on redemption (per IP + per User)
+
+### ✅ Phase 2 Success (Guardian-managed students)
 - [x] Teacher creates a group class → appears in class list
-- [x] Teacher creates a family (name + email) → appears in students page
+- [x] Teacher creates a student record with an initial guardian (guardian name + email) → appears in students page
 - [x] Teacher adds a student and enrolls them in a class
 - [x] Enrollment appears in the class detail page
 - [x] Invalid form inputs show inline error messages
@@ -127,32 +150,45 @@ Teacher can create classes and manage both family-linked students and independen
 - [ ] Independent student visits open classes → requests to join (creates PENDING enrollment)
 - [ ] Teacher approves pending request → status becomes ACTIVE → student sees confirmed class
 
+### Phase 2 Success (Multi-guardian + link codes)
+- [ ] Guardian creates a child (no login) → Student row created with one StudentGuardian link
+- [ ] Guardian generates a CLAIM_STUDENT code → child enters code at `/register` → child account created and linked to the existing Student row; original guardian still linked
+- [ ] Student generates a CLAIM_GUARDIAN code → existing guardian User redeems it → StudentGuardian row created; student still has own login
+- [ ] Two guardians link to the same Student → both see the same enrollments on their dashboards
+- [ ] Linked guardian and student both see the same data; either can act on enrollments
+- [ ] Expired code (>24h) is rejected with a clear error
+- [ ] Used code cannot be redeemed twice
+- [ ] Role-mismatched code rejected (e.g., a Guardian trying to redeem a CLAIM_STUDENT code)
+- [ ] Generating a 6th active code for the same Student is rejected
+
 ---
 
-## Phase 3 — Schedule View (Family & Student)
+## Phase 3 — Schedule View (Guardian & Student)
 
-Family logs in to see their child's sessions. Independent student logs in to see their own sessions.
+Guardian logs in to see all linked children's sessions. Independent student logs in to see their own sessions. Both surfaces query the same `Student` rows, so a linked child + guardian see identical data.
 
-**Family dashboard:**
-- [ ] `app/(family)/layout.tsx` — minimal nav, family auth guard
-- [ ] `app/(family)/dashboard/page.tsx` — child's upcoming sessions as cards
-- [ ] `app/(family)/settings/page.tsx` — placeholder (locale, theme, install)
+**Guardian dashboard:**
+- [ ] `app/guardian/layout.tsx` — minimal nav, GUARDIAN auth guard
+- [ ] `app/guardian/dashboard/page.tsx` — upcoming sessions across all linked children as cards (grouped by child if >1)
+- [ ] `app/guardian/students/page.tsx` — list of linked children with status badges + "Link child by code" / "Add child" actions
+- [ ] `app/guardian/settings/page.tsx` — placeholder (locale, theme, install, link/unlink children)
 
 **Student dashboard (NEW):**
 - [ ] `app/student/layout.tsx` — student auth guard (STUDENT role required)
 - [ ] `app/student/dashboard/page.tsx` — upcoming sessions + pending requests as cards
 - [ ] `app/student/classes/page.tsx` — browse open classes, "Request to join" button
-- [ ] `app/student/settings/page.tsx` — placeholder (locale, theme, install)
+- [ ] `app/student/settings/page.tsx` — placeholder (locale, theme, install, link/unlink guardian)
 - [ ] `lib/actions/student.ts` — `getStudentEnrollments()`, `requestEnrollment()`, `getOpenClasses()`
 
-**Shared components:**
-- [ ] `components/schedule/SessionCard.tsx` — date, time, subject, status badge (ACTIVE | PENDING)
-- [ ] Seed script: create test family + student + test independent student + upcoming sessions
+**Shared:**
+- [ ] `lib/auth-helpers.ts` — `canActOnStudent(studentId, userId)`: returns true if `student.userId === userId` OR a `StudentGuardian (studentId, userId)` row exists. Used in every guardian/student server action.
+- [ ] `components/schedule/SessionCard.tsx` — date, time, subject, status badge (ACTIVE | PENDING), child name (when guardian view + multiple children)
+- [ ] Seed script: create test guardian + 2 children + 1 co-guardian linked to one of them + test independent student + upcoming sessions
 - [ ] Light styling improvements to distinguish ACTIVE vs PENDING status
 
-### ✅ Phase 3 Success (Family)
-- [ ] Family logs in → sees child's upcoming sessions as cards
-- [ ] Session cards show correct date, time, and subject
+### ✅ Phase 3 Success (Guardian)
+- [ ] Guardian logs in → sees upcoming sessions for *all* linked children as cards
+- [ ] Session cards show correct date, time, subject, and (if >1 child) which child the card belongs to
 - [ ] Empty state message shown when no sessions exist
 - [ ] Settings page loads without errors
 
@@ -161,6 +197,11 @@ Family logs in to see their child's sessions. Independent student logs in to see
 - [ ] Student sees pending requests with "Waiting for teacher confirmation" badge
 - [ ] Student browses open classes → can request to join
 - [ ] Student settings page loads without errors
+
+### Phase 3 Success (Linked guardian + student see same data)
+- [ ] Linked guardian and child both view the same upcoming sessions for that child
+- [ ] Either can request enrollment for the child → request appears on both dashboards
+- [ ] Two co-guardians of the same child see identical data
 
 ---
 
@@ -183,7 +224,7 @@ Classes sync to the teacher's Google Calendar.
 - [ ] After picking, `designatedCalendarId` saved to DB
 - [ ] Creating a class → recurring event appears in the designated work calendar
 - [ ] The personal/private calendar is never read or modified by the app
-- [ ] Family dashboard shows sessions from DB only — no Google Calendar data
+- [ ] Guardian and student dashboards show sessions from DB only — no Google Calendar data
 - [ ] Cancelling a session updates only the designated calendar
 - [ ] Token refresh works — teacher stays connected after 1 hour
 
@@ -191,19 +232,21 @@ Classes sync to the teacher's Google Calendar.
 
 ## Phase 5 — Reschedule & Voting
 
-Teacher offers new slots; families vote; teacher confirms.
+Teacher offers new slots; guardians and students vote; teacher confirms.
 
-- [ ] `app/(teacher)/reschedule/[sessionId]/page.tsx` — pick 1–2 new time slots
-- [ ] `app/(teacher)/reschedule/[offerId]/results/page.tsx` — live vote tally
-- [ ] `app/(family)/vote/[offerId]/page.tsx` — large Option A / Option B buttons
+- [ ] `app/teacher/reschedule/[sessionId]/page.tsx` — pick 1–2 new time slots
+- [ ] `app/teacher/reschedule/[offerId]/results/page.tsx` — live vote tally
+- [ ] `app/vote/[offerId]/page.tsx` — large Option A / Option B buttons (accessible to any User authorized on the underlying Student — guardian or student)
 - [ ] Server Actions: `createRescheduleOffer`, `submitVote`, `resolveOffer`
+- [ ] `submitVote` records vote under `studentId`, not the acting User — so a co-guardian voting after the other guardian (or after the student) updates the same vote rather than duplicating
 - [ ] On resolve: update Google Calendar event to winning time slot
-- [ ] Unique DB constraint prevents double-voting per student per offer
+- [ ] Unique DB constraint `@@unique([offerId, studentId])` prevents double-voting per student per offer
 
 ### ✅ Phase 5 Success
 - [ ] Teacher creates offer with 2 options → `RescheduleOffer` row in DB
-- [ ] Family sees vote page with 2 large, clearly labelled buttons
-- [ ] Student can vote once; voting twice updates (does not duplicate) the record
+- [ ] Guardian or student sees vote page with 2 large, clearly labelled buttons
+- [ ] Anyone authorized on a Student can vote once; voting twice updates (does not duplicate) the record
+- [ ] When a guardian votes and then the linked student (or co-guardian) votes again, only the latest choice is counted
 - [ ] Vote tally on teacher results page reflects current counts
 - [ ] Teacher resolves offer → Google Calendar event moves to winning time
 - [ ] Resolved offer page shows the confirmed slot; voting buttons disabled
@@ -224,7 +267,7 @@ Browser push + service worker; install prompt flow.
 - [ ] `components/pwa/InstallBanner.tsx` — bottom-sheet on first login
 - [ ] `components/pwa/InstallButton.tsx` — persistent in settings page
 - [ ] Vercel Cron: `app/api/cron/reminders/route.ts` — 24h + 1h push reminders
-- [ ] Trigger push to enrolled families when reschedule offer is created
+- [ ] Trigger push to all Users linked to enrolled students (guardian + student themselves) when reschedule offer is created
 
 ### ✅ Phase 6 Success
 - [ ] Android Chrome: install banner appears after first login
@@ -232,7 +275,7 @@ Browser push + service worker; install prompt flow.
 - [ ] Install button visible in settings at all times
 - [ ] iOS Safari: custom instruction banner shown (no native prompt)
 - [ ] Once installed (`standalone`), no install prompts shown anywhere
-- [ ] Family receives push when teacher creates a reschedule offer
+- [ ] Guardian (and linked student, if any) receives push when teacher creates a reschedule offer
 - [ ] Reminder push fires ~24h before an upcoming session
 
 ---
@@ -291,6 +334,6 @@ Final UX pass and production deployment.
 ### ✅ Phase 9 Success
 - [ ] All pages load on mobile without horizontal scroll or overflow
 - [ ] Teacher full flow works end-to-end on production URL
-- [ ] Family full flow (vote + push notification) works on production URL
+- [ ] Guardian + student full flow (vote + push notification) works on production URL
 - [ ] Zero console errors in production build
 - [ ] App installable as PWA from the production URL on Android + iOS

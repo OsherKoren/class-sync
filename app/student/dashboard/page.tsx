@@ -24,11 +24,7 @@ export default async function StudentDashboard() {
   const session = await auth();
   const result = await getStudentEnrollments();
 
-  let enrollments = [];
-  if (!("error" in result)) {
-    enrollments = result.data;
-  }
-
+  const enrollments = "error" in result ? [] : result.data;
   const active = enrollments.filter((e) => e.status === "ACTIVE");
   const pending = enrollments.filter((e) => e.status === "PENDING");
 
@@ -95,7 +91,7 @@ export default async function StudentDashboard() {
           <Card>
             <CardContent className="pt-6">
               <p className="text-center text-muted-foreground mb-4">
-                You haven't enrolled in any classes yet.
+                You haven&apos;t enrolled in any classes yet.
               </p>
               <div className="text-center">
                 <Link href="/student/classes">

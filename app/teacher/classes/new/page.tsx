@@ -6,13 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -112,7 +106,7 @@ export default function CreateClassPage() {
 
                 <div>
                   <Label htmlFor="type">Class type</Label>
-                  <Select value={type} onValueChange={setType}>
+                  <Select value={type} onValueChange={(v) => { if (v !== null) setType(v); }}>
                     <SelectTrigger id="type">
                       <SelectValue />
                     </SelectTrigger>
@@ -125,7 +119,7 @@ export default function CreateClassPage() {
 
                 <div>
                   <Label htmlFor="dayOfWeek">Day</Label>
-                  <Select value={dayOfWeek} onValueChange={setDayOfWeek}>
+                  <Select value={dayOfWeek} onValueChange={(v) => { if (v !== null) setDayOfWeek(v); }}>
                     <SelectTrigger id="dayOfWeek">
                       <span>{dayNames[parseInt(dayOfWeek)]}</span>
                     </SelectTrigger>
@@ -142,7 +136,7 @@ export default function CreateClassPage() {
                 <div>
                   <Label htmlFor="startTime">Start time (24-hour format)</Label>
                   <div className="flex gap-2">
-                    <Select value={startTime} onValueChange={setStartTime}>
+                    <Select value={startTime} onValueChange={(v) => { if (v !== null) setStartTime(v); }}>
                       <SelectTrigger className="flex-1" id="startTime">
                         <SelectValue />
                       </SelectTrigger>

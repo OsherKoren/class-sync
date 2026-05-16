@@ -9,13 +9,10 @@ import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
-import { createFamily } from "@/lib/actions/family";
+import { createGuardian } from "@/lib/actions/guardian";
 
-export default function AddFamilyPage() {
+export default function AddGuardianPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
@@ -27,10 +24,7 @@ export default function AddFamilyPage() {
     setLoading(true);
     setError("");
 
-    const result = await createFamily({
-      name,
-      email,
-    });
+    const result = await createGuardian({ name, email });
 
     if ("error" in result) {
       setError(result.error);
@@ -38,7 +32,7 @@ export default function AddFamilyPage() {
       return;
     }
 
-    router.push(`/teacher/students/${result.data.familyId}`);
+    router.push(`/teacher/students/${result.data.userId}`);
     router.refresh();
   }
 
@@ -46,9 +40,9 @@ export default function AddFamilyPage() {
     <div className="p-8">
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Add family</h1>
+          <h1 className="text-3xl font-bold mb-2">Add guardian</h1>
           <p className="text-muted-foreground">
-            Create a new family account and add their students
+            Create a guardian account, then add their children as students
           </p>
         </div>
 
@@ -56,10 +50,10 @@ export default function AddFamilyPage() {
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <Label htmlFor="name">Family name</Label>
+                <Label htmlFor="name">Guardian name</Label>
                 <Input
                   id="name"
-                  placeholder="e.g., Smith Family"
+                  placeholder="e.g., Sarah Cohen"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -71,7 +65,7 @@ export default function AddFamilyPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="family@email.com"
+                  placeholder="guardian@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -80,8 +74,9 @@ export default function AddFamilyPage() {
 
               <div className="bg-muted p-4 rounded-lg">
                 <p className="text-sm text-muted-foreground">
-                  A temporary password will be sent to this email address.
-                  The family can change it after first login.
+                  A temporary password will be generated. Share it with the
+                  guardian so they can log in and set their own password. After
+                  login, they can link their child&apos;s account via a link code.
                 </p>
               </div>
 
@@ -89,7 +84,7 @@ export default function AddFamilyPage() {
 
               <div className="flex gap-4">
                 <Button type="submit" disabled={loading}>
-                  {loading ? "Creating…" : "Create family"}
+                  {loading ? "Creating…" : "Create guardian"}
                 </Button>
                 <Link href="/teacher/students">
                   <Button type="button" variant="outline">

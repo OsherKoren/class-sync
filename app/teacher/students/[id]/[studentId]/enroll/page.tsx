@@ -10,8 +10,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { enrollStudent, getFamilyById } from "@/lib/actions/family";
+import { enrollStudent, getGuardianStudents } from "@/lib/actions/guardian";
 import { getTeacherClasses } from "@/lib/actions/class";
+
+type GuardianData = {
+  guardianId: string;
+  guardianName: string;
+  guardianEmail: string;
+  students: Array<{ id: string; name: string }>;
+};
+
+type ClassInfo = {
+  id: string;
+  name: string;
+  subject: string;
+  type: string;
+  dayOfWeek: number;
+  startTime: string;
+  duration: number;
+  enrollmentCount: number;
+};
 
 const dayNames = [
   "Sunday",
@@ -28,9 +46,9 @@ export default function EnrollStudentPage({
 }: {
   params: Promise<{ id: string; studentId: string }>;
 }) {
-  const { id: familyId, studentId } = use(params);
-  const [family, setFamily] = useState<any>(null);
-  const [classes, setClasses] = useState<any[]>([]);
+  const { id: guardianId, studentId } = use(params);
+  const [family, setFamily] = useState<GuardianData | null>(null);
+  const [classes, setClasses] = useState<ClassInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [enrolling, setEnrolling] = useState<string | null>(null);
@@ -39,7 +57,7 @@ export default function EnrollStudentPage({
 
   useEffect(() => {
     async function loadData() {
-      const familyResult = await getFamilyById(familyId);
+      const familyResult = await getGuardianStudents(guardianId);
       const classesResult = await getTeacherClasses();
 
       if ("error" in familyResult) {
@@ -57,9 +75,9 @@ export default function EnrollStudentPage({
       setLoading(false);
     }
     loadData();
-  }, [familyId]);
+  }, [guardianId]);
 
-  const student = family?.students.find((s: any) => s.id === studentId);
+  const student = family?.students?.find((s) => s.id === studentId);
 
   async function handleEnroll(classId: string) {
     setEnrolling(classId);
@@ -87,8 +105,8 @@ export default function EnrollStudentPage({
       <div className="p-8">
         <div className="max-w-4xl mx-auto">
           <p className="text-destructive">{error || "Student not found"}</p>
-          <Link href={`/teacher/students/${familyId}`} className="mt-4 inline-block">
-            <Button>Back to family</Button>
+          <Link href={`/teacher/students/${guardianId}`} className="mt-4 inline-block">
+            <Button>Back to students</Button>
           </Link>
         </div>
       </div>
@@ -100,10 +118,10 @@ export default function EnrollStudentPage({
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <Link
-            href={`/teacher/students/${familyId}`}
+            href={`/teacher/students/${guardianId}`}
             className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block"
           >
-            ← Back to family
+            ← Back to students
           </Link>
           <h1 className="text-3xl font-bold mb-2">Enroll {student.name}</h1>
           <p className="text-muted-foreground">

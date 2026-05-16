@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { approveEnrollment, rejectEnrollment } from "@/lib/actions/family";
+import { approveEnrollment, rejectEnrollment } from "@/lib/actions/guardian";
 
 export function EnrollmentManagement({ enrollmentId }: { enrollmentId: string }) {
   const [approving, setApproving] = useState(false);

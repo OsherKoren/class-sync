@@ -20,7 +20,7 @@ export async function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
-  if (pathname.startsWith("/api/family/vote")) {
+  if (pathname.startsWith("/api/vote")) {
     const { success: ok } = await voteRateLimit.limit(ip);
     if (!ok) return new NextResponse("Too Many Requests", { status: 429 });
   }
@@ -32,7 +32,7 @@ export async function proxy(req: NextRequest) {
 
   const isProtected =
     pathname.startsWith("/teacher") ||
-    pathname.startsWith("/family") ||
+    pathname.startsWith("/guardian") ||
     pathname.startsWith("/student");
   if (!isProtected) return NextResponse.next();
 
@@ -46,7 +46,7 @@ export async function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  if (pathname.startsWith("/family") && token.role !== "FAMILY") {
+  if (pathname.startsWith("/guardian") && token.role !== "GUARDIAN") {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 

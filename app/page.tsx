@@ -12,8 +12,8 @@ export default async function Home() {
         redirect("/teacher/dashboard");
       case "STUDENT":
         redirect("/student/dashboard");
-      case "FAMILY":
-        redirect("/family/dashboard");
+      case "GUARDIAN":
+        redirect("/guardian/dashboard");
     }
   }
 

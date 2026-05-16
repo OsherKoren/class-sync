@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { completeRegistration } from "@/lib/actions/auth";
 
-type Role = "FAMILY" | "STUDENT" | "TEACHER";
+type Role = "GUARDIAN" | "STUDENT" | "TEACHER";
 
 export default function CompleteRegistrationPage() {
   const router = useRouter();
@@ -43,7 +43,7 @@ export default function CompleteRegistrationPage() {
     }
 
     const dashboardMap: Record<Role, string> = {
-      FAMILY: "/family/dashboard",
+      GUARDIAN: "/guardian/dashboard",
       STUDENT: "/student/dashboard",
       TEACHER: "/teacher/dashboard",
     };
@@ -92,9 +92,9 @@ export default function CompleteRegistrationPage() {
               variant="outline"
               className="w-full"
               disabled={loading}
-              onClick={() => handleComplete("FAMILY")}
+              onClick={() => handleComplete("GUARDIAN")}
             >
-              {selectedRole === "FAMILY" && loading
+              {selectedRole === "GUARDIAN" && loading
                 ? "Setting up…"
                 : "I'm a parent"}
             </Button>
