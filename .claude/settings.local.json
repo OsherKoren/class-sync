@@ -14,7 +14,9 @@
       "Bash(npx shadcn-ui@latest add select --yes)",
       "PowerShell(Stop-Process *)",
       "PowerShell(taskkill *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(npx tsx *)",
+      "Bash(curl -s http://localhost:3000)"
     ]
   }
 }
