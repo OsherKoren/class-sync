@@ -91,9 +91,11 @@ export default function AddFamilyPage() {
                 <Button type="submit" disabled={loading}>
                   {loading ? "Creating…" : "Create family"}
                 </Button>
-                <Button type="button" variant="outline" asChild>
-                  <Link href="/teacher/students">Cancel</Link>
-                </Button>
+                <Link href="/teacher/students">
+                  <Button type="button" variant="outline">
+                    Cancel
+                  </Button>
+                </Link>
               </div>
             </form>
           </CardContent>

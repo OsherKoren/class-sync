@@ -28,6 +28,39 @@ export async function createClass(
 
   const { name, subject, type, dayOfWeek, startTime, duration } = parsed.data;
 
+  // Check for overlapping classes on the same day
+  const [startHour, startMinute] = startTime.split(":").map(Number);
+  const startTotalMinutes = startHour * 60 + startMinute;
+  const endTotalMinutes = startTotalMinutes + duration;
+
+  const existingClasses = await db.class.findMany({
+    where: {
+      teacherId: session.user.id,
+      dayOfWeek: dayOfWeek,
+    },
+    select: {
+      id: true,
+      startTime: true,
+      duration: true,
+    },
+  });
+
+  // Check if any existing class overlaps with the new one
+  for (const existing of existingClasses) {
+    const [existingHour, existingMinute] = existing.startTime.split(":").map(Number);
+    const existingStart = existingHour * 60 + existingMinute;
+    const existingEnd = existingStart + existing.duration;
+
+    // Check for overlap: new class starts before existing ends AND new class ends after existing starts
+    if (startTotalMinutes < existingEnd && endTotalMinutes > existingStart) {
+      const endHour = Math.floor(existingEnd / 60).toString().padStart(2, "0");
+      const endMin = (existingEnd % 60).toString().padStart(2, "0");
+      return {
+        error: `You already have a class on ${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][dayOfWeek]} from ${existing.startTime} to ${endHour}:${endMin}`,
+      };
+    }
+  }
+
   const classRecord = await db.class.create({
     data: {
       name,
@@ -76,16 +109,21 @@ export async function updateClass(
 }
 
 export async function deleteClass(
-  classId: string
+  classId: string,
+  confirmation?: string
 ): Promise<{ error: string } | { data: { success: true } }> {
   const session = await auth();
   if (!session?.user?.id || session.user.role !== "TEACHER") {
     return { error: "Unauthorized" };
   }
 
+  if (confirmation !== "delete") {
+    return { error: "Please type 'delete' to confirm" };
+  }
+
   const classRecord = await db.class.findUnique({
     where: { id: classId },
-    select: { teacherId: true },
+    select: { teacherId: true, name: true },
   });
 
   if (!classRecord || classRecord.teacherId !== session.user.id) {

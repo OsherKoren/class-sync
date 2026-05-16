@@ -32,9 +32,9 @@ export default async function StudentsPage() {
               Manage families and their students
             </p>
           </div>
-          <Button asChild>
-            <Link href="/teacher/students/new">Add family</Link>
-          </Button>
+          <Link href="/teacher/students/new">
+            <Button>Add family</Button>
+          </Link>
         </div>
 
         {families.length === 0 ? (

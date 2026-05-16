@@ -17,14 +17,14 @@ This folder contains all documentation for the ClassSync project.
   - Code patterns and best practices
   - Git workflow and deployment
 
-- **[../TASKS.md](../TASKS.md)** — Phase Breakdown
+- **[../TASKS.md](TASKS.md)** — Phase Breakdown
   - Task checklist for each phase
   - Success criteria for each phase
   - Prerequisites and dependencies
 
 ## Quick Links
 
-- **Phase Status:** See [TASKS.md](../TASKS.md) for what's completed
+- **Phase Status:** See [TASKS.md](TASKS.md) for what's completed
 - **Technical Details:** See [CLAUDE.md](../CLAUDE.md) for architecture decisions
 - **Product Vision:** See [PRD.md](./PRD.md) for features and roadmap
 
@@ -32,5 +32,5 @@ This folder contains all documentation for the ClassSync project.
 
 When adding new features:
 1. Update [PRD.md](./PRD.md) if changing user-facing behavior
-2. Update [TASKS.md](../TASKS.md) if adding/removing development tasks
+2. Update [TASKS.md](TASKS.md) if adding/removing development tasks
 3. Reference [CLAUDE.md](../CLAUDE.md) for code style and patterns

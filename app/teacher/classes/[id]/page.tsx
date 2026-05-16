@@ -7,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { DeleteClassSection } from "@/components/DeleteClassSection";
 import { getClassById } from "@/lib/actions/class";
 
 const dayNames = [
@@ -22,18 +23,19 @@ const dayNames = [
 export default async function ClassDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const result = await getClassById(params.id);
+  const { id } = await params;
+  const result = await getClassById(id);
 
   if ("error" in result) {
     return (
       <div className="p-8">
         <div className="max-w-4xl mx-auto">
           <p className="text-destructive">{result.error}</p>
-          <Button asChild className="mt-4">
-            <Link href="/teacher/classes">Back to classes</Link>
-          </Button>
+          <Link href="/teacher/classes" className="mt-4 inline-block">
+            <Button>Back to classes</Button>
+          </Link>
         </div>
       </div>
     );
@@ -127,6 +129,8 @@ export default async function ClassDetailPage({
             )}
           </CardContent>
         </Card>
+
+        <DeleteClassSection classId={classData.id} />
       </div>
     </div>
   );

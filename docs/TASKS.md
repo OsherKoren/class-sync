@@ -84,11 +84,11 @@ Teacher can create classes and enroll students.
 - [ ] Zod validation on all form inputs
 
 ### ✅ Phase 2 Success
-- [ ] Teacher creates a group class → appears in class list
-- [ ] Teacher creates a family (name + email) → appears in students page
-- [ ] Teacher adds a student and enrolls them in a class
-- [ ] Enrollment appears in the class detail page
-- [ ] Invalid form inputs show inline error messages
+- [x] Teacher creates a group class → appears in class list
+- [x] Teacher creates a family (name + email) → appears in students page
+- [x] Teacher adds a student and enrolls them in a class
+- [x] Enrollment appears in the class detail page
+- [x] Invalid form inputs show inline error messages
 
 ---
 

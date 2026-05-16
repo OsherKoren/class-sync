@@ -37,11 +37,18 @@ export default function CreateClassPage() {
   const [subject, setSubject] = useState("");
   const [type, setType] = useState("GROUP");
   const [dayOfWeek, setDayOfWeek] = useState("0");
-  const [startTime, setStartTime] = useState("10:00");
-  const [duration, setDuration] = useState("60");
+  const [startTime, setStartTime] = useState("16:00");
+  const [duration, setDuration] = useState("45");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // Generate 15-minute intervals for the dropdown
+  const timeOptions = Array.from({ length: 96 }, (_, i) => {
+    const hours = Math.floor(i / 4);
+    const minutes = (i % 4) * 15;
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+  });
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -120,7 +127,7 @@ export default function CreateClassPage() {
                   <Label htmlFor="dayOfWeek">Day</Label>
                   <Select value={dayOfWeek} onValueChange={setDayOfWeek}>
                     <SelectTrigger id="dayOfWeek">
-                      <SelectValue />
+                      <span>{dayNames[parseInt(dayOfWeek)]}</span>
                     </SelectTrigger>
                     <SelectContent>
                       {dayNames.map((day, index) => (
@@ -133,14 +140,31 @@ export default function CreateClassPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="startTime">Start time</Label>
-                  <Input
-                    id="startTime"
-                    type="time"
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
-                    required
-                  />
+                  <Label htmlFor="startTime">Start time (24-hour format)</Label>
+                  <div className="flex gap-2">
+                    <Select value={startTime} onValueChange={setStartTime}>
+                      <SelectTrigger className="flex-1" id="startTime">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {timeOptions.map((time) => (
+                          <SelectItem key={time} value={time}>
+                            {time}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      type="time"
+                      value={startTime}
+                      onChange={(e) => setStartTime(e.target.value)}
+                      className="w-32"
+                      required
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Choose from 15-min intervals or type custom time
+                  </p>
                 </div>
 
                 <div>
@@ -148,8 +172,8 @@ export default function CreateClassPage() {
                   <Input
                     id="duration"
                     type="number"
-                    min="30"
-                    step="30"
+                    min="15"
+                    step="15"
                     value={duration}
                     onChange={(e) => setDuration(e.target.value)}
                     required
@@ -160,12 +184,14 @@ export default function CreateClassPage() {
               {error && <p className="text-sm text-destructive">{error}</p>}
 
               <div className="flex gap-4">
-                <Button type="submit" disabled={loading}>
+                <Button type="submit" disabled={loading || !name || !subject}>
                   {loading ? "Creating…" : "Create class"}
                 </Button>
-                <Button type="button" variant="outline" asChild>
-                  <Link href="/teacher/classes">Cancel</Link>
-                </Button>
+                <Link href="/teacher/classes">
+                  <Button type="button" variant="outline" disabled={loading}>
+                    Cancel
+                  </Button>
+                </Link>
               </div>
             </form>
           </CardContent>

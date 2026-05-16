@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,8 +17,9 @@ import { getFamilyById, addStudent } from "@/lib/actions/family";
 export default function FamilyDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id: familyId } = use(params);
   const [family, setFamily] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -28,7 +29,7 @@ export default function FamilyDetailPage({
 
   useEffect(() => {
     async function loadFamily() {
-      const result = await getFamilyById(params.id);
+      const result = await getFamilyById(familyId);
       if ("error" in result) {
         setError(result.error);
       } else {
@@ -37,7 +38,7 @@ export default function FamilyDetailPage({
       setLoading(false);
     }
     loadFamily();
-  }, [params.id]);
+  }, [familyId]);
 
   async function handleAddStudent(e: React.FormEvent) {
     e.preventDefault();
@@ -72,9 +73,9 @@ export default function FamilyDetailPage({
       <div className="p-8">
         <div className="max-w-4xl mx-auto">
           <p className="text-destructive">{error || "Family not found"}</p>
-          <Button asChild className="mt-4">
-            <Link href="/teacher/students">Back to students</Link>
-          </Button>
+          <Link href="/teacher/students" className="mt-4 inline-block">
+            <Button>Back to students</Button>
+          </Link>
         </div>
       </div>
     );

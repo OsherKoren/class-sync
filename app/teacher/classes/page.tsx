@@ -42,9 +42,9 @@ export default async function ClassesPage() {
               Manage your classes and enrollments
             </p>
           </div>
-          <Button asChild>
-            <Link href="/teacher/classes/new">Create class</Link>
-          </Button>
+          <Link href="/teacher/classes/new">
+            <Button>Create class</Button>
+          </Link>
         </div>
 
         {classes.length === 0 ? (
