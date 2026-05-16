@@ -16,12 +16,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { registerFamily, registerStudent } from "@/lib/actions/auth";
-
-type UserType = "parent" | "student";
+import { createAccountWithEmail } from "@/lib/actions/auth";
 
 export default function RegisterPage() {
-  const [userType, setUserType] = useState<UserType>("parent");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,8 +38,7 @@ export default function RegisterPage() {
     setLoading(true);
     setError("");
 
-    const registerFn = userType === "parent" ? registerFamily : registerStudent;
-    const result = await registerFn({ name, email, password });
+    const result = await createAccountWithEmail({ name, email, password });
 
     if ("error" in result) {
       setError(result.error);
@@ -59,24 +55,12 @@ export default function RegisterPage() {
     setLoading(false);
 
     if (signInResult?.error) {
-      setError("Account created but sign-in failed. Please go to login.");
+      setError("Account created but sign-in failed. Please try logging in.");
     } else {
-      const dashboard =
-        userType === "parent" ? "/family/dashboard" : "/student/dashboard";
-      router.push(dashboard);
+      router.push("/register/complete");
       router.refresh();
     }
   }
-
-  async function handleGoogleSignIn() {
-    sessionStorage.setItem("registration_type", userType);
-    await signIn("google", { callbackUrl: "/register/complete" });
-  }
-
-  const description =
-    userType === "parent"
-      ? "Sign up to follow your child's schedule"
-      : "Sign up to manage your tutoring schedule";
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -86,32 +70,13 @@ export default function RegisterPage() {
             C
           </div>
           <CardTitle className="text-2xl">Create account</CardTitle>
-          <CardDescription>{description}</CardDescription>
+          <CardDescription>Sign up for ClassSync</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant={userType === "parent" ? "default" : "outline"}
-              className="flex-1"
-              onClick={() => setUserType("parent")}
-            >
-              Parent
-            </Button>
-            <Button
-              type="button"
-              variant={userType === "student" ? "default" : "outline"}
-              className="flex-1"
-              onClick={() => setUserType("student")}
-            >
-              Student
-            </Button>
-          </div>
-
           <Button
             variant="outline"
             className="w-full"
-            onClick={handleGoogleSignIn}
+            onClick={() => signIn("google", { callbackUrl: "/register/complete" })}
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" aria-hidden>
               <path

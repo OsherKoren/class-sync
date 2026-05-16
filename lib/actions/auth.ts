@@ -12,6 +12,85 @@ const registerSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
+export async function createAccountWithEmail(
+  input: unknown
+): Promise<{ error: string } | { data: { success: true } }> {
+  const parsed = registerSchema.safeParse(input);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message };
+  }
+
+  const { name, email, password } = parsed.data;
+
+  const existing = await db.user.findUnique({
+    where: { email },
+    select: { id: true },
+  });
+
+  if (existing) {
+    return { error: "An account with this email already exists" };
+  }
+
+  const passwordHash = await bcrypt.hash(password, 12);
+
+  await db.user.create({
+    data: { name, email, passwordHash },
+  });
+
+  return { data: { success: true } };
+}
+
+export async function completeRegistration(
+  role: "FAMILY" | "STUDENT" | "TEACHER"
+): Promise<{ error: string } | { data: { success: true } }> {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return { error: "Not authenticated" };
+  }
+
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { id: true, name: true, role: true, family: true, student: true },
+  });
+
+  if (!user) {
+    return { error: "User not found" };
+  }
+
+  // Only allow role setup if user doesn't have one yet
+  if (user.role && user.role !== "USER") {
+    if (user.family || user.student) {
+      return { error: "Profile already set up" };
+    }
+  }
+
+  if (role === "FAMILY") {
+    await db.family.create({
+      data: { userId: user.id },
+    });
+    await db.user.update({
+      where: { id: user.id },
+      data: { role: "FAMILY" },
+    });
+  } else if (role === "STUDENT") {
+    await db.student.create({
+      data: { name: user.name || "Student", userId: user.id },
+    });
+    await db.user.update({
+      where: { id: user.id },
+      data: { role: "STUDENT" },
+    });
+  } else if (role === "TEACHER") {
+    await db.user.update({
+      where: { id: user.id },
+      data: { role: "TEACHER" },
+    });
+  }
+
+  return { data: { success: true } };
+}
+
 export async function registerFamily(
   input: unknown
 ): Promise<{ error: string } | { data: { success: true } }> {
@@ -74,49 +153,6 @@ export async function registerStudent(
   await db.student.create({
     data: { name, userId: user.id },
   });
-
-  return { data: { success: true } };
-}
-
-export async function completeOAuthRegistration(
-  role: "FAMILY" | "STUDENT"
-): Promise<{ error: string } | { data: { success: true } }> {
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    return { error: "Not authenticated" };
-  }
-
-  const user = await db.user.findUnique({
-    where: { id: session.user.id },
-    select: { id: true, name: true, family: true, student: true },
-  });
-
-  if (!user) {
-    return { error: "User not found" };
-  }
-
-  if (user.family || user.student) {
-    return { error: "Profile already set up" };
-  }
-
-  if (role === "FAMILY") {
-    await db.family.create({
-      data: { userId: user.id },
-    });
-    await db.user.update({
-      where: { id: user.id },
-      data: { role: "FAMILY" },
-    });
-  } else if (role === "STUDENT") {
-    await db.student.create({
-      data: { name: user.name || "Student", userId: user.id },
-    });
-    await db.user.update({
-      where: { id: user.id },
-      data: { role: "STUDENT" },
-    });
-  }
 
   return { data: { success: true } };
 }

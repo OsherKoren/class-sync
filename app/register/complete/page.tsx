@@ -11,9 +11,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { completeOAuthRegistration } from "@/lib/actions/auth";
+import { completeRegistration } from "@/lib/actions/auth";
 
-type Role = "FAMILY" | "STUDENT";
+type Role = "FAMILY" | "STUDENT" | "TEACHER";
 
 export default function CompleteRegistrationPage() {
   const router = useRouter();
@@ -33,7 +33,7 @@ export default function CompleteRegistrationPage() {
     setError("");
     setSelectedRole(role);
 
-    const result = await completeOAuthRegistration(role);
+    const result = await completeRegistration(role);
 
     if ("error" in result) {
       setError(result.error);
@@ -42,8 +42,12 @@ export default function CompleteRegistrationPage() {
       return;
     }
 
-    const dashboard = role === "FAMILY" ? "/family/dashboard" : "/student/dashboard";
-    router.push(dashboard);
+    const dashboardMap: Record<Role, string> = {
+      FAMILY: "/family/dashboard",
+      STUDENT: "/student/dashboard",
+      TEACHER: "/teacher/dashboard",
+    };
+    router.push(dashboardMap[role]);
     router.refresh();
   }
 
@@ -67,7 +71,7 @@ export default function CompleteRegistrationPage() {
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <p className="text-sm text-muted-foreground">
-            Hi {session?.user?.name}! Are you a parent or a student?
+            Hi {session?.user?.name}! What&apos;s your role?
           </p>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
@@ -93,6 +97,17 @@ export default function CompleteRegistrationPage() {
               {selectedRole === "STUDENT" && loading
                 ? "Setting up…"
                 : "I'm a student"}
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="w-full"
+              disabled={loading}
+              onClick={() => handleComplete("TEACHER")}
+            >
+              {selectedRole === "TEACHER" && loading
+                ? "Setting up…"
+                : "I'm a teacher"}
             </Button>
           </div>
         </CardContent>
