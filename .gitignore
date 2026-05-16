@@ -36,6 +36,11 @@ yarn-error.log*
 
 # IDE
 .idea/
+.claude/
+
+# playwright
+playwright-report/
+test-results/
 
 # vercel
 .vercel
