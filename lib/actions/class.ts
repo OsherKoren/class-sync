@@ -1,0 +1,202 @@
+"use server";
+
+import { z } from "zod";
+import { db } from "@/lib/db";
+import { auth } from "@/lib/auth";
+
+const classSchema = z.object({
+  name: z.string().min(2, "Class name must be at least 2 characters"),
+  subject: z.string().min(2, "Subject must be at least 2 characters"),
+  type: z.enum(["GROUP", "PRIVATE"]),
+  dayOfWeek: z.number().min(0).max(6),
+  startTime: z.string().regex(/^\d{2}:\d{2}$/, "Time must be in HH:MM format"),
+  duration: z.number().min(30, "Duration must be at least 30 minutes"),
+});
+
+export async function createClass(
+  input: unknown
+): Promise<{ error: string } | { data: { id: string } }> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "TEACHER") {
+    return { error: "Unauthorized" };
+  }
+
+  const parsed = classSchema.safeParse(input);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message };
+  }
+
+  const { name, subject, type, dayOfWeek, startTime, duration } = parsed.data;
+
+  const classRecord = await db.class.create({
+    data: {
+      name,
+      subject,
+      type,
+      dayOfWeek,
+      startTime,
+      duration,
+      teacherId: session.user.id,
+    },
+    select: { id: true },
+  });
+
+  return { data: { id: classRecord.id } };
+}
+
+export async function updateClass(
+  classId: string,
+  input: unknown
+): Promise<{ error: string } | { data: { success: true } }> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "TEACHER") {
+    return { error: "Unauthorized" };
+  }
+
+  const parsed = classSchema.partial().safeParse(input);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message };
+  }
+
+  const classRecord = await db.class.findUnique({
+    where: { id: classId },
+    select: { teacherId: true },
+  });
+
+  if (!classRecord || classRecord.teacherId !== session.user.id) {
+    return { error: "Class not found or unauthorized" };
+  }
+
+  await db.class.update({
+    where: { id: classId },
+    data: parsed.data,
+  });
+
+  return { data: { success: true } };
+}
+
+export async function deleteClass(
+  classId: string
+): Promise<{ error: string } | { data: { success: true } }> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "TEACHER") {
+    return { error: "Unauthorized" };
+  }
+
+  const classRecord = await db.class.findUnique({
+    where: { id: classId },
+    select: { teacherId: true },
+  });
+
+  if (!classRecord || classRecord.teacherId !== session.user.id) {
+    return { error: "Class not found or unauthorized" };
+  }
+
+  await db.class.delete({ where: { id: classId } });
+
+  return { data: { success: true } };
+}
+
+export async function getTeacherClasses(): Promise<
+  | { error: string }
+  | {
+      data: Array<{
+        id: string;
+        name: string;
+        subject: string;
+        type: string;
+        dayOfWeek: number;
+        startTime: string;
+        duration: number;
+        enrollmentCount: number;
+      }>;
+    }
+> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "TEACHER") {
+    return { error: "Unauthorized" };
+  }
+
+  const classes = await db.class.findMany({
+    where: { teacherId: session.user.id },
+    select: {
+      id: true,
+      name: true,
+      subject: true,
+      type: true,
+      dayOfWeek: true,
+      startTime: true,
+      duration: true,
+      _count: { select: { enrollments: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return {
+    data: classes.map((c) => ({
+      ...c,
+      enrollmentCount: c._count.enrollments,
+    })),
+  };
+}
+
+export async function getClassById(classId: string): Promise<
+  | { error: string }
+  | {
+      data: {
+        id: string;
+        name: string;
+        subject: string;
+        type: string;
+        dayOfWeek: number;
+        startTime: string;
+        duration: number;
+        enrollments: Array<{
+          id: string;
+          studentId: string;
+          studentName: string;
+        }>;
+      };
+    }
+> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "TEACHER") {
+    return { error: "Unauthorized" };
+  }
+
+  const classRecord = await db.class.findUnique({
+    where: { id: classId },
+    select: {
+      id: true,
+      name: true,
+      subject: true,
+      type: true,
+      dayOfWeek: true,
+      startTime: true,
+      duration: true,
+      teacherId: true,
+      enrollments: {
+        select: {
+          id: true,
+          student: { select: { id: true, name: true } },
+        },
+      },
+    },
+  });
+
+  if (!classRecord || classRecord.teacherId !== session.user.id) {
+    return { error: "Class not found or unauthorized" };
+  }
+
+  return {
+    data: {
+      ...classRecord,
+      enrollments: classRecord.enrollments.map((e) => ({
+        id: e.id,
+        studentId: e.student.id,
+        studentName: e.student.name,
+      })),
+      teacherId: undefined,
+    },
+  };
+}

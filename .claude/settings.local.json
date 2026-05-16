@@ -10,7 +10,8 @@
       "Bash(npx shadcn@latest *)",
       "Bash(npm run *)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(npx shadcn-ui@latest add select --yes)"
     ]
   }
 }
