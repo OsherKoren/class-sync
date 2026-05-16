@@ -43,52 +43,65 @@ export async function createAccountWithEmail(
 export async function completeRegistration(
   role: "FAMILY" | "STUDENT" | "TEACHER"
 ): Promise<{ error: string } | { data: { success: true } }> {
-  const session = await auth();
+  try {
+    const session = await auth();
 
-  if (!session?.user?.id) {
-    return { error: "Not authenticated" };
-  }
+    if (!session?.user?.id) {
+      return { error: "Not authenticated" };
+    }
 
-  const user = await db.user.findUnique({
-    where: { id: session.user.id },
-    select: { id: true, name: true, role: true, family: true, student: true },
-  });
+    const user = await db.user.findUnique({
+      where: { id: session.user.id },
+      select: { id: true, name: true, role: true, family: true, student: true },
+    });
 
-  if (!user) {
-    return { error: "User not found" };
-  }
+    if (!user) {
+      return { error: "User not found" };
+    }
 
-  // Only allow role setup if user doesn't have one yet
-  if (user.role && user.role !== "USER") {
+    // Check if already set up
     if (user.family || user.student) {
       return { error: "Profile already set up" };
     }
-  }
 
-  if (role === "FAMILY") {
-    await db.family.create({
-      data: { userId: user.id },
-    });
-    await db.user.update({
-      where: { id: user.id },
-      data: { role: "FAMILY" },
-    });
-  } else if (role === "STUDENT") {
-    await db.student.create({
-      data: { name: user.name || "Student", userId: user.id },
-    });
-    await db.user.update({
-      where: { id: user.id },
-      data: { role: "STUDENT" },
-    });
-  } else if (role === "TEACHER") {
-    await db.user.update({
-      where: { id: user.id },
-      data: { role: "TEACHER" },
-    });
-  }
+    if (role === "FAMILY") {
+      try {
+        await db.family.create({
+          data: { userId: user.id },
+        });
+      } catch (err) {
+        console.error("Error creating family:", err);
+        return { error: "Failed to create family profile" };
+      }
+      await db.user.update({
+        where: { id: user.id },
+        data: { role: "FAMILY" },
+      });
+    } else if (role === "STUDENT") {
+      try {
+        await db.student.create({
+          data: { name: user.name || "Student", userId: user.id },
+        });
+      } catch (err) {
+        console.error("Error creating student:", err);
+        return { error: "Failed to create student profile" };
+      }
+      await db.user.update({
+        where: { id: user.id },
+        data: { role: "STUDENT" },
+      });
+    } else if (role === "TEACHER") {
+      await db.user.update({
+        where: { id: user.id },
+        data: { role: "TEACHER" },
+      });
+    }
 
-  return { data: { success: true } };
+    return { data: { success: true } };
+  } catch (err) {
+    console.error("Error in completeRegistration:", err);
+    return { error: "An error occurred during setup. Please try again." };
+  }
 }
 
 export async function registerFamily(

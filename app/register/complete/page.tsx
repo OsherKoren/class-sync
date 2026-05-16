@@ -81,22 +81,22 @@ export default function CompleteRegistrationPage() {
               size="lg"
               className="w-full"
               disabled={loading}
-              onClick={() => handleComplete("FAMILY")}
+              onClick={() => handleComplete("STUDENT")}
             >
-              {selectedRole === "FAMILY" && loading
+              {selectedRole === "STUDENT" && loading
                 ? "Setting up…"
-                : "I'm a parent"}
+                : "I'm a student"}
             </Button>
             <Button
               size="lg"
               variant="outline"
               className="w-full"
               disabled={loading}
-              onClick={() => handleComplete("STUDENT")}
+              onClick={() => handleComplete("FAMILY")}
             >
-              {selectedRole === "STUDENT" && loading
+              {selectedRole === "FAMILY" && loading
                 ? "Setting up…"
-                : "I'm a student"}
+                : "I'm a parent"}
             </Button>
             <Button
               size="lg"
