@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --tailwind --app --no-src-dir --import-alias \"@/*\" --eslint)",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\('next:', p.dependencies.next, '\\\\nreact:', p.dependencies.react\\)\")",
+      "Bash(npm install *)",
+      "Bash(npx shadcn@latest init -d)",
+      "Bash(node *)",
+      "Bash(npx prisma *)",
+      "Bash(npx shadcn@latest *)",
+      "Bash(npm run *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
+    ]
+  }
+}
