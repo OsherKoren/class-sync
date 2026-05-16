@@ -9,7 +9,14 @@
     "lint": "eslint",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "test:debug": "playwright test --debug"
+    "test:debug": "playwright test --debug",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "tsc --noEmit"
+    ]
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
@@ -48,6 +55,8 @@
     "@types/web-push": "^3.6.4",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.5",
     "serwist": "^9.5.11",
     "tailwindcss": "^4",
     "typescript": "^5"
