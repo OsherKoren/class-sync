@@ -1,0 +1,210 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  TEACHER
+  FAMILY
+}
+
+enum ClassType {
+  GROUP
+  PRIVATE
+}
+
+enum SessionStatus {
+  SCHEDULED
+  CANCELLED
+  COMPLETED
+  RESCHEDULED
+}
+
+enum OfferStatus {
+  OPEN
+  RESOLVED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  role          Role      @default(FAMILY)
+  locale        String    @default("he")
+  theme         String    @default("system")
+
+  googleAccessToken    String?
+  googleRefreshToken   String?
+  googleTokenExpiry    DateTime?
+  designatedCalendarId String?
+
+  accounts          Account[]
+  sessions          Session[]
+  taughtClasses     Class[]
+  family            Family?
+  pushSubscriptions PushSubscription[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+model Family {
+  id       String    @id @default(cuid())
+  userId   String    @unique
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  students Student[]
+
+  createdAt DateTime @default(now())
+}
+
+model Student {
+  id       String @id @default(cuid())
+  name     String
+  familyId String
+  family   Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  enrollments Enrollment[]
+  votes       Vote[]
+
+  createdAt DateTime @default(now())
+}
+
+model Class {
+  id              String    @id @default(cuid())
+  name            String
+  subject         String
+  type            ClassType
+  dayOfWeek       Int
+  startTime       String
+  duration        Int
+  teacherId       String
+  teacher         User      @relation(fields: [teacherId], references: [id])
+  calendarEventId String?
+
+  enrollments    Enrollment[]
+  lessonSessions LessonSession[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Enrollment {
+  id        String  @id @default(cuid())
+  studentId String
+  classId   String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  class     Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([studentId, classId])
+}
+
+model LessonSession {
+  id              String        @id @default(cuid())
+  classId         String
+  class           Class         @relation(fields: [classId], references: [id], onDelete: Cascade)
+  scheduledAt     DateTime
+  status          SessionStatus @default(SCHEDULED)
+  calendarEventId String?
+
+  rescheduleOffers RescheduleOffer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RescheduleOffer {
+  id               String        @id @default(cuid())
+  lessonSessionId  String
+  lessonSession    LessonSession @relation(fields: [lessonSessionId], references: [id], onDelete: Cascade)
+  status           OfferStatus   @default(OPEN)
+  resolvedOptionId String?
+
+  options RescheduleOption[]
+  votes   Vote[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RescheduleOption {
+  id          String          @id @default(cuid())
+  offerId     String
+  offer       RescheduleOffer @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  scheduledAt DateTime
+  label       String
+
+  votes Vote[]
+}
+
+model Vote {
+  id        String           @id @default(cuid())
+  offerId   String
+  offer     RescheduleOffer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  optionId  String
+  option    RescheduleOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  studentId String
+  student   Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([offerId, studentId])
+}
+
+model PushSubscription {
+  id       String @id @default(cuid())
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint String @unique
+  p256dh   String
+  auth     String
+
+  createdAt DateTime @default(now())
+}
