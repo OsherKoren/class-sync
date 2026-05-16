@@ -7,6 +7,7 @@
 **Target Users:**
 - Teachers: Tutors managing multiple classes and students
 - Families: Parents/guardians enrolling their children in tutoring classes
+- Independent Students: Teenagers (13+) managing their own tutoring schedule
 
 ---
 
@@ -26,6 +27,15 @@
 - Receives push notifications for important updates
 - Primary language: Hebrew
 
+### Independent Student (Teen, 13+)
+- Has their own email and Google account
+- Manages their own tutoring schedule independently
+- Can request to join open classes (awaits teacher confirmation)
+- Can be enrolled directly by teacher
+- Sees pending requests and confirmed classes on their dashboard
+- Participates in voting on reschedule offers
+- Primary language: Hebrew or English
+
 ---
 
 ## Core Features
@@ -37,18 +47,21 @@
 - **Family Dashboard:** View upcoming sessions
 - **Password Reset:** Families can reset forgotten passwords
 
-### Phase 2 ✅ — Class Management
+### Phase 2 ✅ — Class & Student Management
 - **Create Classes:** Teacher defines name, subject, type (group/private), day, time, duration
 - **Manage Families:** Teacher can create family accounts and manage students
-- **Add Students:** Teacher adds students to families
-- **Enroll Students:** Students can be enrolled in classes
-- **View Enrollments:** Class detail page shows all enrolled students
+- **Add Students:** Teacher adds students to families OR finds independent students by email
+- **Two-Way Enrollment:** Teacher enrolls students directly (auto-confirmed) OR students request to join open classes (teacher approves/rejects)
+- **View Enrollments:** Class detail page shows all enrolled students + pending requests
+- **Student Registration:** Independent students register with email/password or Google OAuth, create their own account
 
-### Phase 3 — Family Schedule View
-- **Upcoming Sessions:** Family sees cards with class info, date, time
-- **Session Cards:** Display subject, teacher, day, time, duration
+### Phase 3 — Schedule View (Family & Student)
+- **Family Dashboard:** Parent sees child's upcoming sessions as cards
+- **Student Dashboard:** Independent student sees their own enrolled classes + pending requests
+- **Session Cards:** Display subject, teacher, day, time, duration, enrollment status
+- **Pending Requests:** Show classes awaiting teacher confirmation
 - **Empty State:** Message when no sessions exist
-- **Settings:** Family can adjust preferences
+- **Settings:** Family/student can adjust preferences (language, theme)
 
 ### Phase 4 — Google Calendar Integration
 - **Calendar Sync:** Classes automatically sync to teacher's designated calendar
@@ -104,11 +117,19 @@
 ### Family Workflow
 1. Register with email + password OR Google sign-up
 2. Land on family dashboard
-3. View upcoming sessions as cards (date, time, subject)
+3. View child's upcoming sessions as cards (date, time, subject)
 4. Click session → see details
 5. (Future) When teacher creates reschedule offer → get push notification
 6. Click notification → vote on new time slots
 7. See updated session time once teacher resolves offer
+
+### Independent Student Workflow
+1. Register with email + password OR Google sign-up
+2. Land on student dashboard → see enrolled classes + pending requests
+3. Browse open classes → request to join
+4. Receive confirmation once teacher approves
+5. View enrolled sessions as cards
+6. (Future) Participate in reschedule voting if teacher creates offer
 
 ---
 
@@ -167,11 +188,15 @@
 ## Data Model Overview
 
 ### Core Entities
-- **User** — Teachers and families (email, passwordHash, role, locale, theme, Google tokens)
-- **Family** — Groups students under a parent account
-- **Student** — Child enrolled in classes
-- **Class** — Recurring tutoring session (name, subject, day, time, duration, teacher)
-- **Enrollment** — Student + Class relationship
+- **User** — Teachers, families, and independent students (email, passwordHash, role, locale, theme, Google tokens)
+- **Family** — Groups students under a parent account (optional, null for independent students)
+- **Student** — Either a child (linked to Family) OR an independent teen (linked to User)
+  - Has optional `familyId` (parent-managed) or `userId` (self-managed)
+- **Class** — Recurring tutoring session (name, subject, day, time, duration, teacher, isOpen flag)
+- **Enrollment** — Student + Class relationship with status (PENDING, ACTIVE, REJECTED)
+  - PENDING: student self-requested, awaiting teacher confirmation
+  - ACTIVE: confirmed by teacher or teacher-enrolled (auto-confirmed)
+  - REJECTED: teacher declined student's request
 - **LessonSession** — Individual occurrence of a class
 - **RescheduleOffer** — Teacher's proposal for new time slots
 - **RescheduleOption** — Alternative time slot option

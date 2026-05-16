@@ -36,6 +36,8 @@ Prisma schema live on Neon; teacher and family login working; abuse protection i
 - Teacher signs in with Google only (identified by `TEACHER_EMAIL` env var)
 - Families self-register with Google OR email + password — no teacher setup required
 - Young children share a parent's account; parents manage scheduling on their behalf
+- Independent students (13+) can self-register with their own Google OR email + password
+- Two-way enrollment: teachers can enroll students directly (auto-confirmed) OR students request to join open classes (teacher approves/rejects)
 
 **Prerequisites before starting:**
 - Neon account → create free project → copy `DATABASE_URL`
@@ -70,43 +72,95 @@ Prisma schema live on Neon; teacher and family login working; abuse protection i
 
 ---
 
-## Phase 2 — Teacher: Class & Student Management
+## Phase 2 — Class & Student Management
 
-Teacher can create classes and enroll students.
+Teacher can create classes and manage both family-linked students and independent students. Independent students can self-register.
 
-- [ ] `app/(teacher)/layout.tsx` — sidebar nav, teacher auth guard
-- [ ] `app/(teacher)/dashboard/page.tsx` — static placeholder
-- [ ] `app/(teacher)/classes/new/page.tsx` — form: name, subject, type, day, time
-- [ ] `app/(teacher)/classes/[id]/page.tsx` — detail + enrolled students
-- [ ] `app/(teacher)/students/page.tsx` — families + students list
-- [ ] Server Actions: `createClass`, `updateClass`, `deleteClass`
-- [ ] Server Actions: `createFamily`, `addStudent`, `enrollStudent`
-- [ ] Zod validation on all form inputs
+**Core schema changes:**
+- [ ] Add `STUDENT` to `Role` enum
+- [ ] Make `Student.familyId` nullable → `String?`
+- [ ] Add `Student.userId String? @unique` → link independent students
+- [ ] Add `EnrollmentStatus` enum: `PENDING | ACTIVE | REJECTED`
+- [ ] Update `Enrollment` model: add `status` field
+- [ ] Add `Class.isOpen Boolean @default(false)` — toggle for student self-enrollment
+- [ ] `npx prisma db push` + `npx prisma generate`
 
-### ✅ Phase 2 Success
+**Teacher class/enrollment features:**
+- [x] `app/teacher/classes/new/page.tsx` — form: name, subject, type, day, time
+- [x] `app/teacher/classes/[id]/page.tsx` — detail + enrolled students
+- [x] `app/teacher/classes/page.tsx` — class list
+- [x] `app/teacher/dashboard/page.tsx` — quick-access cards
+- [x] `app/teacher/students/page.tsx` — families list
+- [x] `app/teacher/students/new/page.tsx` — add family form
+- [x] `app/teacher/students/[id]/page.tsx` — family detail + add student form
+- [x] `app/teacher/students/[id]/[studentId]/enroll/page.tsx` — enroll into class
+
+**Student management features (new):**
+- [ ] `app/teacher/classes/[id]/page.tsx` — add "Enroll by email" section + pending requests list
+- [ ] `app/teacher/students/page.tsx` — add "Find student by email" search (independent students)
+- [ ] Server Action: `findStudentByEmail(email)` — teacher searches for existing student
+- [ ] Server Action: `enrollStudentByEmail(email, classId)` — create ACTIVE enrollment
+- [ ] Server Action: `approveEnrollment(enrollmentId)` — change PENDING → ACTIVE
+- [ ] Server Action: `rejectEnrollment(enrollmentId)` — change PENDING → REJECTED
+- [ ] Update `enrollStudent()` to set `status: ACTIVE` (teacher-enrolled always confirmed)
+
+**Student registration/auth features (new):**
+- [ ] Update `lib/auth.ts` — handle post-OAuth role selection
+- [ ] `lib/actions/auth.ts` — add `registerStudent(name, email, password)` server action
+- [ ] `lib/actions/auth.ts` — add `completeOAuthRegistration(role)` for Google post-signup
+- [ ] `app/register/page.tsx` — add "Parent / Student" toggle
+- [ ] `app/register/complete/page.tsx` (new) — post-Google role selection page
+- [ ] `app/login/page.tsx` — role-based redirect (TEACHER → `/teacher/dashboard`, FAMILY → `/family/dashboard`, STUDENT → `/student/dashboard`)
+- [ ] `proxy.ts` — add `/student/*` protection, add `/register/complete` to public routes
+
+### ✅ Phase 2 Success (Family-linked students)
 - [x] Teacher creates a group class → appears in class list
 - [x] Teacher creates a family (name + email) → appears in students page
 - [x] Teacher adds a student and enrolls them in a class
 - [x] Enrollment appears in the class detail page
 - [x] Invalid form inputs show inline error messages
 
+### Phase 2 Success (Independent students)
+- [ ] Independent student registers with email + password → lands on student dashboard
+- [ ] Independent student registers with Google → confirms "I'm a student" → lands on student dashboard
+- [ ] Teacher finds independent student by email → enrolls them in a class (ACTIVE status)
+- [ ] Independent student visits open classes → requests to join (creates PENDING enrollment)
+- [ ] Teacher approves pending request → status becomes ACTIVE → student sees confirmed class
+
 ---
 
-## Phase 3 — Family: Schedule View
+## Phase 3 — Schedule View (Family & Student)
 
-Family logs in and sees their child's upcoming sessions.
+Family logs in to see their child's sessions. Independent student logs in to see their own sessions.
 
+**Family dashboard:**
 - [ ] `app/(family)/layout.tsx` — minimal nav, family auth guard
-- [ ] `app/(family)/dashboard/page.tsx` — upcoming session cards
-- [ ] `components/schedule/SessionCard.tsx` — date, time, subject, status badge
-- [ ] Seed script: create test family + student + 3 upcoming sessions
+- [ ] `app/(family)/dashboard/page.tsx` — child's upcoming sessions as cards
 - [ ] `app/(family)/settings/page.tsx` — placeholder (locale, theme, install)
 
-### ✅ Phase 3 Success
+**Student dashboard (NEW):**
+- [ ] `app/student/layout.tsx` — student auth guard (STUDENT role required)
+- [ ] `app/student/dashboard/page.tsx` — upcoming sessions + pending requests as cards
+- [ ] `app/student/classes/page.tsx` — browse open classes, "Request to join" button
+- [ ] `app/student/settings/page.tsx` — placeholder (locale, theme, install)
+- [ ] `lib/actions/student.ts` — `getStudentEnrollments()`, `requestEnrollment()`, `getOpenClasses()`
+
+**Shared components:**
+- [ ] `components/schedule/SessionCard.tsx` — date, time, subject, status badge (ACTIVE | PENDING)
+- [ ] Seed script: create test family + student + test independent student + upcoming sessions
+- [ ] Light styling improvements to distinguish ACTIVE vs PENDING status
+
+### ✅ Phase 3 Success (Family)
 - [ ] Family logs in → sees child's upcoming sessions as cards
 - [ ] Session cards show correct date, time, and subject
 - [ ] Empty state message shown when no sessions exist
 - [ ] Settings page loads without errors
+
+### Phase 3 Success (Independent Student)
+- [ ] Student logs in → sees enrolled classes as cards (ACTIVE status)
+- [ ] Student sees pending requests with "Waiting for teacher confirmation" badge
+- [ ] Student browses open classes → can request to join
+- [ ] Student settings page loads without errors
 
 ---
 
