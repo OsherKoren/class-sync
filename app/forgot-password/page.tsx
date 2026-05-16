@@ -55,9 +55,9 @@ export default function ForgotPasswordPage() {
               Click the link in the email to reset your password. The link will
               expire in 1 hour.
             </p>
-            <Button asChild className="w-full">
-              <Link href="/login">Back to sign in</Link>
-            </Button>
+            <Link href="/login" className="w-full">
+              <Button className="w-full">Back to sign in</Button>
+            </Link>
           </CardContent>
         </Card>
       </div>

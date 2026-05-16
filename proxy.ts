@@ -31,7 +31,9 @@ export async function proxy(req: NextRequest) {
   }
 
   const isProtected =
-    pathname.startsWith("/teacher") || pathname.startsWith("/family");
+    pathname.startsWith("/teacher") ||
+    pathname.startsWith("/family") ||
+    pathname.startsWith("/student");
   if (!isProtected) return NextResponse.next();
 
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
@@ -45,6 +47,10 @@ export async function proxy(req: NextRequest) {
   }
 
   if (pathname.startsWith("/family") && token.role !== "FAMILY") {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+
+  if (pathname.startsWith("/student") && token.role !== "STUDENT") {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 

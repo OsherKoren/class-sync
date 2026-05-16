@@ -115,7 +115,145 @@ export async function enrollStudent(
   }
 
   await db.enrollment.create({
-    data: { studentId, classId },
+    data: { studentId, classId, status: "ACTIVE" },
+  });
+
+  return { data: { success: true } };
+}
+
+export async function findStudentByEmail(
+  email: string
+): Promise<
+  | { error: string }
+  | {
+      data: {
+        studentId: string;
+        name: string;
+        email: string;
+      };
+    }
+> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "TEACHER") {
+    return { error: "Unauthorized" };
+  }
+
+  const user = await db.user.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      student: { select: { id: true } },
+    },
+  });
+
+  if (!user || !user.student) {
+    return { error: "Student not found" };
+  }
+
+  return {
+    data: {
+      studentId: user.student.id,
+      name: user.name || "Student",
+      email: user.email,
+    },
+  };
+}
+
+export async function enrollStudentByEmail(
+  email: string,
+  classId: string
+): Promise<{ error: string } | { data: { success: true } }> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "TEACHER") {
+    return { error: "Unauthorized" };
+  }
+
+  const classRecord = await db.class.findUnique({
+    where: { id: classId },
+    select: { teacherId: true },
+  });
+
+  if (!classRecord || classRecord.teacherId !== session.user.id) {
+    return { error: "Class not found or unauthorized" };
+  }
+
+  const user = await db.user.findUnique({
+    where: { email },
+    select: { student: { select: { id: true } } },
+  });
+
+  if (!user || !user.student) {
+    return { error: "Student not found" };
+  }
+
+  const existing = await db.enrollment.findUnique({
+    where: {
+      studentId_classId: { studentId: user.student.id, classId },
+    },
+  });
+
+  if (existing) {
+    return { error: "Student is already enrolled in this class" };
+  }
+
+  await db.enrollment.create({
+    data: {
+      studentId: user.student.id,
+      classId,
+      status: "ACTIVE",
+    },
+  });
+
+  return { data: { success: true } };
+}
+
+export async function approveEnrollment(
+  enrollmentId: string
+): Promise<{ error: string } | { data: { success: true } }> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "TEACHER") {
+    return { error: "Unauthorized" };
+  }
+
+  const enrollment = await db.enrollment.findUnique({
+    where: { id: enrollmentId },
+    select: { class: { select: { teacherId: true } } },
+  });
+
+  if (!enrollment || enrollment.class.teacherId !== session.user.id) {
+    return { error: "Enrollment not found or unauthorized" };
+  }
+
+  await db.enrollment.update({
+    where: { id: enrollmentId },
+    data: { status: "ACTIVE" },
+  });
+
+  return { data: { success: true } };
+}
+
+export async function rejectEnrollment(
+  enrollmentId: string
+): Promise<{ error: string } | { data: { success: true } }> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "TEACHER") {
+    return { error: "Unauthorized" };
+  }
+
+  const enrollment = await db.enrollment.findUnique({
+    where: { id: enrollmentId },
+    select: { class: { select: { teacherId: true } } },
+  });
+
+  if (!enrollment || enrollment.class.teacherId !== session.user.id) {
+    return { error: "Enrollment not found or unauthorized" };
+  }
+
+  await db.enrollment.update({
+    where: { id: enrollmentId },
+    data: { status: "REJECTED" },
   });
 
   return { data: { success: true } };

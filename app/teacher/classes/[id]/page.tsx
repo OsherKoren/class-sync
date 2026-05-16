@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/card";
 import { DeleteClassSection } from "@/components/DeleteClassSection";
 import { getClassById } from "@/lib/actions/class";
+import { EnrollmentManagement } from "@/components/teacher/EnrollmentManagement";
+import { ToggleOpenEnrollment } from "@/components/teacher/ToggleOpenEnrollment";
 
 const dayNames = [
   "Sunday",
@@ -42,6 +44,12 @@ export default async function ClassDetailPage({
   }
 
   const classData = result.data;
+  const activeEnrollments = classData.enrollments.filter(
+    (e) => e.status === "ACTIVE"
+  );
+  const pendingEnrollments = classData.enrollments.filter(
+    (e) => e.status === "PENDING"
+  );
 
   return (
     <div className="p-8">
@@ -84,15 +92,46 @@ export default async function ClassDetailPage({
               <CardTitle className="text-sm font-medium">Enrolled</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{classData.enrollments.length}</p>
+              <p className="text-2xl font-bold">{activeEnrollments.length}</p>
               <p className="text-xs text-muted-foreground">
-                {classData.enrollments.length === 1 ? "student" : "students"}
+                {activeEnrollments.length === 1 ? "student" : "students"}
               </p>
             </CardContent>
           </Card>
         </div>
 
-        <Card>
+        <ToggleOpenEnrollment classId={classData.id} isOpen={classData.isOpen} />
+
+        {pendingEnrollments.length > 0 && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Pending Requests</CardTitle>
+              <CardDescription>
+                Students requesting to join this class
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {pendingEnrollments.map((enrollment) => (
+                  <div
+                    key={enrollment.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
+                    <div>
+                      <p className="font-medium">{enrollment.studentName}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Pending approval
+                      </p>
+                    </div>
+                    <EnrollmentManagement enrollmentId={enrollment.id} />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        <Card className="mb-6">
           <CardHeader>
             <CardTitle>Enrolled students</CardTitle>
             <CardDescription>
@@ -100,7 +139,7 @@ export default async function ClassDetailPage({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {classData.enrollments.length === 0 ? (
+            {activeEnrollments.length === 0 ? (
               <p className="text-muted-foreground">
                 No students enrolled yet.{" "}
                 <Link
@@ -112,7 +151,7 @@ export default async function ClassDetailPage({
               </p>
             ) : (
               <div className="space-y-2">
-                {classData.enrollments.map((enrollment) => (
+                {activeEnrollments.map((enrollment) => (
                   <div
                     key={enrollment.id}
                     className="flex items-center justify-between p-3 border rounded-lg"

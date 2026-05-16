@@ -189,10 +189,12 @@ export async function getClassById(classId: string): Promise<
         dayOfWeek: number;
         startTime: string;
         duration: number;
+        isOpen: boolean;
         enrollments: Array<{
           id: string;
           studentId: string;
           studentName: string;
+          status: string;
         }>;
       };
     }
@@ -212,10 +214,12 @@ export async function getClassById(classId: string): Promise<
       dayOfWeek: true,
       startTime: true,
       duration: true,
+      isOpen: true,
       teacherId: true,
       enrollments: {
         select: {
           id: true,
+          status: true,
           student: { select: { id: true, name: true } },
         },
       },
@@ -233,6 +237,7 @@ export async function getClassById(classId: string): Promise<
         id: e.id,
         studentId: e.student.id,
         studentName: e.student.name,
+        status: e.status,
       })),
       teacherId: undefined,
     },

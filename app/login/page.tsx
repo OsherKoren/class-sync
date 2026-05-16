@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
@@ -24,6 +24,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { data: session } = useSession();
 
   async function handleCredentials(e: React.FormEvent) {
     e.preventDefault();
@@ -41,8 +42,23 @@ export default function LoginPage() {
     if (result?.error) {
       setError("Invalid email or password");
     } else {
-      router.push("/family/dashboard");
+      // Get the updated session with the role
+      const newSession = await fetch("/api/auth/session").then((res) => res.json());
+      const dashboard = getDashboardUrl(newSession?.user?.role);
+      router.push(dashboard);
       router.refresh();
+    }
+  }
+
+  function getDashboardUrl(role?: string): string {
+    switch (role) {
+      case "TEACHER":
+        return "/teacher/dashboard";
+      case "STUDENT":
+        return "/student/dashboard";
+      case "FAMILY":
+      default:
+        return "/family/dashboard";
     }
   }
 

@@ -9,11 +9,18 @@ datasource db {
 enum Role {
   TEACHER
   FAMILY
+  STUDENT
 }
 
 enum ClassType {
   GROUP
   PRIVATE
+}
+
+enum EnrollmentStatus {
+  PENDING
+  ACTIVE
+  REJECTED
 }
 
 enum SessionStatus {
@@ -51,6 +58,7 @@ model User {
   sessions          Session[]
   taughtClasses     Class[]
   family            Family?
+  student           Student?
   pushSubscriptions PushSubscription[]
 
   createdAt DateTime @default(now())
@@ -106,10 +114,12 @@ model Family {
 }
 
 model Student {
-  id       String @id @default(cuid())
+  id       String  @id @default(cuid())
   name     String
-  familyId String
-  family   Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  familyId String?
+  userId   String? @unique
+  family   Family? @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  user     User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   enrollments Enrollment[]
   votes       Vote[]
@@ -128,6 +138,7 @@ model Class {
   teacherId       String
   teacher         User      @relation(fields: [teacherId], references: [id])
   calendarEventId String?
+  isOpen          Boolean   @default(false)
 
   enrollments    Enrollment[]
   lessonSessions LessonSession[]
@@ -137,11 +148,12 @@ model Class {
 }
 
 model Enrollment {
-  id        String  @id @default(cuid())
+  id        String             @id @default(cuid())
   studentId String
   classId   String
-  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  class     Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
+  status    EnrollmentStatus   @default(PENDING)
+  student   Student            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  class     Class              @relation(fields: [classId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
