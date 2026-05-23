@@ -1,15 +1,10 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { getTeacherClasses } from "@/lib/actions/class";
 import { getTranslations } from "next-intl/server";
 import { auth } from "@/lib/auth";
+import { ScheduleView } from "@/components/schedule/ScheduleView";
 
 export default async function ClassesPage() {
   const [result, session, t] = await Promise.all([
@@ -34,13 +29,11 @@ export default async function ClassesPage() {
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold mb-2">{t('teacher.classes.title')}</h1>
-            <p className="text-muted-foreground">
-              {t('teacher.classes.subtitle')}
-            </p>
+            <h1 className="text-3xl font-bold mb-2">{t("teacher.classes.title")}</h1>
+            <p className="text-muted-foreground">{t("teacher.classes.subtitle")}</p>
           </div>
           <Link href="/teacher/classes/new">
-            <Button>{t('teacher.classes.createClass')}</Button>
+            <Button>{t("teacher.classes.createClass")}</Button>
           </Link>
         </div>
 
@@ -48,60 +41,15 @@ export default async function ClassesPage() {
           <Card>
             <CardContent className="pt-6">
               <p className="text-center text-muted-foreground">
-                {t('teacher.classes.noClasses')}{" "}
-                <Link
-                  href="/teacher/classes/new"
-                  className="underline underline-offset-4"
-                >
-                  {t('teacher.classes.createFirst')}
+                {t("teacher.classes.noClasses")}{" "}
+                <Link href="/teacher/classes/new" className="underline underline-offset-4">
+                  {t("teacher.classes.createFirst")}
                 </Link>
               </p>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4">
-            {classes.map((cls) => (
-              <Link key={cls.id} href={`/teacher/classes/${cls.id}`}>
-                <Card className="hover:bg-accent transition-colors cursor-pointer">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle>{cls.name}</CardTitle>
-                        <CardDescription>
-                          {cls.subject}
-                          {teacherName && (
-                            <span className="block">{teacherName}</span>
-                          )}
-                        </CardDescription>
-                      </div>
-                      <div className="text-right text-sm">
-                        <p className="font-medium">{t(`classTypes.${cls.type}` as `classTypes.${string}`)}</p>
-                        {(cls.level || cls.grade) && (
-                          <p className="text-muted-foreground">
-                            {cls.grade && <span>{cls.grade}</span>}
-                            {cls.grade && cls.level && <span> · </span>}
-                            {cls.level && (
-                              <span>{t(`classLevels.${cls.level}` as `classLevels.${string}`)}</span>
-                            )}
-                          </p>
-                        )}
-                        <p className="text-muted-foreground">
-                          {t(`days.${cls.dayOfWeek}` as `days.${number}`)} at {cls.startTime}
-                        </p>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      {cls.enrollmentCount}{" "}
-                      {cls.enrollmentCount === 1 ? t('common.student') : t('common.students')}{" "}
-                      enrolled • {cls.duration} {t('common.minutesPerSession')}
-                    </p>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
+          <ScheduleView classes={classes} teacherName={teacherName} />
         )}
       </div>
     </div>

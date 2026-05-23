@@ -297,6 +297,12 @@
       "revoke": "Revoke"
     }
   },
+  "schedule": {
+    "listView": "List",
+    "weekView": "Weekly",
+    "dayView": "Daily",
+    "noClassesThisDay": "No classes scheduled"
+  },
   "components": {
     "deleteClass": {
       "title": "Delete class",

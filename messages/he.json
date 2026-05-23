@@ -297,6 +297,12 @@
       "revoke": "בטל"
     }
   },
+  "schedule": {
+    "listView": "רשימה",
+    "weekView": "שבועי",
+    "dayView": "יומי",
+    "noClassesThisDay": "אין שיעורים מתוכננים"
+  },
   "components": {
     "deleteClass": {
       "title": "מחק כיתה",
