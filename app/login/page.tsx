@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { signIn, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,11 +13,11 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { LogoPill } from "@/components/LogoPill";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -26,8 +26,16 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { data: session } = useSession();
+  const searchParams = useSearchParams();
   const t = useTranslations();
+
+  const oauthError = searchParams.get("error");
+  const oauthErrorMessage =
+    oauthError === "OAuthAccountNotLinked"
+      ? t("auth.oauthAccountNotLinked")
+      : oauthError
+      ? t("common.somethingWentWrong")
+      : null;
 
   async function handleCredentials(e: React.FormEvent) {
     e.preventDefault();
@@ -47,8 +55,11 @@ export default function LoginPage() {
     } else {
       // Get the updated session with the role
       const newSession = await fetch("/api/auth/session").then((res) => res.json());
-      const dashboard = getDashboardUrl(newSession?.user?.role);
-      router.push(dashboard);
+      if (!newSession?.user?.registrationComplete) {
+        router.push("/register/complete");
+      } else {
+        router.push(getDashboardUrl(newSession?.user?.role));
+      }
       router.refresh();
     }
   }
@@ -72,12 +83,13 @@ export default function LoginPage() {
       </div>
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-2 flex items-center justify-center px-3 h-9 rounded-lg bg-primary text-primary-foreground text-sm font-bold">
-            {t('common.appName')}
-          </div>
+          <LogoPill className="mx-auto mb-2">{t('common.appName')}</LogoPill>
           <CardDescription>{t('auth.signInTitle')}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
+          {oauthErrorMessage && (
+            <p className="text-sm text-destructive text-center">{oauthErrorMessage}</p>
+          )}
           <Button
             variant="outline"
             className="w-full"
@@ -118,6 +130,7 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
+                dir="ltr"
                 placeholder={t('auth.emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -139,6 +152,7 @@ export default function LoginPage() {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  dir="ltr"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required

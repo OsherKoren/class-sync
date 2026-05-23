@@ -95,8 +95,7 @@ export function StudentClassesClient({
           <h1 className="text-3xl font-bold">{t("student.classes.pageTitle")}</h1>
         </div>
 
-        <div className="sticky top-16 z-40 bg-background/95 backdrop-blur-sm py-3 -mx-8 px-8 border-b mb-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <div className="flex border rounded-md overflow-hidden divide-x">
             {(["mine", "all"] as Tab[]).map((tt) => (
               <button key={tt} onClick={() => setTab(tt)}
@@ -117,7 +116,6 @@ export function StudentClassesClient({
               ))}
             </div>
           )}
-        </div>
         </div>
 
         {tab === "mine" && enrolledClasses.length === 0 && (

@@ -1,8 +1,9 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
-import { getLocale } from "next-intl/server";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { getLocale, getTranslations } from "next-intl/server";
+import { UserMenu } from "@/components/UserMenu";
+import { LogoPill } from "@/components/LogoPill";
 
 export default async function StudentLayout({
   children,
@@ -15,18 +16,31 @@ export default async function StudentLayout({
     redirect("/login");
   }
 
+  if (!session.user.registrationComplete) {
+    redirect("/register/complete");
+  }
+
   if (session.user.role !== "STUDENT") {
     redirect("/");
   }
 
   const locale = await getLocale();
+  const t = await getTranslations();
 
   return (
     <>
+      <LogoPill href="/student/dashboard" className="fixed top-3 start-4 z-50 hover:bg-primary/90 transition-colors">
+        {t('common.appName')}
+      </LogoPill>
       <div className="fixed top-3 end-4 z-50">
-        <LanguageSwitcher current={locale} />
+        <UserMenu
+          name={session.user.name ?? null}
+          email={session.user.email ?? null}
+          image={session.user.image ?? null}
+          currentLocale={locale}
+        />
       </div>
-      {children}
+      <div className="pt-16">{children}</div>
     </>
   );
 }

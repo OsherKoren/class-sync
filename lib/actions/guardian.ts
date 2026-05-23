@@ -88,7 +88,7 @@ export async function enrollStudent(
 
   const classRecord = await db.class.findUnique({
     where: { id: classId },
-    select: { teacherId: true },
+    select: { teacherId: true, maxCapacity: true },
   });
 
   if (!classRecord || classRecord.teacherId !== session.user.id) {
@@ -103,8 +103,18 @@ export async function enrollStudent(
     return { error: "Student is already enrolled in this class" };
   }
 
-  await db.enrollment.create({
-    data: { studentId, classId, status: "ACTIVE" },
+  await db.$transaction(async (tx) => {
+    await tx.enrollment.create({
+      data: { studentId, classId, status: "ACTIVE" },
+    });
+    if (classRecord.maxCapacity !== null) {
+      const activeCount = await tx.enrollment.count({
+        where: { classId, status: "ACTIVE" },
+      });
+      if (activeCount >= classRecord.maxCapacity) {
+        await tx.class.update({ where: { id: classId }, data: { isOpen: false } });
+      }
+    }
   });
 
   return { data: { success: true } };
@@ -155,7 +165,7 @@ export async function enrollStudentByEmail(
 
   const classRecord = await db.class.findUnique({
     where: { id: classId },
-    select: { teacherId: true },
+    select: { teacherId: true, maxCapacity: true },
   });
 
   if (!classRecord || classRecord.teacherId !== session.user.id) {
@@ -179,8 +189,19 @@ export async function enrollStudentByEmail(
     return { error: "Student is already enrolled in this class" };
   }
 
-  await db.enrollment.create({
-    data: { studentId: user.student.id, classId, status: "ACTIVE" },
+  const studentId = user.student.id;
+  await db.$transaction(async (tx) => {
+    await tx.enrollment.create({
+      data: { studentId, classId, status: "ACTIVE" },
+    });
+    if (classRecord.maxCapacity !== null) {
+      const activeCount = await tx.enrollment.count({
+        where: { classId, status: "ACTIVE" },
+      });
+      if (activeCount >= classRecord.maxCapacity) {
+        await tx.class.update({ where: { id: classId }, data: { isOpen: false } });
+      }
+    }
   });
 
   return { data: { success: true } };
@@ -196,16 +217,32 @@ export async function approveEnrollment(
 
   const enrollment = await db.enrollment.findUnique({
     where: { id: enrollmentId },
-    select: { class: { select: { teacherId: true } } },
+    select: {
+      classId: true,
+      class: { select: { teacherId: true, maxCapacity: true } },
+    },
   });
 
   if (!enrollment || enrollment.class.teacherId !== session.user.id) {
     return { error: "Enrollment not found or unauthorized" };
   }
 
-  await db.enrollment.update({
-    where: { id: enrollmentId },
-    data: { status: "ACTIVE" },
+  await db.$transaction(async (tx) => {
+    await tx.enrollment.update({
+      where: { id: enrollmentId },
+      data: { status: "ACTIVE" },
+    });
+    if (enrollment.class.maxCapacity !== null) {
+      const activeCount = await tx.enrollment.count({
+        where: { classId: enrollment.classId, status: "ACTIVE" },
+      });
+      if (activeCount >= enrollment.class.maxCapacity) {
+        await tx.class.update({
+          where: { id: enrollment.classId },
+          data: { isOpen: false },
+        });
+      }
+    }
   });
 
   return { data: { success: true } };

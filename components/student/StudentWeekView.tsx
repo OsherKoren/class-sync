@@ -7,7 +7,7 @@ import { SUBJECT_KEYS, GRADE_KEYS } from "@/lib/classKeys";
 import { type StudentClass } from "@/lib/types";
 import { toMinutes, gridRange } from "@/components/schedule/calendarUtils";
 
-const HOUR_HEIGHT = 112;
+const HOUR_HEIGHT = 180;
 const DAYS = [0, 1, 2, 3, 4, 5, 6] as const;
 
 function getWeekStart(offset: number): Date {
@@ -101,7 +101,7 @@ export function StudentWeekView({
                   {dayClasses.map((cls) => {
                     const isCancelled = cancelledSessions.get(cls.classId)?.has(dateStr) ?? false;
                     const top = (toMinutes(cls.startTime) - startHour * 60) * (HOUR_HEIGHT / 60);
-                    const height = Math.max(cls.duration * (HOUR_HEIGHT / 60), 132);
+                    const height = cls.duration * (HOUR_HEIGHT / 60);
                     return (
                       <button
                         key={cls.classId}

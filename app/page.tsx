@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { LogoPill } from "@/components/LogoPill";
 
 export default async function Home() {
   const session = await auth();
@@ -18,14 +20,15 @@ export default async function Home() {
     }
   }
 
-  const t = await getTranslations();
+  const [t, locale] = await Promise.all([getTranslations(), getLocale()]);
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center min-h-screen bg-background px-4">
+      <div className="absolute top-4 end-4">
+        <LanguageSwitcher current={locale} />
+      </div>
       <div className="flex flex-col items-center gap-6 text-center">
-        <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-primary text-primary-foreground text-3xl font-bold">
-          C
-        </div>
+        <LogoPill>{t('common.appName')}</LogoPill>
         <div className="flex flex-col gap-2">
           <h1 className="text-4xl font-bold tracking-tight text-foreground">
             {t('common.appName')}

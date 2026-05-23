@@ -56,21 +56,23 @@ ORDER BY u.createdAt DESC LIMIT 1;
 
 ---
 
-## Feature 3: Browse Open Classes
+## Feature 3: Browse All Classes
 
 ### Prerequisites:
 - Logged in as a student
-- A teacher has created at least one class with `isOpen = true`
+- A teacher has created at least one class
 
 ### Test Steps:
 1. From student dashboard, click **"Find classes"** or go to `/student/classes`
-2. View list of open classes
-3. Click **"Request to join"** on any class
+2. View list of all classes (open and closed)
+3. Click **"Request to join"** on any class (including closed/full ones)
 
 ### Expected Results:
 ✅ Page shows "Available Classes"  
 ✅ Each class card shows: name, subject, type, schedule  
-✅ "Request to join" button is clickable  
+✅ Closed classes show a "Closed" badge; full classes show "Class full" in red  
+✅ GROUP classes show "X spots left" when capacity is set  
+✅ "Request to join" button is always clickable (outline style when class is closed)  
 ✅ After clicking, button changes to "Requested"  
 ✅ Enrollment record created with `status: "PENDING"`  
 
@@ -116,18 +118,21 @@ ORDER BY e.createdAt DESC;
 ### Test Steps:
 1. Go to teacher class detail page (`/teacher/classes/[id]`)
 2. Look for **"Open Enrollment"** toggle section
-3. Click "Open Enrollment" button
+3. Click "Close Enrollment" or "Open Enrollment" button
 
 ### Expected Results:
 ✅ Toggle section visible below class info  
+✅ For GROUP classes: shows "X / Y enrolled" capacity display  
 ✅ Text changes between:
    - "This class is open for student self-enrollment requests"
-   - "Only you can enroll students in this class"  
+   - "Only you can enroll students in this class"
+   - "Reached capacity — reopen to accept more students" (when auto-closed)  
 ✅ `Class.isOpen` updated in database  
+✅ Enrolled stats card shows "X / Y" when maxCapacity is set  
 
 ### Database Verification:
 ```sql
-SELECT id, name, isOpen FROM "Class" WHERE isOpen = true;
+SELECT id, name, "isOpen", "maxCapacity" FROM "Class";
 ```
 
 ---
@@ -152,7 +157,7 @@ SELECT id, name, isOpen FROM "Class" WHERE isOpen = true;
 
 ### Code Paths:
 - Teacher component: `components/teacher/EnrollmentManagement.tsx`
-- Action: `lib/actions/family.ts` → `approveEnrollment()`
+- Action: `lib/actions/guardian.ts` → `approveEnrollment()`
 
 ---
 
@@ -175,7 +180,7 @@ SELECT id, name, isOpen FROM "Class" WHERE isOpen = true;
 ✅ Student appears in "Active Classes" immediately  
 
 ### Code Paths:
-- Action: `lib/actions/family.ts` → `enrollStudentByEmail()`
+- Action: `lib/actions/guardian.ts` → `enrollStudentByEmail()`
 
 ---
 
@@ -265,7 +270,7 @@ FROM information_schema.columns
 WHERE table_name = 'Enrollment' 
 ORDER BY ordinal_position;
 
--- Check Class table has isOpen
+-- Check Class table has isOpen and maxCapacity
 SELECT column_name, data_type, is_nullable 
 FROM information_schema.columns 
 WHERE table_name = 'Class' 

@@ -9,9 +9,13 @@ import { useTranslations } from "next-intl";
 export function ToggleOpenEnrollment({
   classId,
   isOpen: initialIsOpen,
+  maxCapacity,
+  enrollmentCount,
 }: {
   classId: string;
   isOpen: boolean;
+  maxCapacity?: number | null;
+  enrollmentCount: number;
 }) {
   const [isOpen, setIsOpen] = useState(initialIsOpen);
   const [loading, setLoading] = useState(false);
@@ -27,6 +31,8 @@ export function ToggleOpenEnrollment({
     setLoading(false);
   }
 
+  const isFull = maxCapacity !== null && maxCapacity !== undefined && enrollmentCount >= maxCapacity;
+
   return (
     <Card className="mb-6">
       <CardHeader>
@@ -34,10 +40,17 @@ export function ToggleOpenEnrollment({
       </CardHeader>
       <CardContent className="flex items-center justify-between">
         <div>
+          {maxCapacity && (
+            <p className="text-sm font-medium mb-1">
+              {t('components.openEnrollment.capacityInfo', { current: enrollmentCount, max: maxCapacity })}
+            </p>
+          )}
           <p className="text-sm text-muted-foreground">
             {isOpen
               ? t('components.openEnrollment.openDesc')
-              : t('components.openEnrollment.closedDesc')}
+              : isFull
+                ? t('components.openEnrollment.autoClosedNote')
+                : t('components.openEnrollment.closedDesc')}
           </p>
         </div>
         <Button onClick={handleToggle} disabled={loading}>

@@ -81,7 +81,7 @@ export default async function StudentLinkPage({
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex justify-center">
-                      <QrCode value={entry.code} size={160} />
+                      <QrCode value={`${process.env.NEXTAUTH_URL}/student/link?code=${entry.code}`} size={160} />
                     </div>
                     <p className="text-xs text-muted-foreground text-center">
                       {t('guardian.linkCodes.expires', { date: new Date(entry.expiresAt).toLocaleString() })}
@@ -124,7 +124,7 @@ export default async function StudentLinkPage({
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex justify-center">
-                      <QrCode value={entry.code} size={160} />
+                      <QrCode value={`${process.env.NEXTAUTH_URL}/guardian/link?code=${entry.code}`} size={160} />
                     </div>
                     <p className="text-xs text-muted-foreground text-center">
                       {t('guardian.linkCodes.expires', { date: new Date(entry.expiresAt).toLocaleString() })}

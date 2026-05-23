@@ -33,6 +33,7 @@ export default async function RootLayout({
       lang={locale}
       dir={locale === 'he' ? 'rtl' : 'ltr'}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>

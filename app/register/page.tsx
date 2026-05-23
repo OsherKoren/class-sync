@@ -18,6 +18,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { createAccountWithEmail } from "@/lib/actions/auth";
 import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { LogoPill } from "@/components/LogoPill";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -66,11 +68,12 @@ export default function RegisterPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="absolute top-4 end-4">
+        <LanguageSwitcher />
+      </div>
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-2xl font-bold text-primary-foreground">
-            C
-          </div>
+          <LogoPill className="mx-auto mb-2">{t('common.appName')}</LogoPill>
           <CardTitle className="text-2xl">{t('auth.registerTitle')}</CardTitle>
           <CardDescription>{t('auth.signUpSubtitle')}</CardDescription>
         </CardHeader>
@@ -125,6 +128,7 @@ export default function RegisterPage() {
               <Input
                 id="email"
                 type="email"
+                dir="ltr"
                 placeholder={t('auth.emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -138,6 +142,7 @@ export default function RegisterPage() {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  dir="ltr"
                   placeholder={t('auth.atLeast8')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -163,6 +168,7 @@ export default function RegisterPage() {
                 <Input
                   id="confirm"
                   type={showConfirm ? "text" : "password"}
+                  dir="ltr"
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   required

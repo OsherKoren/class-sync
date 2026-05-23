@@ -4,13 +4,16 @@ import { useState } from "react";
 import { updateLocale } from "@/lib/actions/settings";
 
 function getLocaleCookie() {
-  if (typeof document === "undefined") return "he";
   const match = document.cookie.match(/(?:^|;\s*)locale=([^;]*)/);
   return match ? match[1] : "he";
 }
 
 export function LanguageSwitcher({ current: currentProp }: { current?: string } = {}) {
-  const current = currentProp ?? getLocaleCookie();
+  const [current, setCurrent] = useState<string>(() => {
+    if (currentProp) return currentProp;
+    if (typeof document !== "undefined") return getLocaleCookie();
+    return "he";
+  });
   const [saving, setSaving] = useState(false);
 
   async function switchTo(locale: "he" | "en") {

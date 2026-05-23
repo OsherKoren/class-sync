@@ -13,6 +13,8 @@ const classSchema = z.object({
   dayOfWeek: z.number().min(0).max(6),
   startTime: z.string().regex(/^\d{2}:\d{2}$/, "Time must be in HH:MM format"),
   duration: z.number().min(30, "Duration must be at least 30 minutes"),
+  isOpen: z.boolean().optional(),
+  maxCapacity: z.number().int().min(1).optional().nullable(),
 });
 
 export async function createClass(
@@ -28,7 +30,7 @@ export async function createClass(
     return { error: parsed.error.issues[0].message };
   }
 
-  const { name, subject, type, level, grade, dayOfWeek, startTime, duration } = parsed.data;
+  const { name, subject, type, level, grade, dayOfWeek, startTime, duration, maxCapacity } = parsed.data;
 
   // Check for overlapping classes on the same day
   const [startHour, startMinute] = startTime.split(":").map(Number);
@@ -73,6 +75,7 @@ export async function createClass(
       dayOfWeek,
       startTime,
       duration,
+      maxCapacity: maxCapacity ?? (type === "GROUP" ? 4 : null),
       teacherId: session.user.id,
     },
     select: { id: true },
@@ -152,6 +155,7 @@ export async function getTeacherClasses(): Promise<
         dayOfWeek: number;
         startTime: string;
         duration: number;
+        maxCapacity: number | null;
         enrollmentCount: number;
       }>;
     }
@@ -173,6 +177,7 @@ export async function getTeacherClasses(): Promise<
       dayOfWeek: true,
       startTime: true,
       duration: true,
+      maxCapacity: true,
       _count: { select: { enrollments: true } },
     },
     orderBy: { createdAt: "desc" },
@@ -200,6 +205,7 @@ export async function getClassById(classId: string): Promise<
         startTime: string;
         duration: number;
         isOpen: boolean;
+        maxCapacity: number | null;
         enrollments: Array<{
           id: string;
           studentId: string;
@@ -227,6 +233,7 @@ export async function getClassById(classId: string): Promise<
       startTime: true,
       duration: true,
       isOpen: true,
+      maxCapacity: true,
       teacherId: true,
       enrollments: {
         select: {
@@ -254,6 +261,7 @@ export async function getClassById(classId: string): Promise<
       startTime: classRecord.startTime,
       duration: classRecord.duration,
       isOpen: classRecord.isOpen,
+      maxCapacity: classRecord.maxCapacity,
       enrollments: classRecord.enrollments.map((e) => ({
         id: e.id,
         studentId: e.student.id,

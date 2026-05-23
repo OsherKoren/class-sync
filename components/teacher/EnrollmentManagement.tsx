@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { approveEnrollment, rejectEnrollment } from "@/lib/actions/guardian";
 import { useTranslations } from "next-intl";
@@ -11,12 +12,14 @@ export function EnrollmentManagement({ enrollmentId }: { enrollmentId: string })
   const [approved, setApproved] = useState(false);
   const [rejected, setRejected] = useState(false);
   const t = useTranslations();
+  const router = useRouter();
 
   async function handleApprove() {
     setApproving(true);
     const result = await approveEnrollment(enrollmentId);
     if (!("error" in result)) {
       setApproved(true);
+      router.refresh();
     }
     setApproving(false);
   }
@@ -26,6 +29,7 @@ export function EnrollmentManagement({ enrollmentId }: { enrollmentId: string })
     const result = await rejectEnrollment(enrollmentId);
     if (!("error" in result)) {
       setRejected(true);
+      router.refresh();
     }
     setRejecting(false);
   }

@@ -105,13 +105,21 @@ Teacher can create classes and manage guardian-linked students and independent s
 - [x] `app/teacher/students/[id]/[studentId]/enroll/page.tsx` — enroll into class
 
 **Student management features (new):**
-- [ ] `app/teacher/classes/[id]/page.tsx` — add "Enroll by email" section + pending requests list
-- [ ] `app/teacher/students/page.tsx` — add "Find student by email" search (independent students)
-- [ ] Server Action: `findStudentByEmail(email)` — teacher searches for existing student
-- [ ] Server Action: `enrollStudentByEmail(email, classId)` — create ACTIVE enrollment
-- [ ] Server Action: `approveEnrollment(enrollmentId)` — change PENDING → ACTIVE
-- [ ] Server Action: `rejectEnrollment(enrollmentId)` — change PENDING → REJECTED
-- [ ] Update `enrollStudent()` to set `status: ACTIVE` (teacher-enrolled always confirmed)
+- [ ] `app/teacher/classes/[id]/page.tsx` — add "Enroll by email" UI section (pending requests list already done)
+- [ ] `app/teacher/students/page.tsx` — add "Find student by email" search UI (independent students)
+- [x] Server Action: `findStudentByEmail(email)` — teacher searches for existing student
+- [x] Server Action: `enrollStudentByEmail(email, classId)` — create ACTIVE enrollment
+- [x] Server Action: `approveEnrollment(enrollmentId)` — change PENDING → ACTIVE (auto-closes class when maxCapacity reached)
+- [x] Server Action: `rejectEnrollment(enrollmentId)` — change PENDING → REJECTED
+- [x] Update `enrollStudent()` to set `status: ACTIVE` (teacher-enrolled always confirmed)
+
+**Class capacity features (added):**
+- [x] `Class.maxCapacity Int?` schema field — optional cap on active enrollments
+- [x] GROUP classes default to capacity 4; PRIVATE classes have no limit
+- [x] Auto-close (`isOpen = false`) when active enrollment count reaches `maxCapacity` (transactional, applied on approve + direct enroll)
+- [x] Teacher can reopen manually via `ToggleOpenEnrollment` regardless of capacity
+- [x] Students see ALL classes (open and closed); request button always available; teacher approves/rejects
+- [x] Capacity info shown on class detail page (X / Y enrolled) and student classes list (X spots left)
 
 **Student/Guardian registration/auth features (new):**
 - [ ] Update `lib/auth.ts` — handle post-OAuth role selection
@@ -147,8 +155,8 @@ Teacher can create classes and manage guardian-linked students and independent s
 - [ ] Independent student registers with email + password → lands on student dashboard
 - [ ] Independent student registers with Google → confirms "I'm a student" → lands on student dashboard
 - [ ] Teacher finds independent student by email → enrolls them in a class (ACTIVE status)
-- [ ] Independent student visits open classes → requests to join (creates PENDING enrollment)
-- [ ] Teacher approves pending request → status becomes ACTIVE → student sees confirmed class
+- [x] Independent student browses all classes → requests to join (creates PENDING enrollment)
+- [x] Teacher approves pending request → status becomes ACTIVE → student sees confirmed class
 
 ### Phase 2 Success (Multi-guardian + link codes)
 - [ ] Guardian creates a child (no login) → Student row created with one StudentGuardian link

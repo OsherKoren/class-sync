@@ -45,9 +45,10 @@ export async function completeRegistration(
 ): Promise<{ error: string } | { data: { success: true } }> {
   try {
     const session = await auth();
+    console.log("[completeRegistration] role:", role, "| session:", session?.user?.id ?? "NULL");
 
     if (!session?.user?.id) {
-      return { error: "Not authenticated" };
+      return { error: "Not authenticated — session was null" };
     }
 
     const user = await db.user.findUnique({
@@ -62,35 +63,35 @@ export async function completeRegistration(
     if (role === "GUARDIAN") {
       await db.user.update({
         where: { id: user.id },
-        data: { role: "GUARDIAN" },
+        data: { role: "GUARDIAN", registrationComplete: true },
       });
     } else if (role === "STUDENT") {
-      if (user.student) {
-        return { error: "Profile already set up" };
-      }
-      try {
-        await db.student.create({
-          data: { name: user.name || "Student", userId: user.id },
-        });
-      } catch (err) {
-        console.error("Error creating student:", err);
-        return { error: "Failed to create student profile" };
+      if (!user.student) {
+        try {
+          await db.student.create({
+            data: { name: user.name || "Student", userId: user.id },
+          });
+        } catch (err) {
+          console.error("Error creating student:", err);
+          return { error: "Failed to create student profile" };
+        }
       }
       await db.user.update({
         where: { id: user.id },
-        data: { role: "STUDENT" },
+        data: { role: "STUDENT", registrationComplete: true },
       });
     } else if (role === "TEACHER") {
       await db.user.update({
         where: { id: user.id },
-        data: { role: "TEACHER" },
+        data: { role: "TEACHER", registrationComplete: true },
       });
     }
 
     return { data: { success: true } };
   } catch (err) {
-    console.error("Error in completeRegistration:", err);
-    return { error: "An error occurred during setup. Please try again." };
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("Error in completeRegistration:", message);
+    return { error: process.env.NODE_ENV === "development" ? message : "An error occurred during setup. Please try again." };
   }
 }
 

@@ -94,7 +94,11 @@ export default async function ClassDetailPage({
               <CardTitle className="text-sm font-medium">{t('teacher.classDetail.enrolled')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{activeEnrollments.length}</p>
+              <p className="text-2xl font-bold">
+                {classData.maxCapacity
+                  ? `${activeEnrollments.length} / ${classData.maxCapacity}`
+                  : activeEnrollments.length}
+              </p>
               <p className="text-xs text-muted-foreground">
                 {activeEnrollments.length === 1 ? t('common.student') : t('common.students')}
               </p>
@@ -102,7 +106,12 @@ export default async function ClassDetailPage({
           </Card>
         </div>
 
-        <ToggleOpenEnrollment classId={classData.id} isOpen={classData.isOpen} />
+        <ToggleOpenEnrollment
+          classId={classData.id}
+          isOpen={classData.isOpen}
+          maxCapacity={classData.maxCapacity}
+          enrollmentCount={activeEnrollments.length}
+        />
 
         {pendingEnrollments.length > 0 && (
           <Card className="mb-6">

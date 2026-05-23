@@ -8,7 +8,7 @@ import { type ClassItem } from "@/lib/types";
 import { toMinutes, gridRange } from "./calendarUtils";
 
 const DAYS = [0, 1, 2, 3, 4, 5, 6] as const;
-const HOUR_HEIGHT = 96; // 96px/hr so a 60-min class = 96px, fitting all detail lines
+const HOUR_HEIGHT = 180;
 
 function endTimeStr(startTime: string, duration: number): string {
   const total = toMinutes(startTime) + duration;
@@ -69,7 +69,7 @@ export function WeekView({ classes, teacherName }: { classes: ClassItem[]; teach
                 ))}
                 {dayClasses.map((cls) => {
                   const top = (toMinutes(cls.startTime) - startHour * 60) * (HOUR_HEIGHT / 60);
-                  const height = Math.max(cls.duration * (HOUR_HEIGHT / 60), 96);
+                  const height = cls.duration * (HOUR_HEIGHT / 60);
                   return (
                     <Link
                       key={cls.id}

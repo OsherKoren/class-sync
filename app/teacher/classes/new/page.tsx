@@ -23,7 +23,7 @@ const gradeNums = [4, 5, 6, 7, 8, 9, 10];
 export default function CreateClassPage() {
   const [name, setName] = useState("");
   const [subject, setSubject] = useState("");
-  const [type, setType] = useState("GROUP");
+  const [type, setType] = useState<"GROUP" | "PRIVATE">("GROUP");
   const [level, setLevel] = useState("");
   const [grade, setGrade] = useState("");
   const [gradeCustom, setGradeCustom] = useState(false);
@@ -31,6 +31,7 @@ export default function CreateClassPage() {
   const [dayOfWeek, setDayOfWeek] = useState("0");
   const [startTime, setStartTime] = useState("16:00");
   const [duration, setDuration] = useState("45");
+  const [maxCapacity, setMaxCapacity] = useState("4");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -58,6 +59,7 @@ export default function CreateClassPage() {
         dayOfWeek: parseInt(dayOfWeek),
         startTime,
         duration: parseInt(duration),
+        maxCapacity: type === "GROUP" && maxCapacity ? parseInt(maxCapacity) : undefined,
       });
 
       if ("error" in result) {
@@ -145,7 +147,13 @@ export default function CreateClassPage() {
 
                 <div>
                   <Label htmlFor="type">{t('teacher.createClass.classType')}</Label>
-                  <Select value={type} onValueChange={(v) => { if (v !== null) setType(v); }}>
+                  <Select value={type} onValueChange={(v) => {
+                    if (v !== null) {
+                      setType(v as "GROUP" | "PRIVATE");
+                      if (v === "GROUP") setMaxCapacity("4");
+                      else setMaxCapacity("");
+                    }
+                  }}>
                     <SelectTrigger id="type">
                       <span>{t(`classTypes.${type}` as `classTypes.${string}`)}</span>
                     </SelectTrigger>
@@ -170,6 +178,24 @@ export default function CreateClassPage() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {type === "GROUP" && (
+                  <div>
+                    <Label htmlFor="maxCapacity">{t('teacher.createClass.maxCapacity')}</Label>
+                    <Input
+                      id="maxCapacity"
+                      type="number"
+                      min="1"
+                      step="1"
+                      value={maxCapacity}
+                      onChange={(e) => setMaxCapacity(e.target.value)}
+                      placeholder="4"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {t('teacher.createClass.maxCapacityHint')}
+                    </p>
+                  </div>
+                )}
 
                 <div>
                   <Label htmlFor="grade">{t('teacher.createClass.grade')}</Label>
