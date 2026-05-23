@@ -115,7 +115,9 @@ export function DayView({
                     {t("common.minutes")}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {cls.enrollmentCount}{" "}
+                    {cls.maxCapacity !== null
+                      ? `${cls.enrollmentCount}/${cls.maxCapacity}`
+                      : cls.enrollmentCount}{" "}
                     {cls.enrollmentCount === 1 ? t("common.student") : t("common.students")} enrolled
                   </p>
                 </Link>

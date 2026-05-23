@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,22 +13,24 @@ import {
 } from "@/components/ui/card";
 import { completeRegistration } from "@/lib/actions/auth";
 import { useTranslations } from "next-intl";
+import { LogoPill } from "@/components/LogoPill";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 type Role = "GUARDIAN" | "STUDENT" | "TEACHER";
 
+const dashboardByRole: Record<Role, string> = {
+  GUARDIAN: "/guardian/dashboard",
+  STUDENT: "/student/dashboard",
+  TEACHER: "/teacher/dashboard",
+};
+
 export default function CompleteRegistrationPage() {
+  const { data: session, status, update } = useSession();
   const router = useRouter();
-  const { data: session, status } = useSession();
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const t = useTranslations();
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    }
-  }, [status, router]);
 
   async function handleComplete(role: Role) {
     setLoading(true);
@@ -44,13 +46,9 @@ export default function CompleteRegistrationPage() {
       return;
     }
 
-    const dashboardMap: Record<Role, string> = {
-      GUARDIAN: "/guardian/dashboard",
-      STUDENT: "/student/dashboard",
-      TEACHER: "/teacher/dashboard",
-    };
-    router.push(dashboardMap[role]);
-    router.refresh();
+    // Refresh the JWT cookie so the proxy sees the new role before navigation
+    await update();
+    router.push(dashboardByRole[role]);
   }
 
   if (status === "loading") {
@@ -63,17 +61,18 @@ export default function CompleteRegistrationPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="absolute top-4 end-4">
+        <LanguageSwitcher />
+      </div>
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-2xl font-bold text-primary-foreground">
-            C
-          </div>
+          <LogoPill className="mx-auto mb-2">{t('common.appName')}</LogoPill>
           <CardTitle className="text-2xl">{t('auth.welcomeTitle')}</CardTitle>
           <CardDescription>{t('auth.welcomeSubtitle')}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <p className="text-sm text-muted-foreground">
-            Hi {session?.user?.name}!
+            {t('auth.greeting', { name: session?.user?.name ?? "" })}
           </p>
 
           {error && <p className="text-sm text-destructive">{error}</p>}

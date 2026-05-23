@@ -62,6 +62,8 @@ model User {
   googleTokenExpiry       DateTime?
   designatedCalendarId    String?
 
+  registrationComplete    Boolean   @default(false)
+
   passwordResetToken      String?    @unique
   passwordResetExpiry     DateTime?
 
@@ -126,6 +128,7 @@ model Student {
   enrollments Enrollment[]
   votes       Vote[]
   linkCodes   LinkCode[]
+  absences    SessionAbsence[]
 
   createdAt DateTime @default(now())
 }
@@ -173,10 +176,12 @@ model Class {
   teacherId       String
   teacher         User      @relation(fields: [teacherId], references: [id])
   calendarEventId String?
-  isOpen          Boolean   @default(false)
+  isOpen          Boolean   @default(true)
+  maxCapacity     Int?
 
   enrollments    Enrollment[]
   lessonSessions LessonSession[]
+  absences       SessionAbsence[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -246,6 +251,19 @@ model Vote {
   updatedAt DateTime @updatedAt
 
   @@unique([offerId, studentId])
+}
+
+model SessionAbsence {
+  id        String   @id @default(cuid())
+  studentId String
+  classId   String
+  date      String   // "YYYY-MM-DD"
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([studentId, classId, date])
+  @@index([studentId])
 }
 
 model PushSubscription {

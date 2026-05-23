@@ -78,7 +78,9 @@ export function ScheduleView({
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    {cls.enrollmentCount}{" "}
+                    {cls.maxCapacity !== null
+                      ? `${cls.enrollmentCount}/${cls.maxCapacity}`
+                      : cls.enrollmentCount}{" "}
                     {cls.enrollmentCount === 1 ? t("common.student") : t("common.students")}{" "}
                     enrolled · {cls.duration} {t("common.minutesPerSession")}
                   </p>
@@ -89,7 +91,7 @@ export function ScheduleView({
         </div>
       )}
 
-      {view === "week" && <WeekView classes={classes} />}
+      {view === "week" && <WeekView classes={classes} teacherName={teacherName} />}
       {view === "day" && <DayView classes={classes} teacherName={teacherName} />}
     </div>
   );

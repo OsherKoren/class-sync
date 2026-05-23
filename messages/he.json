@@ -22,7 +22,11 @@
     "students": "תלמידים",
     "language": "שפה",
     "hebrew": "עברית",
-    "english": "English"
+    "english": "English",
+    "theme": "ערכת נושא",
+    "themeLight": "בהיר",
+    "themeDark": "כהה",
+    "themeSystem": "מערכת"
   },
   "days": {
     "0": "ראשון",
@@ -46,6 +50,7 @@
     "password": "סיסמה",
     "forgotPassword": "שכחת סיסמה?",
     "invalidCredentials": "אימייל או סיסמה שגויים",
+    "oauthAccountNotLinked": "קיים חשבון עם האימייל הזה. אנא כנס עם האימייל והסיסמה שלך.",
     "signingIn": "נכנס…",
     "newHere": "חדש כאן?",
     "createAccount": "צור חשבון",
@@ -61,6 +66,7 @@
     "alreadyHaveAccount": "כבר יש לך חשבון?",
     "welcomeTitle": "ברוכים הבאים ל-ClassSync",
     "welcomeSubtitle": "בואו נגדיר את החשבון שלך",
+    "greeting": "שלום, {name}!",
     "settingUp": "מגדיר…",
     "imStudent": "אני תלמיד",
     "imParent": "אני הורה",
@@ -140,6 +146,8 @@
       "startTime": "שעת התחלה (פורמט 24 שעות)",
       "startTimeHint": "בחר ממרווחי 15 דקות או הקלד שעה מותאמת",
       "duration": "משך (דקות)",
+      "maxCapacity": "מקסימום תלמידים (אופציונלי)",
+      "maxCapacityHint": "הכיתה תיסגר אוטומטית כשתגיע לקיבולת",
       "creating": "יוצר…",
       "create": "צור כיתה",
       "grades": {
@@ -219,13 +227,36 @@
     },
     "classes": {
       "backToDashboard": "← חזרה ללוח הבקרה",
+      "pageTitle": "לוח השיעורים שלי",
+      "tabMine": "השיעורים שלי",
+      "tabAll": "כל השיעורים",
       "title": "כיתות זמינות",
-      "subtitle": "בקש להצטרף לאחת מהכיתות הפתוחות",
+      "subtitle": "עיין בכל הכיתות ובקש להצטרף",
       "loadingClasses": "טוען כיתות...",
-      "noClasses": "אין כיתות פתוחות כרגע.",
+      "noClasses": "אין כיתות זמינות עדיין.",
+      "noEnrollments": "עדיין לא נרשמת לשיעורים.",
       "request": "בקש להצטרף",
       "requesting": "שולח בקשה…",
-      "requested": "בקשה נשלחה"
+      "requested": "בקשה נשלחה",
+      "enrolled": "רשום",
+      "spotsLeft": "נותרו {count} מקומות",
+      "classFull": "הכיתה מלאה",
+      "closedBadge": "סגור",
+      "cancelNextSession": "בטל שיעור הבא",
+      "nextCancelled": "השיעור הבא בוטל",
+      "cancelled": "בוטל",
+      "clickToCancel": "לחץ לביטול שיעור זה",
+      "thisWeek": "השבוע",
+      "cancelDialog": {
+        "title": "ביטול שיעור",
+        "body": "לבטל את שיעור {className} בתאריך {date}?",
+        "confirm": "כן, בטל",
+        "cancelling": "מבטל…",
+        "cancelledTitle": "השיעור בוטל",
+        "cancelledBody": "האם תרצה להשתתף בשיעור אחר במקום?",
+        "noAlternatives": "אין שיעורים חלופיים זמינים.",
+        "done": "סיום"
+      }
     },
     "link": {
       "backToDashboard": "← חזרה ללוח הבקרה",
@@ -326,6 +357,8 @@
       "title": "פתח הרשמה",
       "openDesc": "כיתה זו פתוחה לבקשות הרשמה עצמאית",
       "closedDesc": "רק אתה יכול לרשום תלמידים לכיתה זו",
+      "autoClosedNote": "הגיעה לקיבולת — פתח שוב לקבלת תלמידים נוספים",
+      "capacityInfo": "{current} / {max} רשומים",
       "closeBtn": "סגור הרשמה",
       "openBtn": "פתח הרשמה"
     }

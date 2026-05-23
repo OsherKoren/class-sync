@@ -15,7 +15,7 @@ function endTimeStr(startTime: string, duration: number): string {
   return `${Math.floor(total / 60).toString().padStart(2, "0")}:${(total % 60).toString().padStart(2, "0")}`;
 }
 
-export function WeekView({ classes }: { classes: ClassItem[] }) {
+export function WeekView({ classes, teacherName }: { classes: ClassItem[]; teacherName: string | null }) {
   const t = useTranslations();
   const { startHour, endHour } = gridRange(classes);
   const hours = Array.from({ length: endHour - startHour }, (_, i) => startHour + i);
@@ -78,7 +78,10 @@ export function WeekView({ classes }: { classes: ClassItem[] }) {
                       className="absolute inset-x-0.5 rounded bg-primary/20 border border-primary/50 px-1.5 py-1 overflow-hidden hover:bg-primary/35 transition-colors"
                     >
                       <p className="text-xs font-semibold leading-none truncate">{cls.name}</p>
-                      <p className="text-xs text-muted-foreground leading-none truncate mt-1">{SUBJECT_KEYS.has(cls.subject) ? t(`teacher.createClass.subjects.${cls.subject}` as `teacher.createClass.subjects.${string}`) : cls.subject}</p>
+                      <p className="text-xs text-muted-foreground leading-none truncate mt-1">
+                        {SUBJECT_KEYS.has(cls.subject) ? t(`teacher.createClass.subjects.${cls.subject}` as `teacher.createClass.subjects.${string}`) : cls.subject}
+                        {teacherName && ` · ${teacherName}`}
+                      </p>
                       <p className="text-xs text-muted-foreground leading-none mt-1">
                         {t(`classTypes.${cls.type}` as `classTypes.${string}`)}
                       </p>
@@ -93,7 +96,9 @@ export function WeekView({ classes }: { classes: ClassItem[] }) {
                         {cls.startTime}–{endTimeStr(cls.startTime, cls.duration)}
                       </p>
                       <p className="text-xs text-muted-foreground leading-none mt-1">
-                        {cls.enrollmentCount}{" "}
+                        {cls.maxCapacity !== null
+                          ? `${cls.enrollmentCount}/${cls.maxCapacity}`
+                          : cls.enrollmentCount}{" "}
                         {cls.enrollmentCount === 1 ? t("common.student") : t("common.students")}
                       </p>
                     </Link>
