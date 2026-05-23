@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useTranslations } from "next-intl";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -25,6 +26,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { data: session } = useSession();
+  const t = useTranslations();
 
   async function handleCredentials(e: React.FormEvent) {
     e.preventDefault();
@@ -40,7 +42,7 @@ export default function LoginPage() {
     setLoading(false);
 
     if (result?.error) {
-      setError("Invalid email or password");
+      setError(t('auth.invalidCredentials'));
     } else {
       // Get the updated session with the role
       const newSession = await fetch("/api/auth/session").then((res) => res.json());
@@ -69,8 +71,8 @@ export default function LoginPage() {
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-2xl font-bold text-primary-foreground">
             C
           </div>
-          <CardTitle className="text-2xl">ClassSync</CardTitle>
-          <CardDescription>Sign in to your account</CardDescription>
+          <CardTitle className="text-2xl">{t('common.appName')}</CardTitle>
+          <CardDescription>{t('auth.signInTitle')}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <Button
@@ -98,22 +100,22 @@ export default function LoginPage() {
                 fill="#EA4335"
               />
             </svg>
-            Continue with Google
+            {t('auth.continueWithGoogle')}
           </Button>
 
           <div className="relative flex items-center">
             <Separator className="flex-1" />
-            <span className="mx-3 text-xs text-muted-foreground">or</span>
+            <span className="mx-3 text-xs text-muted-foreground">{t('auth.or')}</span>
             <Separator className="flex-1" />
           </div>
 
           <form onSubmit={handleCredentials} className="flex flex-col gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.email')}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="your@email.com"
+                placeholder={t('auth.emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -122,12 +124,12 @@ export default function LoginPage() {
             </div>
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t('auth.password')}</Label>
                 <Link
                   href="/forgot-password"
                   className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4 transition-colors"
                 >
-                  Forgot password?
+                  {t('auth.forgotPassword')}
                 </Link>
               </div>
               <div className="relative">
@@ -154,14 +156,14 @@ export default function LoginPage() {
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Signing in…" : "Sign in"}
+              {loading ? t('auth.signingIn') : t('common.signIn')}
             </Button>
           </form>
 
           <p className="text-center text-xs text-muted-foreground">
-            New here?{" "}
+            {t('auth.newHere')}{" "}
             <Link href="/register" className="underline underline-offset-4">
-              Create an account
+              {t('auth.createAccount')}
             </Link>
           </p>
         </CardContent>

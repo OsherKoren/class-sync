@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { completeRegistration } from "@/lib/actions/auth";
+import { useTranslations } from "next-intl";
 
 type Role = "GUARDIAN" | "STUDENT" | "TEACHER";
 
@@ -21,6 +22,7 @@ export default function CompleteRegistrationPage() {
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const t = useTranslations();
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -54,7 +56,7 @@ export default function CompleteRegistrationPage() {
   if (status === "loading") {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
-        <p>Loading...</p>
+        <p>{t('common.loading')}</p>
       </div>
     );
   }
@@ -66,12 +68,12 @@ export default function CompleteRegistrationPage() {
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-2xl font-bold text-primary-foreground">
             C
           </div>
-          <CardTitle className="text-2xl">Welcome to ClassSync</CardTitle>
-          <CardDescription>Let&apos;s get your account set up</CardDescription>
+          <CardTitle className="text-2xl">{t('auth.welcomeTitle')}</CardTitle>
+          <CardDescription>{t('auth.welcomeSubtitle')}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <p className="text-sm text-muted-foreground">
-            Hi {session?.user?.name}! What&apos;s your role?
+            Hi {session?.user?.name}!
           </p>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
@@ -84,8 +86,8 @@ export default function CompleteRegistrationPage() {
               onClick={() => handleComplete("STUDENT")}
             >
               {selectedRole === "STUDENT" && loading
-                ? "Setting up…"
-                : "I'm a student"}
+                ? t('auth.settingUp')
+                : t('auth.imStudent')}
             </Button>
             <Button
               size="lg"
@@ -95,8 +97,8 @@ export default function CompleteRegistrationPage() {
               onClick={() => handleComplete("GUARDIAN")}
             >
               {selectedRole === "GUARDIAN" && loading
-                ? "Setting up…"
-                : "I'm a parent"}
+                ? t('auth.settingUp')
+                : t('auth.imParent')}
             </Button>
             <Button
               size="lg"
@@ -106,8 +108,8 @@ export default function CompleteRegistrationPage() {
               onClick={() => handleComplete("TEACHER")}
             >
               {selectedRole === "TEACHER" && loading
-                ? "Setting up…"
-                : "I'm a teacher"}
+                ? t('auth.settingUp')
+                : t('auth.imTeacher')}
             </Button>
           </div>
         </CardContent>

@@ -11,6 +11,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { createGuardian } from "@/lib/actions/guardian";
+import { useTranslations } from "next-intl";
 
 export default function AddGuardianPage() {
   const [name, setName] = useState("");
@@ -18,6 +19,7 @@ export default function AddGuardianPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const t = useTranslations();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -40,9 +42,9 @@ export default function AddGuardianPage() {
     <div className="p-8">
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Add guardian</h1>
+          <h1 className="text-3xl font-bold mb-2">{t('teacher.addGuardian.title')}</h1>
           <p className="text-muted-foreground">
-            Create a guardian account, then add their children as students
+            {t('teacher.addGuardian.subtitle')}
           </p>
         </div>
 
@@ -50,10 +52,10 @@ export default function AddGuardianPage() {
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <Label htmlFor="name">Guardian name</Label>
+                <Label htmlFor="name">{t('teacher.addGuardian.guardianName')}</Label>
                 <Input
                   id="name"
-                  placeholder="e.g., Sarah Cohen"
+                  placeholder={t('teacher.addGuardian.namePlaceholder')}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -61,11 +63,11 @@ export default function AddGuardianPage() {
               </div>
 
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('auth.email')}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="guardian@email.com"
+                  placeholder={t('teacher.addGuardian.emailPlaceholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -74,9 +76,7 @@ export default function AddGuardianPage() {
 
               <div className="bg-muted p-4 rounded-lg">
                 <p className="text-sm text-muted-foreground">
-                  A temporary password will be generated. Share it with the
-                  guardian so they can log in and set their own password. After
-                  login, they can link their child&apos;s account via a link code.
+                  {t('teacher.addGuardian.tempPasswordNote')}
                 </p>
               </div>
 
@@ -84,11 +84,11 @@ export default function AddGuardianPage() {
 
               <div className="flex gap-4">
                 <Button type="submit" disabled={loading}>
-                  {loading ? "Creating…" : "Create guardian"}
+                  {loading ? t('teacher.addGuardian.creating') : t('teacher.addGuardian.create')}
                 </Button>
                 <Link href="/teacher/students">
                   <Button type="button" variant="outline">
-                    Cancel
+                    {t('common.cancel')}
                   </Button>
                 </Link>
               </div>

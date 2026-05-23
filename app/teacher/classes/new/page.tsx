@@ -15,27 +15,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createClass } from "@/lib/actions/class";
+import { useTranslations } from "next-intl";
 
-const dayNames = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
+const gradeNums = [4, 5, 6, 7, 8, 9, 10];
 
 export default function CreateClassPage() {
   const [name, setName] = useState("");
   const [subject, setSubject] = useState("");
   const [type, setType] = useState("GROUP");
+  const [level, setLevel] = useState("");
+  const [grade, setGrade] = useState("");
+  const [gradeCustom, setGradeCustom] = useState(false);
   const [dayOfWeek, setDayOfWeek] = useState("0");
   const [startTime, setStartTime] = useState("16:00");
   const [duration, setDuration] = useState("45");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const t = useTranslations();
 
   // Generate 15-minute intervals for the dropdown
   const timeOptions = Array.from({ length: 96 }, (_, i) => {
@@ -54,6 +51,8 @@ export default function CreateClassPage() {
         name,
         subject,
         type,
+        level: level || undefined,
+        grade: grade || undefined,
         dayOfWeek: parseInt(dayOfWeek),
         startTime,
         duration: parseInt(duration),
@@ -67,7 +66,7 @@ export default function CreateClassPage() {
 
       router.push("/teacher/classes");
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError(t('common.somethingWentWrong'));
       setLoading(false);
     }
   }
@@ -76,9 +75,9 @@ export default function CreateClassPage() {
     <div className="p-8">
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Create class</h1>
+          <h1 className="text-3xl font-bold mb-2">{t('teacher.createClass.title')}</h1>
           <p className="text-muted-foreground">
-            Set up a new class for your students
+            {t('teacher.createClass.subtitle')}
           </p>
         </div>
 
@@ -87,10 +86,10 @@ export default function CreateClassPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
-                  <Label htmlFor="name">Class name</Label>
+                  <Label htmlFor="name">{t('teacher.createClass.className')}</Label>
                   <Input
                     id="name"
-                    placeholder="e.g., Math 101"
+                    placeholder={t('teacher.createClass.classNamePlaceholder')}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
@@ -98,10 +97,10 @@ export default function CreateClassPage() {
                 </div>
 
                 <div className="col-span-2">
-                  <Label htmlFor="subject">Subject</Label>
+                  <Label htmlFor="subject">{t('teacher.createClass.subject')}</Label>
                   <Input
                     id="subject"
-                    placeholder="e.g., Mathematics"
+                    placeholder={t('teacher.createClass.subjectPlaceholder')}
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
                     required
@@ -109,28 +108,88 @@ export default function CreateClassPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="type">Class type</Label>
+                  <Label htmlFor="type">{t('teacher.createClass.classType')}</Label>
                   <Select value={type} onValueChange={(v) => { if (v !== null) setType(v); }}>
                     <SelectTrigger id="type">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="GROUP">Group</SelectItem>
-                      <SelectItem value="PRIVATE">Private</SelectItem>
+                      <SelectItem value="GROUP">{t('teacher.createClass.group')}</SelectItem>
+                      <SelectItem value="PRIVATE">{t('teacher.createClass.private')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
-                  <Label htmlFor="dayOfWeek">Day</Label>
-                  <Select value={dayOfWeek} onValueChange={(v) => { if (v !== null) setDayOfWeek(v); }}>
-                    <SelectTrigger id="dayOfWeek">
-                      <span>{dayNames[parseInt(dayOfWeek)]}</span>
+                  <Label htmlFor="level">{t('teacher.createClass.level')}</Label>
+                  <Select value={level} onValueChange={(v) => { if (v !== null) setLevel(v === "NONE" ? "" : v); }}>
+                    <SelectTrigger id="level">
+                      <SelectValue placeholder={t('teacher.createClass.selectLevel')} />
                     </SelectTrigger>
                     <SelectContent>
-                      {dayNames.map((day, index) => (
+                      <SelectItem value="NONE">{t('teacher.createClass.noLevel')}</SelectItem>
+                      <SelectItem value="BEGINNER">{t('teacher.createClass.beginner')}</SelectItem>
+                      <SelectItem value="INTERMEDIATE">{t('teacher.createClass.intermediate')}</SelectItem>
+                      <SelectItem value="ADVANCED">{t('teacher.createClass.advanced')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="grade">{t('teacher.createClass.grade')}</Label>
+                  {gradeCustom ? (
+                    <div className="flex gap-2">
+                      <Input
+                        id="grade"
+                        placeholder={t('teacher.createClass.gradePlaceholder')}
+                        value={grade}
+                        onChange={(e) => setGrade(e.target.value)}
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => { setGradeCustom(false); setGrade(""); }}
+                        className="shrink-0"
+                      >
+                        {t('common.cancel')}
+                      </Button>
+                    </div>
+                  ) : (
+                    <Select
+                      value={grade}
+                      onValueChange={(v) => {
+                        if (v === null) return;
+                        if (v === "CUSTOM") { setGradeCustom(true); setGrade(""); }
+                        else setGrade(v === "NONE" ? "" : v);
+                      }}
+                    >
+                      <SelectTrigger id="grade">
+                        <SelectValue placeholder={t('teacher.createClass.noGrade')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="NONE">{t('teacher.createClass.noGrade')}</SelectItem>
+                        {gradeNums.map((g) => (
+                          <SelectItem key={g} value={t(`teacher.createClass.grades.${g}` as `teacher.createClass.grades.${number}`)}>
+                            {t(`teacher.createClass.grades.${g}` as `teacher.createClass.grades.${number}`)}
+                          </SelectItem>
+                        ))}
+                        <SelectItem value="CUSTOM">{t('teacher.createClass.customGrade')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="dayOfWeek">{t('teacher.createClass.day')}</Label>
+                  <Select value={dayOfWeek} onValueChange={(v) => { if (v !== null) setDayOfWeek(v); }}>
+                    <SelectTrigger id="dayOfWeek">
+                      <span>{t(`days.${dayOfWeek}` as `days.${number}`)}</span>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[0, 1, 2, 3, 4, 5, 6].map((index) => (
                         <SelectItem key={index} value={index.toString()}>
-                          {day}
+                          {t(`days.${index}` as `days.${number}`)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -138,7 +197,7 @@ export default function CreateClassPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="startTime">Start time (24-hour format)</Label>
+                  <Label htmlFor="startTime">{t('teacher.createClass.startTime')}</Label>
                   <div className="flex gap-2">
                     <Select value={startTime} onValueChange={(v) => { if (v !== null) setStartTime(v); }}>
                       <SelectTrigger className="flex-1" id="startTime">
@@ -161,12 +220,12 @@ export default function CreateClassPage() {
                     />
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Choose from 15-min intervals or type custom time
+                    {t('teacher.createClass.startTimeHint')}
                   </p>
                 </div>
 
                 <div>
-                  <Label htmlFor="duration">Duration (minutes)</Label>
+                  <Label htmlFor="duration">{t('teacher.createClass.duration')}</Label>
                   <Input
                     id="duration"
                     type="number"
@@ -183,11 +242,11 @@ export default function CreateClassPage() {
 
               <div className="flex gap-4">
                 <Button type="submit" disabled={loading || !name || !subject}>
-                  {loading ? "Creating…" : "Create class"}
+                  {loading ? t('teacher.createClass.creating') : t('teacher.createClass.create')}
                 </Button>
                 <Link href="/teacher/classes">
                   <Button type="button" variant="outline" disabled={loading}>
-                    Cancel
+                    {t('common.cancel')}
                   </Button>
                 </Link>
               </div>

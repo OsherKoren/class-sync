@@ -8,12 +8,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { redeemLinkCode } from "@/lib/actions/link-code";
+import { useTranslations } from "next-intl";
 
 export default function StudentLinkPage() {
   const router = useRouter();
   const [code, setCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const t = useTranslations();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -37,25 +39,24 @@ export default function StudentLinkPage() {
           href="/student/dashboard"
           className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block"
         >
-          ← Back to dashboard
+          {t('student.link.backToDashboard')}
         </Link>
         <Card>
           <CardHeader>
-            <CardTitle>Claim your student account</CardTitle>
+            <CardTitle>{t('student.link.title')}</CardTitle>
             <CardDescription>
-              Ask your parent or guardian to generate a student link code, then enter it here to
-              connect your login to your student profile.
+              {t('student.link.subtitle')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="code">Link code</Label>
+                <Label htmlFor="code">{t('student.link.linkCode')}</Label>
                 <Input
                   id="code"
                   value={code}
                   onChange={(e) => setCode(e.target.value.toUpperCase().replace(/\s/g, ""))}
-                  placeholder="AB3X7Q"
+                  placeholder={t('student.link.codePlaceholder')}
                   maxLength={6}
                   className="font-mono tracking-widest text-center text-xl uppercase"
                   autoFocus
@@ -64,7 +65,7 @@ export default function StudentLinkPage() {
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
               <Button type="submit" disabled={submitting || !code.trim()} className="w-full">
-                {submitting ? "Linking…" : "Claim account"}
+                {submitting ? t('student.link.linking') : t('student.link.claimAccount')}
               </Button>
             </form>
           </CardContent>

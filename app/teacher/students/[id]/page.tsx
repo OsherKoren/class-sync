@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getGuardianStudents, addStudent } from "@/lib/actions/guardian";
+import { useTranslations } from "next-intl";
 
 type GuardianData = {
   guardianId: string;
@@ -33,6 +34,7 @@ export default function GuardianDetailPage({
   const [addingStudent, setAddingStudent] = useState(false);
   const [studentName, setStudentName] = useState("");
   const [addError, setAddError] = useState("");
+  const t = useTranslations();
 
   useEffect(() => {
     async function loadGuardian() {
@@ -72,7 +74,7 @@ export default function GuardianDetailPage({
   if (loading) {
     return (
       <div className="p-8">
-        <p>Loading...</p>
+        <p>{t('common.loading')}</p>
       </div>
     );
   }
@@ -81,9 +83,9 @@ export default function GuardianDetailPage({
     return (
       <div className="p-8">
         <div className="max-w-4xl mx-auto">
-          <p className="text-destructive">{error || "Guardian not found"}</p>
+          <p className="text-destructive">{error || t('teacher.guardianDetail.guardianNotFound')}</p>
           <Link href="/teacher/students" className="mt-4 inline-block">
-            <Button>Back to students</Button>
+            <Button>{t('teacher.guardianDetail.backBtn')}</Button>
           </Link>
         </div>
       </div>
@@ -98,7 +100,7 @@ export default function GuardianDetailPage({
             href="/teacher/students"
             className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block"
           >
-            ← Back to students
+            {t('teacher.guardianDetail.backToStudents')}
           </Link>
           <h1 className="text-3xl font-bold mb-2">{guardian.guardianName}</h1>
           <p className="text-muted-foreground">{guardian.guardianEmail}</p>
@@ -107,15 +109,15 @@ export default function GuardianDetailPage({
         <div className="grid gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>Students</CardTitle>
+              <CardTitle>{t('teacher.guardianDetail.studentsTitle')}</CardTitle>
               <CardDescription>
-                Students linked to this guardian
+                {t('teacher.guardianDetail.studentsLinked')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {guardian.students.length === 0 ? (
                 <p className="text-muted-foreground mb-4">
-                  No students linked yet.
+                  {t('teacher.guardianDetail.noStudents')}
                 </p>
               ) : (
                 <div className="space-y-2 mb-4">
@@ -129,7 +131,7 @@ export default function GuardianDetailPage({
                         href={`/teacher/students/${guardianId}/${student.id}/enroll`}
                         className="text-sm text-primary hover:underline"
                       >
-                        Enroll in class
+                        {t('teacher.guardianDetail.enrollInClass')}
                       </Link>
                     </div>
                   ))}
@@ -138,17 +140,17 @@ export default function GuardianDetailPage({
 
               <form onSubmit={handleAddStudent} className="space-y-3 pt-4 border-t">
                 <div>
-                  <Label htmlFor="studentName">Add new student</Label>
+                  <Label htmlFor="studentName">{t('teacher.guardianDetail.addStudent')}</Label>
                   <div className="flex gap-2 mt-2">
                     <Input
                       id="studentName"
-                      placeholder="Student name"
+                      placeholder={t('teacher.guardianDetail.studentName')}
                       value={studentName}
                       onChange={(e) => setStudentName(e.target.value)}
                       required
                     />
                     <Button type="submit" disabled={addingStudent}>
-                      Add
+                      {t('teacher.guardianDetail.add')}
                     </Button>
                   </div>
                   {addError && (

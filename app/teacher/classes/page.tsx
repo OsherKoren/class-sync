@@ -8,19 +8,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getTeacherClasses } from "@/lib/actions/class";
-
-const dayNames = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
+import { getTranslations } from "next-intl/server";
 
 export default async function ClassesPage() {
   const result = await getTeacherClasses();
+  const t = await getTranslations();
 
   if ("error" in result) {
     return (
@@ -37,13 +29,13 @@ export default async function ClassesPage() {
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Classes</h1>
+            <h1 className="text-3xl font-bold mb-2">{t('teacher.classes.title')}</h1>
             <p className="text-muted-foreground">
-              Manage your classes and enrollments
+              {t('teacher.classes.subtitle')}
             </p>
           </div>
           <Link href="/teacher/classes/new">
-            <Button>Create class</Button>
+            <Button>{t('teacher.classes.createClass')}</Button>
           </Link>
         </div>
 
@@ -51,12 +43,12 @@ export default async function ClassesPage() {
           <Card>
             <CardContent className="pt-6">
               <p className="text-center text-muted-foreground">
-                No classes yet.{" "}
+                {t('teacher.classes.noClasses')}{" "}
                 <Link
                   href="/teacher/classes/new"
                   className="underline underline-offset-4"
                 >
-                  Create your first class
+                  {t('teacher.classes.createFirst')}
                 </Link>
               </p>
             </CardContent>
@@ -74,8 +66,19 @@ export default async function ClassesPage() {
                       </div>
                       <div className="text-right text-sm">
                         <p className="font-medium">{cls.type}</p>
+                        {(cls.level || cls.grade) && (
+                          <p className="text-muted-foreground">
+                            {cls.grade && <span>{cls.grade}</span>}
+                            {cls.grade && cls.level && <span> · </span>}
+                            {cls.level && (
+                              <span className="capitalize">
+                                {cls.level.charAt(0) + cls.level.slice(1).toLowerCase()}
+                              </span>
+                            )}
+                          </p>
+                        )}
                         <p className="text-muted-foreground">
-                          {dayNames[cls.dayOfWeek]} at {cls.startTime}
+                          {t(`days.${cls.dayOfWeek}` as `days.${number}`)} at {cls.startTime}
                         </p>
                       </div>
                     </div>
@@ -83,8 +86,8 @@ export default async function ClassesPage() {
                   <CardContent>
                     <p className="text-sm text-muted-foreground">
                       {cls.enrollmentCount}{" "}
-                      {cls.enrollmentCount === 1 ? "student" : "students"}
-                      enrolled • {cls.duration} minutes per session
+                      {cls.enrollmentCount === 1 ? t('common.student') : t('common.students')}{" "}
+                      enrolled • {cls.duration} {t('common.minutesPerSession')}
                     </p>
                   </CardContent>
                 </Card>

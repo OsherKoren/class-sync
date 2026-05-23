@@ -1,0 +1,305 @@
+{
+  "common": {
+    "appName": "ClassSync",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "somethingWentWrong": "Something went wrong. Please try again.",
+    "backToDashboard": "← Back to dashboard",
+    "minutes": "minutes",
+    "minutesPerSession": "minutes per session",
+    "student": "student",
+    "students": "students",
+    "language": "Language",
+    "hebrew": "Hebrew",
+    "english": "English"
+  },
+  "days": {
+    "0": "Sunday",
+    "1": "Monday",
+    "2": "Tuesday",
+    "3": "Wednesday",
+    "4": "Thursday",
+    "5": "Friday",
+    "6": "Saturday"
+  },
+  "home": {
+    "tagline": "Scheduling made simple for teachers and students",
+    "createAccount": "Create account"
+  },
+  "auth": {
+    "signInTitle": "Sign in to your account",
+    "continueWithGoogle": "Continue with Google",
+    "or": "or",
+    "email": "Email",
+    "emailPlaceholder": "your@email.com",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "invalidCredentials": "Invalid email or password",
+    "signingIn": "Signing in…",
+    "newHere": "New here?",
+    "createAccount": "Create an account",
+    "registerTitle": "Create account",
+    "signUpSubtitle": "Sign up for ClassSync",
+    "signUpWithGoogle": "Sign up with Google",
+    "fullName": "Full name",
+    "namePlaceholder": "Your name",
+    "atLeast8": "At least 8 characters",
+    "confirmPassword": "Confirm password",
+    "passwordsNoMatch": "Passwords do not match",
+    "creatingAccount": "Creating account…",
+    "alreadyHaveAccount": "Already have an account?",
+    "welcomeTitle": "Welcome to ClassSync",
+    "welcomeSubtitle": "Let's get your account set up",
+    "settingUp": "Setting up…",
+    "imStudent": "I'm a student",
+    "imParent": "I'm a parent",
+    "imTeacher": "I'm a teacher",
+    "resetPasswordTitle": "Reset password",
+    "resetPasswordSubtitle": "Enter your email and we'll send you a reset link",
+    "sending": "Sending…",
+    "sendResetLink": "Send reset link",
+    "rememberPassword": "Remember your password?",
+    "checkEmail": "Check your email",
+    "resetLinkSent": "We sent a password reset link to {email}",
+    "resetLinkExpiry": "Click the link in the email to reset your password. The link will expire in 1 hour.",
+    "backToSignIn": "Back to sign in",
+    "createNewPassword": "Create new password",
+    "enterNewPassword": "Enter your new password below",
+    "newPassword": "New password",
+    "resetting": "Resetting…",
+    "passwordResetSuccess": "Password reset",
+    "passwordResetSuccessBody": "Your password has been reset successfully",
+    "redirecting": "Redirecting to sign in..."
+  },
+  "teacher": {
+    "dashboard": {
+      "title": "Teacher Dashboard",
+      "welcome": "Welcome, {name}",
+      "classes": "Classes",
+      "classesDesc": "Manage your classes and students",
+      "students": "Students",
+      "studentsDesc": "View and manage enrolled families",
+      "reschedules": "Reschedules",
+      "reschedulesDesc": "Offer new time slots and view voting results",
+      "settings": "Settings",
+      "settingsDesc": "Manage your account and calendar"
+    },
+    "classes": {
+      "title": "Classes",
+      "subtitle": "Manage your classes and enrollments",
+      "createClass": "Create class",
+      "noClasses": "No classes yet.",
+      "createFirst": "Create your first class",
+      "enrolledCount": "{count} {students} enrolled • {duration} minutes per session"
+    },
+    "createClass": {
+      "title": "Create class",
+      "subtitle": "Set up a new class for your students",
+      "className": "Class name",
+      "classNamePlaceholder": "e.g., Math 101",
+      "subject": "Subject",
+      "subjectPlaceholder": "e.g., Mathematics",
+      "classType": "Class type",
+      "group": "Group",
+      "private": "Private",
+      "level": "Level (optional)",
+      "selectLevel": "Select level",
+      "noLevel": "No level",
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "grade": "Grade (optional)",
+      "gradePlaceholder": "e.g., Grade 11, Mixed",
+      "noGrade": "No grade",
+      "customGrade": "Custom…",
+      "day": "Day",
+      "startTime": "Start time (24-hour format)",
+      "startTimeHint": "Choose from 15-min intervals or type custom time",
+      "duration": "Duration (minutes)",
+      "creating": "Creating…",
+      "create": "Create class",
+      "grades": {
+        "4": "Grade 4",
+        "5": "Grade 5",
+        "6": "Grade 6",
+        "7": "Grade 7",
+        "8": "Grade 8",
+        "9": "Grade 9",
+        "10": "Grade 10"
+      }
+    },
+    "classDetail": {
+      "backToClasses": "← Back to classes",
+      "type": "Type",
+      "schedule": "Schedule",
+      "enrolled": "Enrolled",
+      "pendingRequests": "Pending Requests",
+      "pendingDesc": "Students requesting to join this class",
+      "pendingApproval": "Pending approval",
+      "enrolledStudents": "Enrolled students",
+      "enrolledDesc": "Students enrolled in this class",
+      "noStudents": "No students enrolled yet.",
+      "goToStudents": "Go to students page to enroll"
+    },
+    "students": {
+      "title": "Students",
+      "subtitle": "Manage students and their guardians",
+      "addGuardian": "Add guardian & student",
+      "noGuardians": "No guardians yet.",
+      "addFirst": "Add your first guardian"
+    },
+    "addGuardian": {
+      "title": "Add guardian",
+      "subtitle": "Create a guardian account, then add their children as students",
+      "guardianName": "Guardian name",
+      "namePlaceholder": "e.g., Sarah Cohen",
+      "emailPlaceholder": "guardian@email.com",
+      "tempPasswordNote": "A temporary password will be generated. Share it with the guardian so they can log in and set their own password. After login, they can link their child's account via a link code.",
+      "creating": "Creating…",
+      "create": "Create guardian"
+    },
+    "guardianDetail": {
+      "backToStudents": "← Back to students",
+      "guardianNotFound": "Guardian not found",
+      "backBtn": "Back to students",
+      "studentsTitle": "Students",
+      "studentsLinked": "Students linked to this guardian",
+      "noStudents": "No students linked yet.",
+      "addStudent": "Add new student",
+      "studentName": "Student name",
+      "enrollInClass": "Enroll in class",
+      "add": "Add"
+    },
+    "enrollStudent": {
+      "backToStudents": "← Back to students",
+      "subtitle": "Select a class to enroll this student",
+      "notFound": "Student not found",
+      "backBtn": "Back to students",
+      "noClasses": "No classes available. Create a class first.",
+      "alreadyEnrolled": "Enrolled",
+      "enrolling": "Enrolling…",
+      "enroll": "Enroll in this class"
+    }
+  },
+  "student": {
+    "dashboard": {
+      "title": "My Classes",
+      "welcome": "Welcome, {name}",
+      "findClasses": "Find classes",
+      "pendingTitle": "Pending Approval",
+      "pendingStatus": "Awaiting approval",
+      "noClasses": "You haven't enrolled in any classes yet.",
+      "browseClasses": "Browse available classes",
+      "activeTitle": "Active Classes",
+      "activeStatus": "Active"
+    },
+    "classes": {
+      "backToDashboard": "← Back to dashboard",
+      "title": "Available Classes",
+      "subtitle": "Request to join any of these open classes",
+      "loadingClasses": "Loading classes...",
+      "noClasses": "No open classes available at the moment.",
+      "request": "Request to join",
+      "requesting": "Requesting…",
+      "requested": "Requested"
+    },
+    "link": {
+      "backToDashboard": "← Back to dashboard",
+      "title": "Claim your student account",
+      "subtitle": "Ask your parent or guardian to generate a student link code, then enter it here to connect your login to your student profile.",
+      "linkCode": "Link code",
+      "codePlaceholder": "AB3X7Q",
+      "linking": "Linking…",
+      "claimAccount": "Claim account"
+    },
+    "settings": {
+      "backToDashboard": "← Back to dashboard",
+      "title": "Settings",
+      "subtitle": "Manage your preferences",
+      "language": "Language",
+      "saving": "Saving…"
+    }
+  },
+  "guardian": {
+    "dashboard": {
+      "title": "My Children",
+      "welcome": "Welcome, {name}",
+      "addChild": "Add child",
+      "linkViaCode": "Link via code",
+      "noChildren": "No children linked to your account yet.",
+      "addChildBtn": "Add a child",
+      "enterCode": "Enter invite code",
+      "manageLinks": "Manage links",
+      "notClaimed": "Student hasn't claimed their account yet",
+      "notEnrolled": "Not enrolled in any classes.",
+      "pending": "Pending"
+    },
+    "link": {
+      "backToDashboard": "← Back to dashboard",
+      "title": "Link to a student",
+      "subtitle": "Enter the guardian invite code shared with you to link your account to a student.",
+      "inviteCode": "Invite code",
+      "codePlaceholder": "AB3X7Q",
+      "linking": "Linking…",
+      "linkAccount": "Link account"
+    },
+    "addChild": {
+      "backToDashboard": "← Back to dashboard",
+      "title": "Add a child",
+      "subtitle": "Create a student profile for your child. You can share a link code with them afterwards so they can claim their account.",
+      "childName": "Child's name",
+      "namePlaceholder": "Enter full name",
+      "creating": "Creating…",
+      "create": "Create profile"
+    },
+    "settings": {
+      "backToDashboard": "← Back to dashboard",
+      "title": "Settings",
+      "language": "Language",
+      "saving": "Saving…"
+    },
+    "linkCodes": {
+      "backToDashboard": "← Back to dashboard",
+      "title": "Manage link codes",
+      "studentClaimTitle": "Student claim codes",
+      "studentClaimDesc": "Share with {name} so they can log in and claim this profile.",
+      "alreadyClaimed": "Student has already claimed their account.",
+      "generateStudent": "Generate student code",
+      "guardianInviteTitle": "Guardian invite codes",
+      "guardianInviteDesc": "Share with another parent or guardian so they can link to {name}.",
+      "generateGuardian": "Generate guardian code",
+      "noActiveCodes": "No active codes.",
+      "expires": "Expires {date}",
+      "revoke": "Revoke"
+    }
+  },
+  "components": {
+    "deleteClass": {
+      "title": "Delete class",
+      "warning": "This action cannot be undone",
+      "instructions": "Type 'delete' below to confirm deletion of this class.",
+      "confirmLabel": "Confirmation",
+      "confirmPlaceholder": "Type 'delete' here",
+      "confirmError": "Please type 'delete' to confirm",
+      "deleting": "Deleting…",
+      "delete": "Delete class"
+    },
+    "enrollment": {
+      "approving": "Approving…",
+      "approve": "Approve",
+      "rejecting": "Rejecting…",
+      "reject": "Reject",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "openEnrollment": {
+      "title": "Open Enrollment",
+      "openDesc": "This class is open for student self-enrollment requests",
+      "closedDesc": "Only you can enroll students in this class",
+      "closeBtn": "Close Enrollment",
+      "openBtn": "Open Enrollment"
+    }
+  }
+}

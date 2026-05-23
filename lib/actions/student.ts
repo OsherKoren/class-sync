@@ -63,6 +63,8 @@ export async function getOpenClasses(): Promise<
         name: string;
         subject: string;
         type: string;
+        level: string | null;
+        grade: string | null;
         dayOfWeek: number;
         startTime: string;
         duration: number;
@@ -81,6 +83,8 @@ export async function getOpenClasses(): Promise<
       name: true,
       subject: true,
       type: true,
+      level: true,
+      grade: true,
       dayOfWeek: true,
       startTime: true,
       duration: true,

@@ -11,16 +11,7 @@ import { DeleteClassSection } from "@/components/DeleteClassSection";
 import { getClassById } from "@/lib/actions/class";
 import { EnrollmentManagement } from "@/components/teacher/EnrollmentManagement";
 import { ToggleOpenEnrollment } from "@/components/teacher/ToggleOpenEnrollment";
-
-const dayNames = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
+import { getTranslations } from "next-intl/server";
 
 export default async function ClassDetailPage({
   params,
@@ -29,6 +20,7 @@ export default async function ClassDetailPage({
 }) {
   const { id } = await params;
   const result = await getClassById(id);
+  const t = await getTranslations();
 
   if ("error" in result) {
     return (
@@ -36,7 +28,7 @@ export default async function ClassDetailPage({
         <div className="max-w-4xl mx-auto">
           <p className="text-destructive">{result.error}</p>
           <Link href="/teacher/classes" className="mt-4 inline-block">
-            <Button>Back to classes</Button>
+            <Button>{t('teacher.classDetail.backToClasses')}</Button>
           </Link>
         </div>
       </div>
@@ -59,7 +51,7 @@ export default async function ClassDetailPage({
             href="/teacher/classes"
             className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block"
           >
-            ← Back to classes
+            {t('teacher.classDetail.backToClasses')}
           </Link>
           <h1 className="text-3xl font-bold mb-2">{classData.name}</h1>
           <p className="text-muted-foreground">{classData.subject}</p>
@@ -68,33 +60,44 @@ export default async function ClassDetailPage({
         <div className="grid gap-6 md:grid-cols-3 mb-8">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Type</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('teacher.classDetail.type')}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">{classData.type}</p>
+              {(classData.grade || classData.level) && (
+                <p className="text-xs text-muted-foreground">
+                  {classData.grade && <span>{classData.grade}</span>}
+                  {classData.grade && classData.level && <span> · </span>}
+                  {classData.level && (
+                    <span className="capitalize">
+                      {classData.level.charAt(0) + classData.level.slice(1).toLowerCase()}
+                    </span>
+                  )}
+                </p>
+              )}
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Schedule</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('teacher.classDetail.schedule')}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">{classData.startTime}</p>
               <p className="text-xs text-muted-foreground">
-                {dayNames[classData.dayOfWeek]} • {classData.duration} min
+                {t(`days.${classData.dayOfWeek}` as `days.${number}`)} • {classData.duration} min
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Enrolled</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('teacher.classDetail.enrolled')}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">{activeEnrollments.length}</p>
               <p className="text-xs text-muted-foreground">
-                {activeEnrollments.length === 1 ? "student" : "students"}
+                {activeEnrollments.length === 1 ? t('common.student') : t('common.students')}
               </p>
             </CardContent>
           </Card>
@@ -105,9 +108,9 @@ export default async function ClassDetailPage({
         {pendingEnrollments.length > 0 && (
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Pending Requests</CardTitle>
+              <CardTitle>{t('teacher.classDetail.pendingRequests')}</CardTitle>
               <CardDescription>
-                Students requesting to join this class
+                {t('teacher.classDetail.pendingDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -120,7 +123,7 @@ export default async function ClassDetailPage({
                     <div>
                       <p className="font-medium">{enrollment.studentName}</p>
                       <p className="text-sm text-muted-foreground">
-                        Pending approval
+                        {t('teacher.classDetail.pendingApproval')}
                       </p>
                     </div>
                     <EnrollmentManagement enrollmentId={enrollment.id} />
@@ -133,20 +136,20 @@ export default async function ClassDetailPage({
 
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Enrolled students</CardTitle>
+            <CardTitle>{t('teacher.classDetail.enrolledStudents')}</CardTitle>
             <CardDescription>
-              Students enrolled in this class
+              {t('teacher.classDetail.enrolledDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {activeEnrollments.length === 0 ? (
               <p className="text-muted-foreground">
-                No students enrolled yet.{" "}
+                {t('teacher.classDetail.noStudents')}{" "}
                 <Link
                   href="/teacher/students"
                   className="underline underline-offset-4"
                 >
-                  Go to students page to enroll
+                  {t('teacher.classDetail.goToStudents')}
                 </Link>
               </p>
             ) : (

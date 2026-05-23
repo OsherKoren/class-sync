@@ -13,12 +13,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { requestPasswordReset } from "@/lib/actions/auth";
+import { useTranslations } from "next-intl";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const t = useTranslations();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -45,18 +47,17 @@ export default function ForgotPasswordPage() {
             <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-2xl font-bold text-primary-foreground">
               C
             </div>
-            <CardTitle className="text-2xl">Check your email</CardTitle>
+            <CardTitle className="text-2xl">{t('auth.checkEmail')}</CardTitle>
             <CardDescription>
-              We sent a password reset link to {email}
+              {t('auth.resetLinkSent', { email })}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <p className="text-sm text-muted-foreground">
-              Click the link in the email to reset your password. The link will
-              expire in 1 hour.
+              {t('auth.resetLinkExpiry')}
             </p>
             <Link href="/login" className="w-full">
-              <Button className="w-full">Back to sign in</Button>
+              <Button className="w-full">{t('auth.backToSignIn')}</Button>
             </Link>
           </CardContent>
         </Card>
@@ -71,19 +72,19 @@ export default function ForgotPasswordPage() {
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-2xl font-bold text-primary-foreground">
             C
           </div>
-          <CardTitle className="text-2xl">Reset password</CardTitle>
+          <CardTitle className="text-2xl">{t('auth.resetPasswordTitle')}</CardTitle>
           <CardDescription>
-            Enter your email and we&apos;ll send you a reset link
+            {t('auth.resetPasswordSubtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.email')}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="your@email.com"
+                placeholder={t('auth.emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -92,14 +93,14 @@ export default function ForgotPasswordPage() {
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Sending…" : "Send reset link"}
+              {loading ? t('auth.sending') : t('auth.sendResetLink')}
             </Button>
           </form>
 
           <p className="text-center text-xs text-muted-foreground">
-            Remember your password?{" "}
+            {t('auth.rememberPassword')}{" "}
             <Link href="/login" className="underline underline-offset-4">
-              Sign in
+              {t('common.signIn')}
             </Link>
           </p>
         </CardContent>

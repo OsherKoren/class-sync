@@ -8,12 +8,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { redeemLinkCode } from "@/lib/actions/link-code";
+import { useTranslations } from "next-intl";
 
 export default function GuardianLinkPage() {
   const router = useRouter();
   const [code, setCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const t = useTranslations();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -37,24 +39,24 @@ export default function GuardianLinkPage() {
           href="/guardian/dashboard"
           className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block"
         >
-          ← Back to dashboard
+          {t('guardian.link.backToDashboard')}
         </Link>
         <Card>
           <CardHeader>
-            <CardTitle>Link to a student</CardTitle>
+            <CardTitle>{t('guardian.link.title')}</CardTitle>
             <CardDescription>
-              Enter the guardian invite code shared with you to link your account to a student.
+              {t('guardian.link.subtitle')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="code">Invite code</Label>
+                <Label htmlFor="code">{t('guardian.link.inviteCode')}</Label>
                 <Input
                   id="code"
                   value={code}
                   onChange={(e) => setCode(e.target.value.toUpperCase().replace(/\s/g, ""))}
-                  placeholder="AB3X7Q"
+                  placeholder={t('guardian.link.codePlaceholder')}
                   maxLength={6}
                   className="font-mono tracking-widest text-center text-xl uppercase"
                   autoFocus
@@ -63,7 +65,7 @@ export default function GuardianLinkPage() {
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
               <Button type="submit" disabled={submitting || !code.trim()} className="w-full">
-                {submitting ? "Linking…" : "Link account"}
+                {submitting ? t('guardian.link.linking') : t('guardian.link.linkAccount')}
               </Button>
             </form>
           </CardContent>

@@ -11,16 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getOpenClasses, requestEnrollment } from "@/lib/actions/student";
-
-const dayNames = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
+import { useTranslations } from "next-intl";
 
 type ClassInfo = {
   id: string;
@@ -30,6 +21,8 @@ type ClassInfo = {
   startTime: string;
   duration: number;
   type: string;
+  level: string | null;
+  grade: string | null;
 };
 
 export default function ClassesPage() {
@@ -38,6 +31,7 @@ export default function ClassesPage() {
   const [error, setError] = useState("");
   const [requesting, setRequesting] = useState<string | null>(null);
   const [requested, setRequested] = useState<Set<string>>(new Set());
+  const t = useTranslations();
 
   useEffect(() => {
     async function loadClasses() {
@@ -67,7 +61,7 @@ export default function ClassesPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background p-8">
-        <p>Loading classes...</p>
+        <p>{t('student.classes.loadingClasses')}</p>
       </div>
     );
   }
@@ -77,11 +71,11 @@ export default function ClassesPage() {
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <Link href="/student/dashboard" className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block">
-            ← Back to dashboard
+            {t('student.classes.backToDashboard')}
           </Link>
-          <h1 className="text-3xl font-bold mb-2">Available Classes</h1>
+          <h1 className="text-3xl font-bold mb-2">{t('student.classes.title')}</h1>
           <p className="text-muted-foreground">
-            Request to join any of these open classes
+            {t('student.classes.subtitle')}
           </p>
         </div>
 
@@ -91,7 +85,7 @@ export default function ClassesPage() {
           <Card>
             <CardContent className="pt-6">
               <p className="text-center text-muted-foreground">
-                No open classes available at the moment.
+                {t('student.classes.noClasses')}
               </p>
             </CardContent>
           </Card>
@@ -107,25 +101,36 @@ export default function ClassesPage() {
                     </div>
                     <div className="text-right text-sm">
                       <p className="font-medium">{cls.type}</p>
+                      {(cls.grade || cls.level) && (
+                        <p className="text-muted-foreground">
+                          {cls.grade && <span>{cls.grade}</span>}
+                          {cls.grade && cls.level && <span> · </span>}
+                          {cls.level && (
+                            <span className="capitalize">
+                              {cls.level.charAt(0) + cls.level.slice(1).toLowerCase()}
+                            </span>
+                          )}
+                        </p>
+                      )}
                       <p className="text-muted-foreground">
-                        {dayNames[cls.dayOfWeek]} at {cls.startTime}
+                        {t(`days.${cls.dayOfWeek}` as `days.${number}`)} at {cls.startTime}
                       </p>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="flex items-center justify-between">
                   <p className="text-sm text-muted-foreground">
-                    {cls.duration} minutes per session
+                    {cls.duration} {t('common.minutesPerSession')}
                   </p>
                   <Button
                     onClick={() => handleRequest(cls.id)}
                     disabled={requesting === cls.id || requested.has(cls.id)}
                   >
                     {requested.has(cls.id)
-                      ? "Requested"
+                      ? t('student.classes.requested')
                       : requesting === cls.id
-                        ? "Requesting…"
-                        : "Request to join"}
+                        ? t('student.classes.requesting')
+                        : t('student.classes.request')}
                   </Button>
                 </CardContent>
               </Card>

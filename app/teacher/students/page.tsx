@@ -8,9 +8,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getTeacherStudents } from "@/lib/actions/guardian";
+import { getTranslations } from "next-intl/server";
 
 export default async function StudentsPage() {
   const result = await getTeacherStudents();
+  const t = await getTranslations();
 
   if ("error" in result) {
     return (
@@ -27,13 +29,13 @@ export default async function StudentsPage() {
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Students</h1>
+            <h1 className="text-3xl font-bold mb-2">{t('teacher.students.title')}</h1>
             <p className="text-muted-foreground">
-              Manage students and their guardians
+              {t('teacher.students.subtitle')}
             </p>
           </div>
           <Link href="/teacher/students/new">
-            <Button>Add guardian &amp; student</Button>
+            <Button>{t('teacher.students.addGuardian')}</Button>
           </Link>
         </div>
 
@@ -41,12 +43,12 @@ export default async function StudentsPage() {
           <Card>
             <CardContent className="pt-6">
               <p className="text-center text-muted-foreground">
-                No guardians yet.{" "}
+                {t('teacher.students.noGuardians')}{" "}
                 <Link
                   href="/teacher/students/new"
                   className="underline underline-offset-4"
                 >
-                  Add your first guardian
+                  {t('teacher.students.addFirst')}
                 </Link>
               </p>
             </CardContent>
@@ -67,7 +69,7 @@ export default async function StudentsPage() {
                       </div>
                       <div className="text-right text-sm font-medium">
                         {guardian.students.length}{" "}
-                        {guardian.students.length === 1 ? "student" : "students"}
+                        {guardian.students.length === 1 ? t('common.student') : t('common.students')}
                       </div>
                     </div>
                   </CardHeader>

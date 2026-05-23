@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { createAccountWithEmail } from "@/lib/actions/auth";
+import { useTranslations } from "next-intl";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -28,11 +29,12 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const t = useTranslations();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (password !== confirm) {
-      setError("Passwords do not match");
+      setError(t('auth.passwordsNoMatch'));
       return;
     }
     setLoading(true);
@@ -69,8 +71,8 @@ export default function RegisterPage() {
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-2xl font-bold text-primary-foreground">
             C
           </div>
-          <CardTitle className="text-2xl">Create account</CardTitle>
-          <CardDescription>Sign up for ClassSync</CardDescription>
+          <CardTitle className="text-2xl">{t('auth.registerTitle')}</CardTitle>
+          <CardDescription>{t('auth.signUpSubtitle')}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <Button
@@ -96,22 +98,22 @@ export default function RegisterPage() {
                 fill="#EA4335"
               />
             </svg>
-            Sign up with Google
+            {t('auth.signUpWithGoogle')}
           </Button>
 
           <div className="relative flex items-center">
             <Separator className="flex-1" />
-            <span className="mx-3 text-xs text-muted-foreground">or</span>
+            <span className="mx-3 text-xs text-muted-foreground">{t('auth.or')}</span>
             <Separator className="flex-1" />
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="name">Full name</Label>
+              <Label htmlFor="name">{t('auth.fullName')}</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="Your name"
+                placeholder={t('auth.namePlaceholder')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -119,11 +121,11 @@ export default function RegisterPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.email')}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="your@email.com"
+                placeholder={t('auth.emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -131,12 +133,12 @@ export default function RegisterPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('auth.password')}</Label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="At least 8 characters"
+                  placeholder={t('auth.atLeast8')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -156,7 +158,7 @@ export default function RegisterPage() {
               </div>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="confirm">Confirm password</Label>
+              <Label htmlFor="confirm">{t('auth.confirmPassword')}</Label>
               <div className="relative">
                 <Input
                   id="confirm"
@@ -181,14 +183,14 @@ export default function RegisterPage() {
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Creating account…" : "Create account"}
+              {loading ? t('auth.creatingAccount') : t('auth.registerTitle')}
             </Button>
           </form>
 
           <p className="text-center text-xs text-muted-foreground">
-            Already have an account?{" "}
+            {t('auth.alreadyHaveAccount')}{" "}
             <Link href="/login" className="underline underline-offset-4">
-              Sign in
+              {t('common.signIn')}
             </Link>
           </p>
         </CardContent>

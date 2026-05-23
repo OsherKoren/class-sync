@@ -8,6 +8,8 @@ const classSchema = z.object({
   name: z.string().min(2, "Class name must be at least 2 characters"),
   subject: z.string().min(2, "Subject must be at least 2 characters"),
   type: z.enum(["GROUP", "PRIVATE"]),
+  level: z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED"]).optional(),
+  grade: z.string().max(50).optional(),
   dayOfWeek: z.number().min(0).max(6),
   startTime: z.string().regex(/^\d{2}:\d{2}$/, "Time must be in HH:MM format"),
   duration: z.number().min(30, "Duration must be at least 30 minutes"),
@@ -26,7 +28,7 @@ export async function createClass(
     return { error: parsed.error.issues[0].message };
   }
 
-  const { name, subject, type, dayOfWeek, startTime, duration } = parsed.data;
+  const { name, subject, type, level, grade, dayOfWeek, startTime, duration } = parsed.data;
 
   // Check for overlapping classes on the same day
   const [startHour, startMinute] = startTime.split(":").map(Number);
@@ -66,6 +68,8 @@ export async function createClass(
       name,
       subject,
       type,
+      level,
+      grade,
       dayOfWeek,
       startTime,
       duration,
@@ -143,6 +147,8 @@ export async function getTeacherClasses(): Promise<
         name: string;
         subject: string;
         type: string;
+        level: string | null;
+        grade: string | null;
         dayOfWeek: number;
         startTime: string;
         duration: number;
@@ -162,6 +168,8 @@ export async function getTeacherClasses(): Promise<
       name: true,
       subject: true,
       type: true,
+      level: true,
+      grade: true,
       dayOfWeek: true,
       startTime: true,
       duration: true,
@@ -186,6 +194,8 @@ export async function getClassById(classId: string): Promise<
         name: string;
         subject: string;
         type: string;
+        level: string | null;
+        grade: string | null;
         dayOfWeek: number;
         startTime: string;
         duration: number;
@@ -211,6 +221,8 @@ export async function getClassById(classId: string): Promise<
       name: true,
       subject: true,
       type: true,
+      level: true,
+      grade: true,
       dayOfWeek: true,
       startTime: true,
       duration: true,
@@ -236,6 +248,8 @@ export async function getClassById(classId: string): Promise<
       name: classRecord.name,
       subject: classRecord.subject,
       type: classRecord.type,
+      level: classRecord.level,
+      grade: classRecord.grade,
       dayOfWeek: classRecord.dayOfWeek,
       startTime: classRecord.startTime,
       duration: classRecord.duration,

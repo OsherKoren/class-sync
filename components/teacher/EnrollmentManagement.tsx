@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { approveEnrollment, rejectEnrollment } from "@/lib/actions/guardian";
+import { useTranslations } from "next-intl";
 
 export function EnrollmentManagement({ enrollmentId }: { enrollmentId: string }) {
   const [approving, setApproving] = useState(false);
   const [rejecting, setRejecting] = useState(false);
   const [approved, setApproved] = useState(false);
   const [rejected, setRejected] = useState(false);
+  const t = useTranslations();
 
   async function handleApprove() {
     setApproving(true);
@@ -29,11 +31,11 @@ export function EnrollmentManagement({ enrollmentId }: { enrollmentId: string })
   }
 
   if (approved) {
-    return <span className="text-sm text-green-600">Approved</span>;
+    return <span className="text-sm text-green-600">{t('components.enrollment.approved')}</span>;
   }
 
   if (rejected) {
-    return <span className="text-sm text-red-600">Rejected</span>;
+    return <span className="text-sm text-red-600">{t('components.enrollment.rejected')}</span>;
   }
 
   return (
@@ -43,7 +45,7 @@ export function EnrollmentManagement({ enrollmentId }: { enrollmentId: string })
         onClick={handleApprove}
         disabled={approving || rejecting}
       >
-        {approving ? "Approving…" : "Approve"}
+        {approving ? t('components.enrollment.approving') : t('components.enrollment.approve')}
       </Button>
       <Button
         size="sm"
@@ -51,7 +53,7 @@ export function EnrollmentManagement({ enrollmentId }: { enrollmentId: string })
         onClick={handleReject}
         disabled={approving || rejecting}
       >
-        {rejecting ? "Rejecting…" : "Reject"}
+        {rejecting ? t('components.enrollment.rejecting') : t('components.enrollment.reject')}
       </Button>
     </div>
   );

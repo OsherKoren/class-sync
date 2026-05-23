@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { updateClass } from "@/lib/actions/class";
+import { useTranslations } from "next-intl";
 
 export function ToggleOpenEnrollment({
   classId,
@@ -14,6 +15,7 @@ export function ToggleOpenEnrollment({
 }) {
   const [isOpen, setIsOpen] = useState(initialIsOpen);
   const [loading, setLoading] = useState(false);
+  const t = useTranslations();
 
   async function handleToggle() {
     setLoading(true);
@@ -28,18 +30,18 @@ export function ToggleOpenEnrollment({
   return (
     <Card className="mb-6">
       <CardHeader>
-        <CardTitle>Open Enrollment</CardTitle>
+        <CardTitle>{t('components.openEnrollment.title')}</CardTitle>
       </CardHeader>
       <CardContent className="flex items-center justify-between">
         <div>
           <p className="text-sm text-muted-foreground">
             {isOpen
-              ? "This class is open for student self-enrollment requests"
-              : "Only you can enroll students in this class"}
+              ? t('components.openEnrollment.openDesc')
+              : t('components.openEnrollment.closedDesc')}
           </p>
         </div>
         <Button onClick={handleToggle} disabled={loading}>
-          {isOpen ? "Close Enrollment" : "Open Enrollment"}
+          {isOpen ? t('components.openEnrollment.closeBtn') : t('components.openEnrollment.openBtn')}
         </Button>
       </CardContent>
     </Card>

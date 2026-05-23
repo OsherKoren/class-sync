@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { QrCode } from "@/components/link-code/QrCode";
 import { getStudentForGuardian } from "@/lib/actions/guardian-dashboard";
 import { getActiveLinkCodes, createLinkCode, revokeLinkCode } from "@/lib/actions/link-code";
+import { getTranslations } from "next-intl/server";
 
 export default async function StudentLinkPage({
   params,
@@ -12,6 +13,7 @@ export default async function StudentLinkPage({
   params: Promise<{ id: string }>;
 }) {
   const { id: studentId } = await params;
+  const t = await getTranslations();
 
   const [studentResult, codesResult] = await Promise.all([
     getStudentForGuardian(studentId),
@@ -51,84 +53,100 @@ export default async function StudentLinkPage({
           href="/guardian/dashboard"
           className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block"
         >
-          ← Back to dashboard
+          {t('guardian.linkCodes.backToDashboard')}
         </Link>
         <h1 className="text-2xl font-bold mb-1">{student.name}</h1>
-        <p className="text-muted-foreground text-sm mb-8">Manage link codes</p>
+        <p className="text-muted-foreground text-sm mb-8">{t('guardian.linkCodes.title')}</p>
 
         <section className="mb-8">
-          <h2 className="text-lg font-semibold mb-3">Student claim codes</h2>
+          <h2 className="text-lg font-semibold mb-3">{t('guardian.linkCodes.studentClaimTitle')}</h2>
           <p className="text-sm text-muted-foreground mb-4">
-            Share with {student.name} so they can log in and claim this profile.
+            {t('guardian.linkCodes.studentClaimDesc', { name: student.name })}
           </p>
           {student.hasAccount && (
             <p className="text-sm text-green-600 dark:text-green-400 mb-4">
-              Student has already claimed their account.
+              {t('guardian.linkCodes.alreadyClaimed')}
             </p>
           )}
-          <CodeList codes={studentCodes} onRevoke={handleRevoke} />
+          {studentCodes.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t('guardian.linkCodes.noActiveCodes')}</p>
+          ) : (
+            <div className="space-y-4">
+              {studentCodes.map((entry) => (
+                <Card key={entry.code}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-2xl font-mono tracking-widest text-center">
+                      {entry.code}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex justify-center">
+                      <QrCode value={entry.code} size={160} />
+                    </div>
+                    <p className="text-xs text-muted-foreground text-center">
+                      {t('guardian.linkCodes.expires', { date: new Date(entry.expiresAt).toLocaleString() })}
+                    </p>
+                    <form action={handleRevoke}>
+                      <input type="hidden" name="code" value={entry.code} />
+                      <Button type="submit" variant="outline" size="sm" className="w-full">
+                        {t('guardian.linkCodes.revoke')}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
           {!student.hasAccount && (
             <form action={handleCreateStudentCode} className="mt-3">
               <Button type="submit" variant="outline" className="w-full">
-                Generate student code
+                {t('guardian.linkCodes.generateStudent')}
               </Button>
             </form>
           )}
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold mb-3">Guardian invite codes</h2>
+          <h2 className="text-lg font-semibold mb-3">{t('guardian.linkCodes.guardianInviteTitle')}</h2>
           <p className="text-sm text-muted-foreground mb-4">
-            Share with another parent or guardian so they can link to {student.name}.
+            {t('guardian.linkCodes.guardianInviteDesc', { name: student.name })}
           </p>
-          <CodeList codes={guardianCodes} onRevoke={handleRevoke} />
+          {guardianCodes.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t('guardian.linkCodes.noActiveCodes')}</p>
+          ) : (
+            <div className="space-y-4">
+              {guardianCodes.map((entry) => (
+                <Card key={entry.code}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-2xl font-mono tracking-widest text-center">
+                      {entry.code}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex justify-center">
+                      <QrCode value={entry.code} size={160} />
+                    </div>
+                    <p className="text-xs text-muted-foreground text-center">
+                      {t('guardian.linkCodes.expires', { date: new Date(entry.expiresAt).toLocaleString() })}
+                    </p>
+                    <form action={handleRevoke}>
+                      <input type="hidden" name="code" value={entry.code} />
+                      <Button type="submit" variant="outline" size="sm" className="w-full">
+                        {t('guardian.linkCodes.revoke')}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
           <form action={handleCreateGuardianCode} className="mt-3">
             <Button type="submit" variant="outline" className="w-full">
-              Generate guardian code
+              {t('guardian.linkCodes.generateGuardian')}
             </Button>
           </form>
         </section>
       </div>
-    </div>
-  );
-}
-
-async function CodeList({
-  codes,
-  onRevoke,
-}: {
-  codes: Array<{ code: string; expiresAt: Date }>;
-  onRevoke: (formData: FormData) => Promise<void>;
-}) {
-  if (codes.length === 0) {
-    return <p className="text-sm text-muted-foreground">No active codes.</p>;
-  }
-
-  return (
-    <div className="space-y-4">
-      {codes.map((entry) => (
-        <Card key={entry.code}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-2xl font-mono tracking-widest text-center">
-              {entry.code}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex justify-center">
-              <QrCode value={entry.code} size={160} />
-            </div>
-            <p className="text-xs text-muted-foreground text-center">
-              Expires {new Date(entry.expiresAt).toLocaleString()}
-            </p>
-            <form action={onRevoke}>
-              <input type="hidden" name="code" value={entry.code} />
-              <Button type="submit" variant="outline" size="sm" className="w-full">
-                Revoke
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      ))}
     </div>
   );
 }

@@ -17,6 +17,12 @@ enum ClassType {
   PRIVATE
 }
 
+enum ClassLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
 enum EnrollmentStatus {
   PENDING
   ACTIVE
@@ -162,6 +168,8 @@ model Class {
   dayOfWeek       Int
   startTime       String
   duration        Int
+  level           ClassLevel?
+  grade           String?
   teacherId       String
   teacher         User      @relation(fields: [teacherId], references: [id])
   calendarEventId String?

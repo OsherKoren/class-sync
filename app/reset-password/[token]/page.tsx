@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { resetPassword } from "@/lib/actions/auth";
+import { useTranslations } from "next-intl";
 
 export default function ResetPasswordPage({
   params,
@@ -29,11 +30,12 @@ export default function ResetPasswordPage({
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+  const t = useTranslations();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (password !== confirm) {
-      setError("Passwords do not match");
+      setError(t('auth.passwordsNoMatch'));
       return;
     }
 
@@ -65,12 +67,12 @@ export default function ResetPasswordPage({
             <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-2xl font-bold text-primary-foreground">
               C
             </div>
-            <CardTitle className="text-2xl">Password reset</CardTitle>
-            <CardDescription>Your password has been reset successfully</CardDescription>
+            <CardTitle className="text-2xl">{t('auth.passwordResetSuccess')}</CardTitle>
+            <CardDescription>{t('auth.passwordResetSuccessBody')}</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Redirecting to sign in...
+              {t('auth.redirecting')}
             </p>
           </CardContent>
         </Card>
@@ -85,13 +87,13 @@ export default function ResetPasswordPage({
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-2xl font-bold text-primary-foreground">
             C
           </div>
-          <CardTitle className="text-2xl">Create new password</CardTitle>
-          <CardDescription>Enter your new password below</CardDescription>
+          <CardTitle className="text-2xl">{t('auth.createNewPassword')}</CardTitle>
+          <CardDescription>{t('auth.enterNewPassword')}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="password">New password</Label>
+              <Label htmlFor="password">{t('auth.newPassword')}</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -116,7 +118,7 @@ export default function ResetPasswordPage({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="confirm">Confirm password</Label>
+              <Label htmlFor="confirm">{t('auth.confirmPassword')}</Label>
               <div className="relative">
                 <Input
                   id="confirm"
@@ -142,14 +144,13 @@ export default function ResetPasswordPage({
 
             {error && <p className="text-sm text-destructive">{error}</p>}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Resetting…" : "Reset password"}
+              {loading ? t('auth.resetting') : t('auth.resetPasswordTitle')}
             </Button>
           </form>
 
           <p className="text-center text-xs text-muted-foreground">
-            Know your password?{" "}
             <Link href="/login" className="underline underline-offset-4">
-              Sign in
+              {t('auth.backToSignIn')}
             </Link>
           </p>
         </CardContent>

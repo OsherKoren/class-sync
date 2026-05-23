@@ -8,12 +8,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createStudentForSelf } from "@/lib/actions/guardian-dashboard";
+import { useTranslations } from "next-intl";
 
 export default function NewStudentPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const t = useTranslations();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -37,32 +39,31 @@ export default function NewStudentPage() {
           href="/guardian/dashboard"
           className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block"
         >
-          ← Back to dashboard
+          {t('guardian.addChild.backToDashboard')}
         </Link>
         <Card>
           <CardHeader>
-            <CardTitle>Add a child</CardTitle>
+            <CardTitle>{t('guardian.addChild.title')}</CardTitle>
             <CardDescription>
-              Create a student profile for your child. You can share a link code with them
-              afterwards so they can claim their account.
+              {t('guardian.addChild.subtitle')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Child&apos;s name</Label>
+                <Label htmlFor="name">{t('guardian.addChild.childName')}</Label>
                 <Input
                   id="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter full name"
+                  placeholder={t('guardian.addChild.namePlaceholder')}
                   required
                   autoFocus
                 />
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
               <Button type="submit" disabled={saving || !name.trim()} className="w-full">
-                {saving ? "Creating…" : "Create profile"}
+                {saving ? t('guardian.addChild.creating') : t('guardian.addChild.create')}
               </Button>
             </form>
           </CardContent>

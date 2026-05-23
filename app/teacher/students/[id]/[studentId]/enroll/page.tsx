@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { enrollStudent, getGuardianStudents } from "@/lib/actions/guardian";
 import { getTeacherClasses } from "@/lib/actions/class";
+import { useTranslations } from "next-intl";
 
 type GuardianData = {
   guardianId: string;
@@ -31,16 +32,6 @@ type ClassInfo = {
   enrollmentCount: number;
 };
 
-const dayNames = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
-
 export default function EnrollStudentPage({
   params,
 }: {
@@ -54,6 +45,7 @@ export default function EnrollStudentPage({
   const [enrolling, setEnrolling] = useState<string | null>(null);
   const [enrollError, setEnrollError] = useState("");
   const [enrolled, setEnrolled] = useState<Set<string>>(new Set());
+  const t = useTranslations();
 
   useEffect(() => {
     async function loadData() {
@@ -95,7 +87,7 @@ export default function EnrollStudentPage({
   if (loading) {
     return (
       <div className="p-8">
-        <p>Loading...</p>
+        <p>{t('common.loading')}</p>
       </div>
     );
   }
@@ -104,9 +96,9 @@ export default function EnrollStudentPage({
     return (
       <div className="p-8">
         <div className="max-w-4xl mx-auto">
-          <p className="text-destructive">{error || "Student not found"}</p>
+          <p className="text-destructive">{error || t('teacher.enrollStudent.notFound')}</p>
           <Link href={`/teacher/students/${guardianId}`} className="mt-4 inline-block">
-            <Button>Back to students</Button>
+            <Button>{t('teacher.enrollStudent.backBtn')}</Button>
           </Link>
         </div>
       </div>
@@ -121,11 +113,11 @@ export default function EnrollStudentPage({
             href={`/teacher/students/${guardianId}`}
             className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block"
           >
-            ← Back to students
+            {t('teacher.enrollStudent.backToStudents')}
           </Link>
-          <h1 className="text-3xl font-bold mb-2">Enroll {student.name}</h1>
+          <h1 className="text-3xl font-bold mb-2">{student.name}</h1>
           <p className="text-muted-foreground">
-            Select a class to enroll this student
+            {t('teacher.enrollStudent.subtitle')}
           </p>
         </div>
 
@@ -133,7 +125,7 @@ export default function EnrollStudentPage({
           <Card>
             <CardContent className="pt-6">
               <p className="text-center text-muted-foreground">
-                No classes available. Create a class first.
+                {t('teacher.enrollStudent.noClasses')}
               </p>
             </CardContent>
           </Card>
@@ -150,7 +142,7 @@ export default function EnrollStudentPage({
                     <div className="text-right text-sm">
                       <p className="font-medium">{cls.type}</p>
                       <p className="text-muted-foreground">
-                        {dayNames[cls.dayOfWeek]} at {cls.startTime}
+                        {t(`days.${cls.dayOfWeek}` as `days.${number}`)} at {cls.startTime}
                       </p>
                     </div>
                   </div>
@@ -158,8 +150,8 @@ export default function EnrollStudentPage({
                 <CardContent className="space-y-4">
                   <p className="text-sm text-muted-foreground">
                     {cls.enrollmentCount}{" "}
-                    {cls.enrollmentCount === 1 ? "student" : "students"} enrolled •{" "}
-                    {cls.duration} minutes per session
+                    {cls.enrollmentCount === 1 ? t('common.student') : t('common.students')} enrolled •{" "}
+                    {cls.duration} {t('common.minutesPerSession')}
                   </p>
 
                   {enrollError && cls.id === enrolling && (
@@ -171,10 +163,10 @@ export default function EnrollStudentPage({
                     disabled={enrolling === cls.id || enrolled.has(cls.id)}
                   >
                     {enrolled.has(cls.id)
-                      ? "Enrolled"
+                      ? t('teacher.enrollStudent.alreadyEnrolled')
                       : enrolling === cls.id
-                        ? "Enrolling…"
-                        : "Enroll in this class"}
+                        ? t('teacher.enrollStudent.enrolling')
+                        : t('teacher.enrollStudent.enroll')}
                   </Button>
                 </CardContent>
               </Card>
