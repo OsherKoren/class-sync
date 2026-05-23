@@ -3,13 +3,15 @@ import { auth, signOut } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getMyStudents } from "@/lib/actions/guardian-dashboard";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default async function GuardianDashboard() {
   const session = await auth();
   const result = await getMyStudents();
   const students = "error" in result ? [] : result.data;
   const t = await getTranslations();
+  const locale = await getLocale();
 
   return (
     <div className="min-h-screen bg-background p-8">
@@ -21,7 +23,8 @@ export default async function GuardianDashboard() {
               {t('guardian.dashboard.welcome', { name: session?.user?.name || '' })}
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher current={locale} />
             <Link href="/guardian/students/new">
               <Button variant="outline">{t('guardian.dashboard.addChild')}</Button>
             </Link>

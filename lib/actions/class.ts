@@ -9,7 +9,7 @@ const classSchema = z.object({
   subject: z.string().min(2, "Subject must be at least 2 characters"),
   type: z.enum(["GROUP", "PRIVATE"]),
   level: z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED"]).optional(),
-  grade: z.string().max(50).optional(),
+  grade: z.string().min(1, "Grade is required").max(50),
   dayOfWeek: z.number().min(0).max(6),
   startTime: z.string().regex(/^\d{2}:\d{2}$/, "Time must be in HH:MM format"),
   duration: z.number().min(30, "Duration must be at least 30 minutes"),

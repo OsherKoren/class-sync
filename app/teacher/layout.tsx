@@ -1,6 +1,8 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
+import { getLocale } from "next-intl/server";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default async function TeacherLayout({
   children,
@@ -17,5 +19,14 @@ export default async function TeacherLayout({
     redirect("/");
   }
 
-  return <>{children}</>;
+  const locale = await getLocale();
+
+  return (
+    <>
+      <div className="fixed top-3 end-4 z-50">
+        <LanguageSwitcher current={locale} />
+      </div>
+      {children}
+    </>
+  );
 }

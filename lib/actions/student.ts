@@ -68,6 +68,7 @@ export async function getOpenClasses(): Promise<
         dayOfWeek: number;
         startTime: string;
         duration: number;
+        teacherName: string | null;
       }>;
     }
 > {
@@ -88,11 +89,14 @@ export async function getOpenClasses(): Promise<
       dayOfWeek: true,
       startTime: true,
       duration: true,
+      teacher: { select: { name: true } },
     },
     orderBy: { createdAt: "desc" },
   });
 
-  return { data: classes };
+  return {
+    data: classes.map((c) => ({ ...c, teacherName: c.teacher.name })),
+  };
 }
 
 export async function requestEnrollment(

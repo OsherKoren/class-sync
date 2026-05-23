@@ -30,7 +30,16 @@
       "PowerShell(npx prisma generate 2>&1)",
       "PowerShell(npx tsc --noEmit 2>&1)",
       "PowerShell(npx tsc --noEmit 2>&1 | Where-Object { $_ -match \"link-code|QrCode|auth-helper|guardian\\\\.ts|lib/link\" })",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Skill(ui-ux-pro-max)",
+      "Bash(python3 *)",
+      "PowerShell(python \"C:\\\\Users\\\\oshra\\\\PycharmProjects\\\\class-sync\\\\.claude\\\\skills\\\\ui-ux-pro-max\\\\scripts\\\\search.py\" \"pink rose blush\" --domain color)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\oshra\\\\PycharmProjects\\\\class-sync\" -Recurse -Directory | Where-Object { $_.Name -match \"\\(app|src\\)\" } | Select-Object -First 10 FullName)",
+      "Bash(Get-ChildItem *)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\oshra\\\\PycharmProjects\\\\class-sync\" -Directory -Depth 2 | Where-Object { $_.FullName -notmatch \"node_modules\" } | Select-Object FullName)",
+      "Bash(Select-Object Name)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d.get\\('dependencies',{}\\).get\\('next-intl','NOT FOUND'\\)\\)\")",
+      "Bash(npx next *)"
     ]
   }
 }

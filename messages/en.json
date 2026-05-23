@@ -1,4 +1,13 @@
 {
+  "classTypes": {
+    "GROUP": "Group",
+    "PRIVATE": "Private"
+  },
+  "classLevels": {
+    "BEGINNER": "Beginner",
+    "INTERMEDIATE": "Intermediate",
+    "ADVANCED": "Advanced"
+  },
   "common": {
     "appName": "ClassSync",
     "signIn": "Sign in",
@@ -100,7 +109,20 @@
       "className": "Class name",
       "classNamePlaceholder": "e.g., Math 101",
       "subject": "Subject",
+      "selectSubject": "Select subject",
       "subjectPlaceholder": "e.g., Mathematics",
+      "subjects": {
+        "mathematics": "Mathematics",
+        "english": "English",
+        "hebrew": "Hebrew",
+        "science": "Science",
+        "history": "History",
+        "arabic": "Arabic",
+        "bible": "Bible Studies",
+        "physics": "Physics",
+        "chemistry": "Chemistry",
+        "biology": "Biology"
+      },
       "classType": "Class type",
       "group": "Group",
       "private": "Private",
@@ -110,9 +132,9 @@
       "beginner": "Beginner",
       "intermediate": "Intermediate",
       "advanced": "Advanced",
-      "grade": "Grade (optional)",
+      "grade": "Grade",
+      "selectGrade": "Select grade",
       "gradePlaceholder": "e.g., Grade 11, Mixed",
-      "noGrade": "No grade",
       "customGrade": "Custom…",
       "day": "Day",
       "startTime": "Start time (24-hour format)",

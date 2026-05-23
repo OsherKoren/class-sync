@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { auth, signOut } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default async function TeacherDashboard() {
   const session = await auth();
   const t = await getTranslations();
+  const locale = await getLocale();
 
   return (
     <div className="min-h-screen bg-background p-8">
@@ -17,16 +19,19 @@ export default async function TeacherDashboard() {
               {t('teacher.dashboard.welcome', { name: session?.user?.name || '' })}
             </p>
           </div>
-          <form
-            action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/login" });
-            }}
-          >
-            <Button type="submit" variant="outline">
-              {t('common.signOut')}
-            </Button>
-          </form>
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher current={locale} />
+            <form
+              action={async () => {
+                "use server";
+                await signOut({ redirectTo: "/login" });
+              }}
+            >
+              <Button type="submit" variant="outline">
+                {t('common.signOut')}
+              </Button>
+            </form>
+          </div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">

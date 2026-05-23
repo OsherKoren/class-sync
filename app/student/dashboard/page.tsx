@@ -9,12 +9,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getStudentEnrollments } from "@/lib/actions/student";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default async function StudentDashboard() {
   const session = await auth();
   const result = await getStudentEnrollments();
   const t = await getTranslations();
+  const locale = await getLocale();
 
   const enrollments = "error" in result ? [] : result.data;
   const active = enrollments.filter((e) => e.status === "ACTIVE");
@@ -30,7 +32,8 @@ export default async function StudentDashboard() {
               {t('student.dashboard.welcome', { name: session?.user?.name || '' })}
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher current={locale} />
             <Link href="/student/classes">
               <Button variant="outline">{t('student.dashboard.findClasses')}</Button>
             </Link>

@@ -26,6 +26,7 @@ export default function CreateClassPage() {
   const [level, setLevel] = useState("");
   const [grade, setGrade] = useState("");
   const [gradeCustom, setGradeCustom] = useState(false);
+  const [subjectCustom, setSubjectCustom] = useState(false);
   const [dayOfWeek, setDayOfWeek] = useState("0");
   const [startTime, setStartTime] = useState("16:00");
   const [duration, setDuration] = useState("45");
@@ -52,7 +53,7 @@ export default function CreateClassPage() {
         subject,
         type,
         level: level || undefined,
-        grade: grade || undefined,
+        grade,
         dayOfWeek: parseInt(dayOfWeek),
         startTime,
         duration: parseInt(duration),
@@ -98,20 +99,54 @@ export default function CreateClassPage() {
 
                 <div className="col-span-2">
                   <Label htmlFor="subject">{t('teacher.createClass.subject')}</Label>
-                  <Input
-                    id="subject"
-                    placeholder={t('teacher.createClass.subjectPlaceholder')}
-                    value={subject}
-                    onChange={(e) => setSubject(e.target.value)}
-                    required
-                  />
+                  {subjectCustom ? (
+                    <div className="flex gap-2">
+                      <Input
+                        id="subject"
+                        placeholder={t('teacher.createClass.subjectPlaceholder')}
+                        value={subject}
+                        onChange={(e) => setSubject(e.target.value)}
+                        className="flex-1"
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => { setSubjectCustom(false); setSubject(""); }}
+                        className="shrink-0"
+                      >
+                        {t('common.cancel')}
+                      </Button>
+                    </div>
+                  ) : (
+                    <Select
+                      value={subject}
+                      onValueChange={(v) => {
+                        if (v === null) return;
+                        if (v === "CUSTOM") { setSubjectCustom(true); setSubject(""); }
+                        else setSubject(v);
+                      }}
+                    >
+                      <SelectTrigger id="subject">
+                        <span>{subject || t('teacher.createClass.selectSubject')}</span>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(["mathematics","english"] as const).map((key) => (
+                          <SelectItem key={key} value={t(`teacher.createClass.subjects.${key}` as `teacher.createClass.subjects.${string}`)}>
+                            {t(`teacher.createClass.subjects.${key}` as `teacher.createClass.subjects.${string}`)}
+                          </SelectItem>
+                        ))}
+                        <SelectItem value="CUSTOM">{t('teacher.createClass.customGrade')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
                 </div>
 
                 <div>
                   <Label htmlFor="type">{t('teacher.createClass.classType')}</Label>
                   <Select value={type} onValueChange={(v) => { if (v !== null) setType(v); }}>
                     <SelectTrigger id="type">
-                      <SelectValue />
+                      <span>{t(`classTypes.${type}` as `classTypes.${string}`)}</span>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="GROUP">{t('teacher.createClass.group')}</SelectItem>
@@ -124,7 +159,7 @@ export default function CreateClassPage() {
                   <Label htmlFor="level">{t('teacher.createClass.level')}</Label>
                   <Select value={level} onValueChange={(v) => { if (v !== null) setLevel(v === "NONE" ? "" : v); }}>
                     <SelectTrigger id="level">
-                      <SelectValue placeholder={t('teacher.createClass.selectLevel')} />
+                      <span>{level ? t(`classLevels.${level}` as `classLevels.${string}`) : t('teacher.createClass.selectLevel')}</span>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="NONE">{t('teacher.createClass.noLevel')}</SelectItem>
@@ -161,14 +196,13 @@ export default function CreateClassPage() {
                       onValueChange={(v) => {
                         if (v === null) return;
                         if (v === "CUSTOM") { setGradeCustom(true); setGrade(""); }
-                        else setGrade(v === "NONE" ? "" : v);
+                        else setGrade(v);
                       }}
                     >
                       <SelectTrigger id="grade">
-                        <SelectValue placeholder={t('teacher.createClass.noGrade')} />
+                        <span>{grade || t('teacher.createClass.selectGrade')}</span>
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="NONE">{t('teacher.createClass.noGrade')}</SelectItem>
                         {gradeNums.map((g) => (
                           <SelectItem key={g} value={t(`teacher.createClass.grades.${g}` as `teacher.createClass.grades.${number}`)}>
                             {t(`teacher.createClass.grades.${g}` as `teacher.createClass.grades.${number}`)}
@@ -241,7 +275,7 @@ export default function CreateClassPage() {
               {error && <p className="text-sm text-destructive">{error}</p>}
 
               <div className="flex gap-4">
-                <Button type="submit" disabled={loading || !name || !subject}>
+                <Button type="submit" disabled={loading || !name || !subject || !grade}>
                   {loading ? t('teacher.createClass.creating') : t('teacher.createClass.create')}
                 </Button>
                 <Link href="/teacher/classes">

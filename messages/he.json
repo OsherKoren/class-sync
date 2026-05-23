@@ -1,4 +1,13 @@
 {
+  "classTypes": {
+    "GROUP": "קבוצה",
+    "PRIVATE": "פרטי"
+  },
+  "classLevels": {
+    "BEGINNER": "רמה מתחילה",
+    "INTERMEDIATE": "רמה בינונית",
+    "ADVANCED": "רמה מתקדמת"
+  },
   "common": {
     "appName": "ClassSync",
     "signIn": "כניסה",
@@ -100,19 +109,32 @@
       "className": "שם הכיתה",
       "classNamePlaceholder": "למשל, מתמטיקה 101",
       "subject": "מקצוע",
+      "selectSubject": "בחר מקצוע",
       "subjectPlaceholder": "למשל, מתמטיקה",
+      "subjects": {
+        "mathematics": "מתמטיקה",
+        "english": "אנגלית",
+        "hebrew": "עברית",
+        "science": "מדעים",
+        "history": "היסטוריה",
+        "arabic": "ערבית",
+        "bible": "תנ\"ך",
+        "physics": "פיזיקה",
+        "chemistry": "כימיה",
+        "biology": "ביולוגיה"
+      },
       "classType": "סוג הכיתה",
       "group": "קבוצה",
       "private": "פרטי",
       "level": "רמה (אופציונלי)",
       "selectLevel": "בחר רמה",
       "noLevel": "ללא רמה",
-      "beginner": "מתחיל",
-      "intermediate": "בינוני",
-      "advanced": "מתקדם",
-      "grade": "כיתה (אופציונלי)",
+      "beginner": "רמה מתחילה",
+      "intermediate": "רמה בינונית",
+      "advanced": "רמה מתקדמת",
+      "grade": "כיתה",
+      "selectGrade": "בחר כיתה",
       "gradePlaceholder": "למשל, כיתה יא, מעורב",
-      "noGrade": "ללא כיתה",
       "customGrade": "מותאם אישית...",
       "day": "יום",
       "startTime": "שעת התחלה (פורמט 24 שעות)",

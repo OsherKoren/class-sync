@@ -63,15 +63,13 @@ export default async function ClassDetailPage({
               <CardTitle className="text-sm font-medium">{t('teacher.classDetail.type')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{classData.type}</p>
+              <p className="text-2xl font-bold">{t(`classTypes.${classData.type}` as `classTypes.${string}`)}</p>
               {(classData.grade || classData.level) && (
                 <p className="text-xs text-muted-foreground">
                   {classData.grade && <span>{classData.grade}</span>}
                   {classData.grade && classData.level && <span> · </span>}
                   {classData.level && (
-                    <span className="capitalize">
-                      {classData.level.charAt(0) + classData.level.slice(1).toLowerCase()}
-                    </span>
+                    <span>{t(`classLevels.${classData.level}` as `classLevels.${string}`)}</span>
                   )}
                 </p>
               )}

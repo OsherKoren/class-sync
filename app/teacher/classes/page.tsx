@@ -9,10 +9,15 @@ import {
 } from "@/components/ui/card";
 import { getTeacherClasses } from "@/lib/actions/class";
 import { getTranslations } from "next-intl/server";
+import { auth } from "@/lib/auth";
 
 export default async function ClassesPage() {
-  const result = await getTeacherClasses();
-  const t = await getTranslations();
+  const [result, session, t] = await Promise.all([
+    getTeacherClasses(),
+    auth(),
+    getTranslations(),
+  ]);
+  const teacherName = session?.user?.name ?? null;
 
   if ("error" in result) {
     return (
@@ -62,18 +67,21 @@ export default async function ClassesPage() {
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle>{cls.name}</CardTitle>
-                        <CardDescription>{cls.subject}</CardDescription>
+                        <CardDescription>
+                          {cls.subject}
+                          {teacherName && (
+                            <span className="block">{teacherName}</span>
+                          )}
+                        </CardDescription>
                       </div>
                       <div className="text-right text-sm">
-                        <p className="font-medium">{cls.type}</p>
+                        <p className="font-medium">{t(`classTypes.${cls.type}` as `classTypes.${string}`)}</p>
                         {(cls.level || cls.grade) && (
                           <p className="text-muted-foreground">
                             {cls.grade && <span>{cls.grade}</span>}
                             {cls.grade && cls.level && <span> · </span>}
                             {cls.level && (
-                              <span className="capitalize">
-                                {cls.level.charAt(0) + cls.level.slice(1).toLowerCase()}
-                              </span>
+                              <span>{t(`classLevels.${cls.level}` as `classLevels.${string}`)}</span>
                             )}
                           </p>
                         )}

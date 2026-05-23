@@ -23,6 +23,7 @@ type ClassInfo = {
   type: string;
   level: string | null;
   grade: string | null;
+  teacherName: string | null;
 };
 
 export default function ClassesPage() {
@@ -97,18 +98,21 @@ export default function ClassesPage() {
                   <div className="flex items-start justify-between">
                     <div>
                       <CardTitle>{cls.name}</CardTitle>
-                      <CardDescription>{cls.subject}</CardDescription>
+                      <CardDescription>
+                        {cls.subject}
+                        {cls.teacherName && (
+                          <span className="block">{cls.teacherName}</span>
+                        )}
+                      </CardDescription>
                     </div>
                     <div className="text-right text-sm">
-                      <p className="font-medium">{cls.type}</p>
+                      <p className="font-medium">{t(`classTypes.${cls.type}` as `classTypes.${string}`)}</p>
                       {(cls.grade || cls.level) && (
                         <p className="text-muted-foreground">
                           {cls.grade && <span>{cls.grade}</span>}
                           {cls.grade && cls.level && <span> · </span>}
                           {cls.level && (
-                            <span className="capitalize">
-                              {cls.level.charAt(0) + cls.level.slice(1).toLowerCase()}
-                            </span>
+                            <span>{t(`classLevels.${cls.level}` as `classLevels.${string}`)}</span>
                           )}
                         </p>
                       )}

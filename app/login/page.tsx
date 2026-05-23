@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -66,6 +67,9 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="absolute top-4 end-4">
+        <LanguageSwitcher />
+      </div>
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-2xl font-bold text-primary-foreground">
