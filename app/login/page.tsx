@@ -72,10 +72,9 @@ export default function LoginPage() {
       </div>
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-2xl font-bold text-primary-foreground">
-            C
+          <div className="mx-auto mb-2 flex items-center justify-center px-3 h-9 rounded-lg bg-primary text-primary-foreground text-sm font-bold">
+            {t('common.appName')}
           </div>
-          <CardTitle className="text-2xl">{t('common.appName')}</CardTitle>
           <CardDescription>{t('auth.signInTitle')}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
