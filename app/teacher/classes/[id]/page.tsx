@@ -11,6 +11,7 @@ import { DeleteClassSection } from "@/components/DeleteClassSection";
 import { getClassById } from "@/lib/actions/class";
 import { EnrollmentManagement } from "@/components/teacher/EnrollmentManagement";
 import { ToggleOpenEnrollment } from "@/components/teacher/ToggleOpenEnrollment";
+import { GRADE_KEYS, SUBJECT_KEYS } from "@/lib/classKeys";
 import { getTranslations } from "next-intl/server";
 
 export default async function ClassDetailPage({
@@ -54,7 +55,7 @@ export default async function ClassDetailPage({
             {t('teacher.classDetail.backToClasses')}
           </Link>
           <h1 className="text-3xl font-bold mb-2">{classData.name}</h1>
-          <p className="text-muted-foreground">{classData.subject}</p>
+          <p className="text-muted-foreground">{SUBJECT_KEYS.has(classData.subject) ? t(`teacher.createClass.subjects.${classData.subject}` as `teacher.createClass.subjects.${string}`) : classData.subject}</p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-3 mb-8">
@@ -66,7 +67,7 @@ export default async function ClassDetailPage({
               <p className="text-2xl font-bold">{t(`classTypes.${classData.type}` as `classTypes.${string}`)}</p>
               {(classData.grade || classData.level) && (
                 <p className="text-xs text-muted-foreground">
-                  {classData.grade && <span>{classData.grade}</span>}
+                  {classData.grade && <span>{GRADE_KEYS.has(classData.grade) ? t(`teacher.createClass.grades.${classData.grade}` as `teacher.createClass.grades.${number}`) : classData.grade}</span>}
                   {classData.grade && classData.level && <span> · </span>}
                   {classData.level && (
                     <span>{t(`classLevels.${classData.level}` as `classLevels.${string}`)}</span>

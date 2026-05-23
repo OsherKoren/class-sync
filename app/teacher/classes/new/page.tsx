@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createClass } from "@/lib/actions/class";
+import { GRADE_KEYS } from "@/lib/classKeys";
 import { useTranslations } from "next-intl";
 
 const gradeNums = [4, 5, 6, 7, 8, 9, 10];
@@ -128,11 +129,11 @@ export default function CreateClassPage() {
                       }}
                     >
                       <SelectTrigger id="subject">
-                        <span>{subject || t('teacher.createClass.selectSubject')}</span>
+                        <span>{subject ? t(`teacher.createClass.subjects.${subject}` as `teacher.createClass.subjects.${string}`) : t('teacher.createClass.selectSubject')}</span>
                       </SelectTrigger>
                       <SelectContent>
                         {(["mathematics","english"] as const).map((key) => (
-                          <SelectItem key={key} value={t(`teacher.createClass.subjects.${key}` as `teacher.createClass.subjects.${string}`)}>
+                          <SelectItem key={key} value={key}>
                             {t(`teacher.createClass.subjects.${key}` as `teacher.createClass.subjects.${string}`)}
                           </SelectItem>
                         ))}
@@ -200,11 +201,11 @@ export default function CreateClassPage() {
                       }}
                     >
                       <SelectTrigger id="grade">
-                        <span>{grade || t('teacher.createClass.selectGrade')}</span>
+                        <span>{grade ? (GRADE_KEYS.has(grade) ? t(`teacher.createClass.grades.${grade}` as `teacher.createClass.grades.${number}`) : grade) : t('teacher.createClass.selectGrade')}</span>
                       </SelectTrigger>
                       <SelectContent>
                         {gradeNums.map((g) => (
-                          <SelectItem key={g} value={t(`teacher.createClass.grades.${g}` as `teacher.createClass.grades.${number}`)}>
+                          <SelectItem key={g} value={g.toString()}>
                             {t(`teacher.createClass.grades.${g}` as `teacher.createClass.grades.${number}`)}
                           </SelectItem>
                         ))}

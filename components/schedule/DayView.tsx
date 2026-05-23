@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
+import { GRADE_KEYS, SUBJECT_KEYS } from "@/lib/classKeys";
 import { type ClassItem } from "@/lib/types";
 import { toMinutes, gridRange } from "./calendarUtils";
 
@@ -92,7 +93,7 @@ export function DayView({
                     <div className="min-w-0">
                       <p className="text-sm font-semibold leading-tight truncate">{cls.name}</p>
                       <p className="text-xs text-muted-foreground truncate">
-                        {cls.subject}
+                        {SUBJECT_KEYS.has(cls.subject) ? t(`teacher.createClass.subjects.${cls.subject}` as `teacher.createClass.subjects.${string}`) : cls.subject}
                         {teacherName && ` · ${teacherName}`}
                       </p>
                     </div>
@@ -102,7 +103,7 @@ export function DayView({
                       </p>
                       {(cls.grade || cls.level) && (
                         <p className="text-xs text-muted-foreground">
-                          {cls.grade}
+                          {cls.grade && (GRADE_KEYS.has(cls.grade) ? t(`teacher.createClass.grades.${cls.grade}` as `teacher.createClass.grades.${number}`) : cls.grade)}
                           {cls.grade && cls.level && " · "}
                           {cls.level && t(`classLevels.${cls.level}` as `classLevels.${string}`)}
                         </p>

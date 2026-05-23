@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
+import { GRADE_KEYS, SUBJECT_KEYS } from "@/lib/classKeys";
 import { type ClassItem } from "@/lib/types";
 import { toMinutes, gridRange } from "./calendarUtils";
 
@@ -77,13 +78,13 @@ export function WeekView({ classes }: { classes: ClassItem[] }) {
                       className="absolute inset-x-0.5 rounded bg-primary/20 border border-primary/50 px-1.5 py-1 overflow-hidden hover:bg-primary/35 transition-colors"
                     >
                       <p className="text-xs font-semibold leading-none truncate">{cls.name}</p>
-                      <p className="text-xs text-muted-foreground leading-none truncate mt-1">{cls.subject}</p>
+                      <p className="text-xs text-muted-foreground leading-none truncate mt-1">{SUBJECT_KEYS.has(cls.subject) ? t(`teacher.createClass.subjects.${cls.subject}` as `teacher.createClass.subjects.${string}`) : cls.subject}</p>
                       <p className="text-xs text-muted-foreground leading-none mt-1">
                         {t(`classTypes.${cls.type}` as `classTypes.${string}`)}
                       </p>
                       {(cls.grade || cls.level) && (
                         <p className="text-xs text-muted-foreground leading-none truncate mt-1">
-                          {cls.grade}
+                          {cls.grade && (GRADE_KEYS.has(cls.grade) ? t(`teacher.createClass.grades.${cls.grade}` as `teacher.createClass.grades.${number}`) : cls.grade)}
                           {cls.grade && cls.level && " · "}
                           {cls.level && t(`classLevels.${cls.level}` as `classLevels.${string}`)}
                         </p>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { GRADE_KEYS, SUBJECT_KEYS } from "@/lib/classKeys";
 import { type ClassItem } from "@/lib/types";
 import { WeekView } from "./WeekView";
 import { DayView } from "./DayView";
@@ -54,7 +55,7 @@ export function ScheduleView({
                     <div>
                       <CardTitle>{cls.name}</CardTitle>
                       <CardDescription>
-                        {cls.subject}
+                        {SUBJECT_KEYS.has(cls.subject) ? t(`teacher.createClass.subjects.${cls.subject}` as `teacher.createClass.subjects.${string}`) : cls.subject}
                         {teacherName && <span className="block">{teacherName}</span>}
                       </CardDescription>
                     </div>
@@ -64,7 +65,7 @@ export function ScheduleView({
                       </p>
                       {(cls.level || cls.grade) && (
                         <p className="text-muted-foreground">
-                          {cls.grade}
+                          {cls.grade && (GRADE_KEYS.has(cls.grade) ? t(`teacher.createClass.grades.${cls.grade}` as `teacher.createClass.grades.${number}`) : cls.grade)}
                           {cls.grade && cls.level && " · "}
                           {cls.level && t(`classLevels.${cls.level}` as `classLevels.${string}`)}
                         </p>
