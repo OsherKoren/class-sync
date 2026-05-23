@@ -36,7 +36,9 @@ yarn-error.log*
 
 # IDE
 .idea/
-.claude/
+.claude/settings.local.json
+.claude/**/__pycache__/
+.claude/**/*.pyc
 
 # playwright
 playwright-report/
