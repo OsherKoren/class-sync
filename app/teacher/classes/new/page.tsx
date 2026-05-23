@@ -49,23 +49,27 @@ export default function CreateClassPage() {
     setLoading(true);
     setError("");
 
-    const result = await createClass({
-      name,
-      subject,
-      type,
-      dayOfWeek: parseInt(dayOfWeek),
-      startTime,
-      duration: parseInt(duration),
-    });
+    try {
+      const result = await createClass({
+        name,
+        subject,
+        type,
+        dayOfWeek: parseInt(dayOfWeek),
+        startTime,
+        duration: parseInt(duration),
+      });
 
-    if ("error" in result) {
-      setError(result.error);
+      if ("error" in result) {
+        setError(result.error);
+        setLoading(false);
+        return;
+      }
+
+      router.push("/teacher/classes");
+    } catch {
+      setError("Something went wrong. Please try again.");
       setLoading(false);
-      return;
     }
-
-    router.push("/teacher/classes");
-    router.refresh();
   }
 
   return (
