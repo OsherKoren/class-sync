@@ -306,6 +306,13 @@
         "cancelledBody": "Would you like to attend another class instead?",
         "noAlternatives": "No alternative classes available.",
         "done": "Done"
+      },
+      "filters": {
+        "allSubjects": "All Subjects",
+        "allGrades": "All Grades",
+        "allLevels": "All Levels",
+        "allDays": "All Days",
+        "clear": "Clear filters"
       }
     },
     "link": {
@@ -331,6 +338,7 @@
       "welcome": "Welcome, {name}",
       "addChild": "Add child",
       "linkViaCode": "Link via code",
+      "viewSchedule": "View schedule",
       "noChildren": "No children linked to your account yet.",
       "addChildBtn": "Add a child",
       "enterCode": "Enter invite code",
@@ -338,6 +346,13 @@
       "notClaimed": "Student hasn't claimed their account yet",
       "notEnrolled": "Not enrolled in any classes.",
       "pending": "Pending"
+    },
+    "classes": {
+      "title": "Children's Schedule",
+      "subtitle": "View your children's class schedules",
+      "backToDashboard": "← Back to dashboard",
+      "noChildren": "No children linked yet. Add a child from the dashboard.",
+      "noEnrollments": "Not enrolled in any active classes."
     },
     "link": {
       "backToDashboard": "← Back to dashboard",
@@ -396,7 +411,9 @@
     "listView": "List",
     "weekView": "Weekly",
     "dayView": "Daily",
-    "noClassesThisDay": "No classes scheduled"
+    "noClassesThisDay": "No classes scheduled",
+    "openClass": "Open class",
+    "cancelSession": "Cancel session"
   },
   "components": {
     "deleteClass": {

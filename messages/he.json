@@ -306,6 +306,13 @@
         "cancelledBody": "האם תרצה להשתתף בשיעור אחר במקום?",
         "noAlternatives": "אין שיעורים חלופיים זמינים.",
         "done": "סיום"
+      },
+      "filters": {
+        "allSubjects": "כל המקצועות",
+        "allGrades": "כל הכיתות",
+        "allLevels": "כל הרמות",
+        "allDays": "כל הימים",
+        "clear": "נקה סינון"
       }
     },
     "link": {
@@ -331,6 +338,7 @@
       "welcome": "שלום, {name}",
       "addChild": "הוסף ילד",
       "linkViaCode": "קשר באמצעות קוד",
+      "viewSchedule": "צפה בלוח שיעורים",
       "noChildren": "אין ילדים מקושרים לחשבונך עדיין.",
       "addChildBtn": "הוסף ילד",
       "enterCode": "הכנס קוד הזמנה",
@@ -338,6 +346,13 @@
       "notClaimed": "התלמיד טרם קשר את חשבונו",
       "notEnrolled": "לא רשום לכיתות.",
       "pending": "ממתין"
+    },
+    "classes": {
+      "title": "לוח שיעורים של ילדיי",
+      "subtitle": "צפה בלוח השיעורים של ילדיך",
+      "backToDashboard": "← חזרה ללוח הבקרה",
+      "noChildren": "אין ילדים מקושרים עדיין. הוסף ילד מלוח הבקרה.",
+      "noEnrollments": "לא רשום לכיתות פעילות."
     },
     "link": {
       "backToDashboard": "← חזרה ללוח הבקרה",
@@ -396,7 +411,9 @@
     "listView": "רשימה",
     "weekView": "שבועי",
     "dayView": "יומי",
-    "noClassesThisDay": "אין שיעורים מתוכננים"
+    "noClassesThisDay": "אין שיעורים מתוכננים",
+    "openClass": "פתח כיתה",
+    "cancelSession": "בטל שיעור"
   },
   "components": {
     "deleteClass": {

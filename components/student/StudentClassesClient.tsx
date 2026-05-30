@@ -1,16 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { requestEnrollment } from "@/lib/actions/student";
 import { type StudentClass } from "@/lib/types";
+import { SUBJECT_KEYS, GRADE_KEYS } from "@/lib/classKeys";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CancelSessionDialog } from "./CancelSessionDialog";
 import { MyClassesList } from "./MyClassesList";
 import { AllClassesList } from "./AllClassesList";
+import { ClassFilters, type ClassFilterState } from "./ClassFilters";
 import { StudentWeekView } from "./StudentWeekView";
 import { StudentDayView } from "./StudentDayView";
 
@@ -49,8 +51,43 @@ export function StudentClassesClient({
   const [requesting, setRequesting] = useState<string | null>(null);
   const [requested, setRequested] = useState<Set<string>>(new Set());
   const [requestError, setRequestError] = useState("");
+  const [filters, setFilters] = useState<ClassFilterState>({ subject: "", grade: "", level: "", dayOfWeek: "" });
 
   const enrolledIds = new Set(enrolledClasses.map((c) => c.classId));
+
+  const subjectOptions = useMemo(() => {
+    const subjects = [...new Set(openClasses.map((c) => c.subject))];
+    return subjects.map((s) => ({ value: s, label: SUBJECT_KEYS.has(s) ? t(`teacher.createClass.subjects.${s}` as `teacher.createClass.subjects.${string}`) : s }));
+  }, [openClasses, t]);
+
+  const gradeOptions = useMemo(() => {
+    const grades = [...new Set(openClasses.map((c) => c.grade).filter((g): g is string => g !== null))];
+    return grades.map((g) => ({ value: g, label: GRADE_KEYS.has(g) ? t(`teacher.createClass.grades.${g}` as `teacher.createClass.grades.${string}`) : g }));
+  }, [openClasses, t]);
+
+  const levelOptions = useMemo(() => {
+    const levels = [...new Set(openClasses.map((c) => c.level).filter((l): l is string => l !== null))];
+    return levels.map((l) => ({ value: l, label: t(`classLevels.${l}` as `classLevels.${string}`) }));
+  }, [openClasses, t]);
+
+  const dayOptions = useMemo(() => {
+    const days = [...new Set(openClasses.map((c) => c.dayOfWeek))].sort((a, b) => a - b);
+    return days.map((d) => ({ value: String(d), label: t(`days.${d}` as `days.${number}`) }));
+  }, [openClasses, t]);
+
+  const filteredClasses = useMemo(() => {
+    return openClasses.filter((c) => {
+      if (filters.subject && c.subject !== filters.subject) return false;
+      if (filters.grade && c.grade !== filters.grade) return false;
+      if (filters.level && c.level !== filters.level) return false;
+      if (filters.dayOfWeek && String(c.dayOfWeek) !== filters.dayOfWeek) return false;
+      return true;
+    });
+  }, [openClasses, filters]);
+
+  function updateFilter(key: keyof ClassFilterState, value: string) {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  }
 
   async function handleRequest(classId: string) {
     setRequesting(classId);
@@ -100,7 +137,7 @@ export function StudentClassesClient({
             {(["mine", "all"] as Tab[]).map((tt) => (
               <button key={tt} onClick={() => setTab(tt)}
                 className={cn("px-4 py-1.5 text-sm transition-colors",
-                  tab === tt ? "bg-primary text-primary-foreground" : "hover:bg-accent")}>
+                  tab === tt ? "bg-primary text-primary-foreground" : "hover:bg-accent active:bg-accent/80")}>
                 {tt === "mine" ? t("student.classes.tabMine") : t("student.classes.tabAll")}
               </button>
             ))}
@@ -110,7 +147,7 @@ export function StudentClassesClient({
               {(["list", "week", "day"] as ViewMode[]).map((v) => (
                 <button key={v} onClick={() => setView(v)}
                   className={cn("px-4 py-1.5 text-sm transition-colors",
-                    view === v ? "bg-primary text-primary-foreground" : "hover:bg-accent")}>
+                    view === v ? "bg-primary text-primary-foreground" : "hover:bg-accent active:bg-accent/80")}>
                   {viewLabels[v]}
                 </button>
               ))}
@@ -136,8 +173,19 @@ export function StudentClassesClient({
           <StudentDayView classes={enrolledClasses} cancelledSessions={cancelledSessions} onCancelClick={openCancel} />
         )}
         {tab === "all" && (
-          <AllClassesList classes={openClasses} enrolledIds={enrolledIds}
-            requesting={requesting} requested={requested} error={requestError} onRequest={handleRequest} />
+          <>
+            <ClassFilters
+              filters={filters}
+              subjectOptions={subjectOptions}
+              gradeOptions={gradeOptions}
+              levelOptions={levelOptions}
+              dayOptions={dayOptions}
+              onChange={updateFilter}
+              onClear={() => setFilters({ subject: "", grade: "", level: "", dayOfWeek: "" })}
+            />
+            <AllClassesList classes={filteredClasses} enrolledIds={enrolledIds}
+              requesting={requesting} requested={requested} error={requestError} onRequest={handleRequest} />
+          </>
         )}
 
         {cancelTarget && (
