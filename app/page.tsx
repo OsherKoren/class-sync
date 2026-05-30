@@ -23,20 +23,17 @@ export default async function Home() {
   const [t, locale] = await Promise.all([getTranslations(), getLocale()]);
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center min-h-screen bg-background px-4">
-      <div className="absolute top-4 end-4">
-        <LanguageSwitcher current={locale} />
-      </div>
-      <div className="flex flex-col items-center gap-6 text-center">
-        <LogoPill>{t('common.appName')}</LogoPill>
-        <div className="flex flex-col gap-2">
-          <h1 className="text-4xl font-bold tracking-tight text-foreground">
-            {t('common.appName')}
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            {t('home.tagline')}
-          </p>
+    <div className="flex flex-1 flex-col items-center justify-center min-h-screen bg-background px-4 pt-14">
+      <header className="fixed top-0 inset-x-0 z-50 h-14 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="flex h-full items-center justify-between px-4">
+          <LogoPill href="/">{t('common.appName')}</LogoPill>
+          <LanguageSwitcher current={locale} />
         </div>
+      </header>
+      <div className="flex flex-col items-center gap-6 text-center">
+        <p className="text-muted-foreground text-lg">
+          {t('home.tagline')}
+        </p>
         <div className="flex flex-col sm:flex-row gap-3 mt-4">
           <Link
             href="/login"

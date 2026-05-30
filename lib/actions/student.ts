@@ -299,9 +299,17 @@ export async function requestEnrollment(
 
   const existing = await db.enrollment.findUnique({
     where: { studentId_classId: { studentId: student.id, classId } },
+    select: { status: true },
   });
 
   if (existing) {
+    if (existing.status === "REJECTED") {
+      await db.enrollment.update({
+        where: { studentId_classId: { studentId: student.id, classId } },
+        data: { status: "PENDING", rejectionReason: null },
+      });
+      return { data: { success: true } };
+    }
     return { error: "You have already requested this class" };
   }
 

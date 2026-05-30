@@ -14,9 +14,15 @@ type StudentWithEnrollments = {
       id: string;
       name: string;
       subject: string;
+      type: string;
+      level: string | null;
+      grade: string | null;
       dayOfWeek: number;
       startTime: string;
       duration: number;
+      maxCapacity: number | null;
+      teacherName: string | null;
+      enrollmentCount: number;
     };
   }>;
 };
@@ -45,9 +51,15 @@ export async function getMyStudents(): Promise<
                   id: true,
                   name: true,
                   subject: true,
+                  type: true,
+                  level: true,
+                  grade: true,
                   dayOfWeek: true,
                   startTime: true,
                   duration: true,
+                  maxCapacity: true,
+                  teacher: { select: { name: true } },
+                  _count: { select: { enrollments: { where: { status: "ACTIVE" } } } },
                 },
               },
             },
@@ -61,7 +73,23 @@ export async function getMyStudents(): Promise<
     id: student.id,
     name: student.name,
     hasAccount: student.userId !== null,
-    enrollments: student.enrollments,
+    enrollments: student.enrollments.map((e) => ({
+      status: e.status,
+      class: {
+        id: e.class.id,
+        name: e.class.name,
+        subject: e.class.subject,
+        type: e.class.type,
+        level: e.class.level,
+        grade: e.class.grade,
+        dayOfWeek: e.class.dayOfWeek,
+        startTime: e.class.startTime,
+        duration: e.class.duration,
+        maxCapacity: e.class.maxCapacity,
+        teacherName: e.class.teacher.name,
+        enrollmentCount: e.class._count.enrollments,
+      },
+    })),
   }));
 
   return { data };

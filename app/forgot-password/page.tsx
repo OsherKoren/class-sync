@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/card";
 import { requestPasswordReset } from "@/lib/actions/auth";
 import { useTranslations } from "next-intl";
+import { LogoPill } from "@/components/LogoPill";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -41,12 +43,17 @@ export default function ForgotPasswordPage() {
 
   if (submitted) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="flex min-h-screen items-center justify-center bg-background px-4 pt-14">
+        <header className="fixed top-0 inset-x-0 z-50 h-14 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="flex h-full items-center justify-between px-4">
+            <LogoPill href="/" className="hover:bg-primary/90 transition-colors">
+              {t('common.appName')}
+            </LogoPill>
+            <LanguageSwitcher />
+          </div>
+        </header>
         <Card className="w-full max-w-sm">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-2xl font-bold text-primary-foreground">
-              C
-            </div>
             <CardTitle className="text-2xl">{t('auth.checkEmail')}</CardTitle>
             <CardDescription>
               {t('auth.resetLinkSent', { email })}
@@ -66,12 +73,17 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 pt-14">
+      <header className="fixed top-0 inset-x-0 z-50 h-14 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="flex h-full items-center justify-between px-4">
+          <LogoPill href="/" className="hover:bg-primary/90 transition-colors">
+            {t('common.appName')}
+          </LogoPill>
+          <LanguageSwitcher />
+        </div>
+      </header>
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-2xl font-bold text-primary-foreground">
-            C
-          </div>
           <CardTitle className="text-2xl">{t('auth.resetPasswordTitle')}</CardTitle>
           <CardDescription>
             {t('auth.resetPasswordSubtitle')}

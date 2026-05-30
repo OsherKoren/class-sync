@@ -26,3 +26,15 @@ export const pushRateLimit = new Ratelimit({
   limiter: Ratelimit.slidingWindow(20, "1 m"),
   prefix: "rl:push",
 });
+
+export const linkCodeGenerateRateLimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(10, "1 m"),
+  prefix: "rl:link-generate",
+});
+
+export const linkCodeRedeemRateLimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(20, "1 m"),
+  prefix: "rl:link-redeem",
+});

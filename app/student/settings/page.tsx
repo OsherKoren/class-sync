@@ -1,65 +1,7 @@
-"use client";
+import { getLocale } from "next-intl/server";
+import { StudentSettingsClient } from "@/components/student/StudentSettingsClient";
 
-import { useState } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { updateLocale } from "@/lib/actions/settings";
-import { useTranslations } from "next-intl";
-
-export default function StudentSettingsPage() {
-  const [saving, setSaving] = useState(false);
-  const t = useTranslations();
-
-  async function handleLocale(locale: "he" | "en") {
-    setSaving(true);
-    const result = await updateLocale(locale);
-    setSaving(false);
-    if (!("error" in result)) {
-      window.location.reload();
-    }
-  }
-
-  return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <Link href="/student/dashboard" className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block">
-            {t('student.settings.backToDashboard')}
-          </Link>
-          <h1 className="text-3xl font-bold mb-2">{t('student.settings.title')}</h1>
-          <p className="text-muted-foreground">{t('student.settings.subtitle')}</p>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('student.settings.language')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                disabled={saving}
-                onClick={() => handleLocale("he")}
-              >
-                {saving ? t('student.settings.saving') : t('common.hebrew')}
-              </Button>
-              <Button
-                variant="outline"
-                disabled={saving}
-                onClick={() => handleLocale("en")}
-              >
-                {saving ? t('student.settings.saving') : t('common.english')}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
+export default async function StudentSettingsPage() {
+  const locale = await getLocale();
+  return <StudentSettingsClient initialLocale={locale} />;
 }

@@ -3,16 +3,12 @@
 import { useState } from "react";
 import { updateLocale } from "@/lib/actions/settings";
 
-function getLocaleCookie() {
-  const match = document.cookie.match(/(?:^|;\s*)locale=([^;]*)/);
-  return match ? match[1] : "he";
-}
-
 export function LanguageSwitcher({ current: currentProp }: { current?: string } = {}) {
-  const [current, setCurrent] = useState<string>(() => {
+  const [current] = useState<string>(() => {
     if (currentProp) return currentProp;
-    if (typeof document !== "undefined") return getLocaleCookie();
-    return "he";
+    if (typeof document === "undefined") return "he";
+    const match = document.cookie.match(/(?:^|;\s*)locale=([^;]*)/);
+    return match ? match[1] : "he";
   });
   const [saving, setSaving] = useState(false);
 

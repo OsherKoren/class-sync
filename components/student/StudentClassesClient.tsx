@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { requestEnrollment, cancelEnrollmentRequest } from "@/lib/actions/student";
 import { type StudentClass } from "@/lib/types";
 import { SUBJECT_KEYS, GRADE_KEYS } from "@/lib/classKeys";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CancelSessionDialog } from "./CancelSessionDialog";
 import { MyClassesList } from "./MyClassesList";
@@ -23,6 +23,13 @@ type OpenClass = {
   maxCapacity: number | null; enrollmentCount: number; spotsLeft: number | null; teacherName: string | null;
 };
 
+type RejectedEnrollment = {
+  classId: string;
+  className: string;
+  classSubject: string;
+  rejectionReason: string | null;
+};
+
 type CancelTarget = { class: StudentClass; date: string };
 type Tab = "mine" | "all";
 type ViewMode = "list" | "week" | "day";
@@ -32,11 +39,13 @@ export function StudentClassesClient({
   openClasses,
   initialAbsences,
   initialPendingIds,
+  initialRejectedEnrollments,
 }: {
   enrolledClasses: StudentClass[];
   openClasses: OpenClass[];
   initialAbsences: Array<{ classId: string; date: string }>;
   initialPendingIds: string[];
+  initialRejectedEnrollments: RejectedEnrollment[];
 }) {
   const t = useTranslations();
   const [tab, setTab] = useState<Tab>("mine");
@@ -52,6 +61,12 @@ export function StudentClassesClient({
   });
   const [requesting, setRequesting] = useState<string | null>(null);
   const [requested, setRequested] = useState<Set<string>>(() => new Set(initialPendingIds));
+  const [rejectedIds, setRejectedIds] = useState<Set<string>>(
+    () => new Set(initialRejectedEnrollments.map((e) => e.classId))
+  );
+  const rejectedReasons = new Map(
+    initialRejectedEnrollments.map((e) => [e.classId, e.rejectionReason])
+  );
   const [cancellingRequest, setCancellingRequest] = useState<string | null>(null);
   const [requestError, setRequestError] = useState("");
   const [filters, setFilters] = useState<ClassFilterState>({ subject: "", grade: "", level: "", dayOfWeek: "" });
@@ -107,7 +122,10 @@ export function StudentClassesClient({
     setRequesting(classId);
     const result = await requestEnrollment(classId);
     if ("error" in result) setRequestError(result.error);
-    else setRequested((prev) => new Set([...prev, classId]));
+    else {
+      setRequested((prev) => new Set([...prev, classId]));
+      setRejectedIds((prev) => { const next = new Set(prev); next.delete(classId); return next; });
+    }
     setRequesting(null);
   }
 
@@ -198,9 +216,40 @@ export function StudentClassesClient({
               onClear={() => setFilters({ subject: "", grade: "", level: "", dayOfWeek: "" })}
             />
             <AllClassesList classes={filteredClasses} enrolledIds={enrolledIds}
-              requesting={requesting} requested={requested} error={requestError} onRequest={handleRequest}
+              requesting={requesting} requested={requested} rejectedIds={rejectedIds}
+              rejectedReasons={rejectedReasons} error={requestError} onRequest={handleRequest}
               cancellingRequest={cancellingRequest} onCancelRequest={handleCancelRequest} />
           </>
+        )}
+
+        {tab === "mine" && initialRejectedEnrollments.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-lg font-semibold mb-4">{t("student.dashboard.rejectedTitle")}</h2>
+            <div className="grid gap-4">
+              {initialRejectedEnrollments.map((enrollment) => (
+                <Card key={enrollment.classId}>
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle>{enrollment.className}</CardTitle>
+                        <CardDescription>{enrollment.classSubject}</CardDescription>
+                      </div>
+                      <div className="px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 text-xs rounded-full">
+                        {t("student.dashboard.rejectedStatus")}
+                      </div>
+                    </div>
+                  </CardHeader>
+                  {enrollment.rejectionReason && (
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">
+                        {t("student.dashboard.rejectedReason", { reason: enrollment.rejectionReason })}
+                      </p>
+                    </CardContent>
+                  )}
+                </Card>
+              ))}
+            </div>
+          </div>
         )}
 
         {cancelTarget && (

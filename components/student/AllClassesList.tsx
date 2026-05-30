@@ -28,6 +28,8 @@ export function AllClassesList({
   enrolledIds,
   requesting,
   requested,
+  rejectedIds,
+  rejectedReasons,
   cancellingRequest,
   error,
   onRequest,
@@ -37,6 +39,8 @@ export function AllClassesList({
   enrolledIds: Set<string>;
   requesting: string | null;
   requested: Set<string>;
+  rejectedIds: Set<string>;
+  rejectedReasons: Map<string, string | null>;
   cancellingRequest: string | null;
   error: string;
   onRequest: (classId: string) => void;
@@ -105,39 +109,60 @@ export function AllClassesList({
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">
-                  {cls.maxCapacity !== null
-                    ? `${cls.enrollmentCount}/${cls.maxCapacity}`
-                    : cls.enrollmentCount}{" "}
-                  {cls.enrollmentCount === 1 ? t("common.student") : t("common.students")}{" "}
-                  enrolled · {cls.duration} {t("common.minutesPerSession")}
-                </p>
-                {isEnrolled ? (
-                  <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                    {t("student.classes.enrolled")}
-                  </span>
-                ) : requested.has(cls.id) ? (
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">{t("student.classes.requested")}</span>
+              <CardContent className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">
+                    {cls.maxCapacity !== null
+                      ? `${cls.enrollmentCount}/${cls.maxCapacity}`
+                      : cls.enrollmentCount}{" "}
+                    {cls.enrollmentCount === 1 ? t("common.student") : t("common.students")}{" "}
+                    enrolled · {cls.duration} {t("common.minutesPerSession")}
+                  </p>
+                  {isEnrolled ? (
+                    <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                      {t("student.classes.enrolled")}
+                    </span>
+                  ) : requested.has(cls.id) ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">{t("student.classes.requested")}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled={cancellingRequest === cls.id}
+                        onClick={() => onCancelRequest(cls.id)}
+                      >
+                        {cancellingRequest === cls.id ? "…" : t("student.classes.cancelRequest")}
+                      </Button>
+                    </div>
+                  ) : rejectedIds.has(cls.id) ? (
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 text-xs rounded-full">
+                        {t("student.dashboard.rejectedStatus")}
+                      </span>
+                      <Button
+                        onClick={() => onRequest(cls.id)}
+                        disabled={requesting === cls.id || !cls.isOpen}
+                        variant="outline"
+                        size="sm"
+                      >
+                        {requesting === cls.id ? t("student.classes.requesting") : t("student.classes.requestAgain")}
+                      </Button>
+                    </div>
+                  ) : (
                     <Button
-                      variant="ghost"
+                      onClick={() => onRequest(cls.id)}
+                      disabled={requesting === cls.id || !cls.isOpen}
+                      variant={cls.isOpen ? "default" : "outline"}
                       size="sm"
-                      disabled={cancellingRequest === cls.id}
-                      onClick={() => onCancelRequest(cls.id)}
                     >
-                      {cancellingRequest === cls.id ? "…" : t("student.classes.cancelRequest")}
+                      {requesting === cls.id ? t("student.classes.requesting") : t("student.classes.request")}
                     </Button>
-                  </div>
-                ) : (
-                  <Button
-                    onClick={() => onRequest(cls.id)}
-                    disabled={requesting === cls.id || !cls.isOpen}
-                    variant={cls.isOpen ? "default" : "outline"}
-                    size="sm"
-                  >
-                    {requesting === cls.id ? t("student.classes.requesting") : t("student.classes.request")}
-                  </Button>
+                  )}
+                </div>
+                {rejectedIds.has(cls.id) && rejectedReasons.get(cls.id) && (
+                  <p className="text-xs text-muted-foreground border-t pt-2">
+                    {t("student.dashboard.rejectedReason", { reason: rejectedReasons.get(cls.id) ?? "" })}
+                  </p>
                 )}
               </CardContent>
             </Card>

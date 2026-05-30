@@ -29,18 +29,20 @@ export default async function StudentLayout({
 
   return (
     <>
-      <LogoPill href="/student/dashboard" className="fixed top-3 start-4 z-50 hover:bg-primary/90 transition-colors">
-        {t('common.appName')}
-      </LogoPill>
-      <div className="fixed top-3 end-4 z-50">
-        <UserMenu
-          name={session.user.name ?? null}
-          email={session.user.email ?? null}
-          image={session.user.image ?? null}
-          currentLocale={locale}
-        />
-      </div>
-      <div className="pt-16">{children}</div>
+      <header className="fixed top-0 inset-x-0 z-50 h-14 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="flex h-full items-center justify-between px-4">
+          <LogoPill href="/student/dashboard" className="hover:bg-primary/90 transition-colors">
+            {t('common.appName')}
+          </LogoPill>
+          <UserMenu
+            name={session.user.name ?? null}
+            email={session.user.email ?? null}
+            image={session.user.image ?? null}
+            currentLocale={locale}
+          />
+        </div>
+      </header>
+      <div className="pt-14">{children}</div>
     </>
   );
 }

@@ -16,12 +16,24 @@ export default async function ClassesPage() {
     ? enrollmentsResult.data.filter((e) => e.status === "PENDING").map((e) => e.classId)
     : [];
 
+  const initialRejectedEnrollments = "data" in enrollmentsResult
+    ? enrollmentsResult.data
+        .filter((e) => e.status === "REJECTED")
+        .map((e) => ({
+          classId: e.classId,
+          className: e.class.name,
+          classSubject: e.class.subject,
+          rejectionReason: e.rejectionReason,
+        }))
+    : [];
+
   return (
     <StudentClassesClient
       enrolledClasses={enrolledClasses}
       openClasses={openClasses}
       initialAbsences={initialAbsences}
       initialPendingIds={initialPendingIds}
+      initialRejectedEnrollments={initialRejectedEnrollments}
     />
   );
 }

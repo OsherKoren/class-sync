@@ -117,7 +117,7 @@ export async function registerGuardian(
   const passwordHash = await bcrypt.hash(password, 12);
 
   await db.user.create({
-    data: { name, email, passwordHash, role: "GUARDIAN" },
+    data: { name, email, passwordHash, role: "GUARDIAN", registrationComplete: true },
     select: { id: true },
   });
 
@@ -146,7 +146,7 @@ export async function registerStudent(
   const passwordHash = await bcrypt.hash(password, 12);
 
   const user = await db.user.create({
-    data: { name, email, passwordHash, role: "STUDENT" },
+    data: { name, email, passwordHash, role: "STUDENT", registrationComplete: true },
     select: { id: true },
   });
 

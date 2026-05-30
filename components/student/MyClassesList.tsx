@@ -18,10 +18,12 @@ export function MyClassesList({
   classes,
   cancelledSessions,
   onCancelClick,
+  readOnly = false,
 }: {
   classes: StudentClass[];
   cancelledSessions: Map<string, Set<string>>;
   onCancelClick: (cls: StudentClass, date: string) => void;
+  readOnly?: boolean;
 }) {
   const t = useTranslations();
 
@@ -79,9 +81,11 @@ export function MyClassesList({
                 {cls.enrollmentCount === 1 ? t("common.student") : t("common.students")}{" "}
                 enrolled · {cls.duration} {t("common.minutesPerSession")}
               </p>
-              <Button variant="outline" size="sm" onClick={() => onCancelClick(cls, nextDate)}>
-                {t("student.classes.cancelNextSession")}
-              </Button>
+              {!readOnly && (
+                <Button variant="outline" size="sm" onClick={() => onCancelClick(cls, nextDate)}>
+                  {t("student.classes.cancelNextSession")}
+                </Button>
+              )}
             </CardContent>
           </Card>
         );

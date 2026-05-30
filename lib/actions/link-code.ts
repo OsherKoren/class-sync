@@ -1,9 +1,11 @@
 "use server";
 
+import { headers } from "next/headers";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { canActOnStudent } from "@/lib/auth-helpers";
 import { generateCode, normalizeCode } from "@/lib/link-code";
+import { linkCodeGenerateRateLimit, linkCodeRedeemRateLimit } from "@/lib/rate-limit";
 
 const MAX_ACTIVE_CODES_PER_STUDENT = 5;
 const CODE_EXPIRY_MS = 24 * 60 * 60 * 1000;
@@ -16,6 +18,10 @@ export async function createLinkCode(
   if (!session?.user?.id) return { error: "Not authenticated" };
 
   const { role, id: userId } = session.user as { role: string; id: string };
+
+  const ip = (await headers()).get("x-forwarded-for") ?? "anonymous";
+  const { success: rateLimitOk } = await linkCodeGenerateRateLimit.limit(`${ip}:${userId}`);
+  if (!rateLimitOk) return { error: "Too many requests. Please try again later." };
 
   // CLAIM_STUDENT: a guardian invites their child → caller must be a linked guardian
   // CLAIM_GUARDIAN: a student/guardian invites a new guardian → caller must be authorized on the student
@@ -74,6 +80,10 @@ export async function redeemLinkCode(
 
   const { role, id: userId } = session.user as { role: string; id: string };
   const code = normalizeCode(rawCode);
+
+  const ip = (await headers()).get("x-forwarded-for") ?? "anonymous";
+  const { success: rateLimitOk } = await linkCodeRedeemRateLimit.limit(`${ip}:${userId}`);
+  if (!rateLimitOk) return { error: "Too many requests. Please try again later." };
 
   try {
     const result = await db.$transaction(async (tx) => {

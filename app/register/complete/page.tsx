@@ -60,13 +60,17 @@ export default function CompleteRegistrationPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="absolute top-4 end-4">
-        <LanguageSwitcher />
-      </div>
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 pt-14">
+      <header className="fixed top-0 inset-x-0 z-50 h-14 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="flex h-full items-center justify-between px-4">
+          <LogoPill href="/" className="hover:bg-primary/90 transition-colors">
+            {t('common.appName')}
+          </LogoPill>
+          <LanguageSwitcher />
+        </div>
+      </header>
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <LogoPill className="mx-auto mb-2">{t('common.appName')}</LogoPill>
           <CardTitle className="text-2xl">{t('auth.welcomeTitle')}</CardTitle>
           <CardDescription>{t('auth.welcomeSubtitle')}</CardDescription>
         </CardHeader>

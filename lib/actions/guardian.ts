@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import bcrypt from "bcryptjs";
@@ -279,6 +280,10 @@ export async function rejectEnrollment(
     where: { id: enrollmentId },
     data: { status: "REJECTED", rejectionReason: parsed.data.reason ?? null },
   });
+
+  revalidatePath("/student/dashboard");
+  revalidatePath("/student/classes");
+  revalidatePath("/teacher/dashboard");
 
   return { data: { success: true } };
 }

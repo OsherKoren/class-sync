@@ -10,16 +10,16 @@ const localeSchema = z.enum(["he", "en"]);
 export async function updateLocale(
   locale: unknown
 ): Promise<{ error: string } | { data: { success: true } }> {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "Unauthorized" };
-
   const parsed = localeSchema.safeParse(locale);
   if (!parsed.success) return { error: "Invalid locale" };
 
-  await db.user.update({
-    where: { id: session.user.id },
-    data: { locale: parsed.data },
-  });
+  const session = await auth();
+  if (session?.user?.id) {
+    await db.user.update({
+      where: { id: session.user.id },
+      data: { locale: parsed.data },
+    });
+  }
 
   const cookieStore = await cookies();
   cookieStore.set("locale", parsed.data, {

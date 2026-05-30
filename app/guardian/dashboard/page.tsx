@@ -1,17 +1,15 @@
 import Link from "next/link";
-import { auth, signOut } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getMyStudents } from "@/lib/actions/guardian-dashboard";
-import { getTranslations, getLocale } from "next-intl/server";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { getTranslations } from "next-intl/server";
 
 export default async function GuardianDashboard() {
   const session = await auth();
   const result = await getMyStudents();
   const students = "error" in result ? [] : result.data;
   const t = await getTranslations();
-  const locale = await getLocale();
 
   return (
     <div className="min-h-screen bg-background p-8">
@@ -24,21 +22,15 @@ export default async function GuardianDashboard() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <LanguageSwitcher current={locale} />
+            <Link href="/guardian/classes">
+              <Button variant="outline">{t('guardian.dashboard.viewSchedule')}</Button>
+            </Link>
             <Link href="/guardian/students/new">
               <Button variant="outline">{t('guardian.dashboard.addChild')}</Button>
             </Link>
             <Link href="/guardian/link">
               <Button variant="outline">{t('guardian.dashboard.linkViaCode')}</Button>
             </Link>
-            <form
-              action={async () => {
-                "use server";
-                await signOut({ redirectTo: "/login" });
-              }}
-            >
-              <Button type="submit" variant="outline">{t('common.signOut')}</Button>
-            </form>
           </div>
         </div>
 

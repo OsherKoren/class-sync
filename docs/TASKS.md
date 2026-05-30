@@ -80,35 +80,35 @@ Prisma schema live on Neon; teacher, guardian, and student login working; abuse 
 Teacher can create classes and manage guardian-linked students and independent students. Guardians and students can also link to each other via link codes.
 
 **Core schema changes (multi-guardian + link-code model):**
-- [ ] Rename `Role.FAMILY` → `Role.GUARDIAN` (and update `User.role` default)
-- [ ] Drop the `Family` model entirely (no longer needed — guardians link directly to students)
-- [ ] Drop `Student.familyId` and the `Student.family` relation
-- [ ] Keep `Student.userId String? @unique` (child's own login, optional)
-- [ ] Change `Student.user` relation to `onDelete: SetNull` — deleting a student's User keeps the Student row for any linked guardians
-- [ ] Add `STUDENT` to `Role` enum (already present in current schema — verify)
-- [ ] Add `StudentGuardian` join model: `(studentId, guardianId)` composite PK, optional `relationship String?`, `@@index([guardianId])`
-- [ ] Add `LinkCodeKind` enum: `CLAIM_STUDENT | CLAIM_GUARDIAN`
-- [ ] Add `LinkCode` model: `code` (6-char PK), `kind`, `studentId`, `createdById`, `expiresAt`, `usedAt`, `usedById`, `@@index([studentId])`
-- [ ] Add `EnrollmentStatus` enum: `PENDING | ACTIVE | REJECTED` (already present — verify)
-- [ ] Update `Enrollment` model: ensure `status` field present (already in current schema — verify)
-- [ ] Add `Class.isOpen Boolean @default(false)` — toggle for student self-enrollment (already in current schema — verify)
-- [ ] `npx prisma db push --force-reset` (dev only — no prod data yet) + `npx prisma generate`
+- [x] Rename `Role.FAMILY` → `Role.GUARDIAN` (and update `User.role` default)
+- [x] Drop the `Family` model entirely (no longer needed — guardians link directly to students)
+- [x] Drop `Student.familyId` and the `Student.family` relation
+- [x] Keep `Student.userId String? @unique` (child's own login, optional)
+- [x] Change `Student.user` relation to `onDelete: SetNull` — deleting a student's User keeps the Student row for any linked guardians
+- [x] Add `STUDENT` to `Role` enum (already present in current schema — verify)
+- [x] Add `StudentGuardian` join model: `(studentId, guardianId)` composite PK, optional `relationship String?`, `@@index([guardianId])`
+- [x] Add `LinkCodeKind` enum: `CLAIM_STUDENT | CLAIM_GUARDIAN`
+- [x] Add `LinkCode` model: `code` (6-char PK), `kind`, `studentId`, `createdById`, `expiresAt`, `usedAt`, `usedById`, `@@index([studentId])`
+- [x] Add `EnrollmentStatus` enum: `PENDING | ACTIVE | REJECTED` (already present — verify)
+- [x] Update `Enrollment` model: ensure `status` field present (already in current schema — verify)
+- [x] Add `Class.isOpen Boolean @default(false)` — toggle for student self-enrollment (already in current schema — verify)
+- [x] `npx prisma db push --force-reset` (dev only — no prod data yet) + `npx prisma generate`
 
 **Teacher class/enrollment features:**
 - [x] `app/teacher/classes/new/page.tsx` — form: name, subject, type, day, time
 - [x] `app/teacher/classes/[id]/page.tsx` — detail + enrolled students
 - [x] `app/teacher/classes/page.tsx` — class list
 - [x] `app/teacher/dashboard/page.tsx` — quick-access cards
-- [ ] `app/teacher/dashboard/page.tsx` — add "Pending Requests" section: fetch all PENDING enrollments across teacher's classes; show student name + class name + approve/reject buttons; hide section when empty
-- [ ] Server Action: `getPendingEnrollments()` — returns all PENDING enrollments for the logged-in teacher's classes (student name, class name, enrollmentId)
+- [x] `app/teacher/dashboard/page.tsx` — add "Pending Requests" section: fetch all PENDING enrollments across teacher's classes; show student name + class name + approve/reject buttons; hide section when empty
+- [x] Server Action: `getPendingEnrollments()` — returns all PENDING enrollments for the logged-in teacher's classes (student name, class name, enrollmentId)
 - [x] `app/teacher/students/page.tsx` — students list (currently grouped by family — to be regrouped by Student with guardian column in refactor)
 - [x] `app/teacher/students/new/page.tsx` — add student + initial guardian form (currently "add family" — to be renamed in refactor)
 - [x] `app/teacher/students/[id]/page.tsx` — student detail + linked guardians + enroll button (currently "family detail" — to be renamed in refactor)
 - [x] `app/teacher/students/[id]/[studentId]/enroll/page.tsx` — enroll into class
 
 **Student management features (new):**
-- [ ] `app/teacher/classes/[id]/page.tsx` — add "Enroll by email" UI section (pending requests list already done)
-- [ ] `app/teacher/students/page.tsx` — add "Find student by email" search UI (independent students)
+- [x] `app/teacher/classes/[id]/page.tsx` — add "Enroll by email" UI section (pending requests list already done)
+- [x] `app/teacher/students/page.tsx` — add "Find student by email" search UI (independent students)
 - [x] Server Action: `findStudentByEmail(email)` — teacher searches for existing student
 - [x] Server Action: `enrollStudentByEmail(email, classId)` — create ACTIVE enrollment
 - [x] Server Action: `approveEnrollment(enrollmentId)` — change PENDING → ACTIVE (auto-closes class when maxCapacity reached)
@@ -124,34 +124,34 @@ Teacher can create classes and manage guardian-linked students and independent s
 - [x] Capacity info shown on class detail page (X / Y enrolled) and student classes list (X spots left)
 
 **Student/Guardian registration/auth features (new):**
-- [ ] Update `lib/auth.ts` — handle post-OAuth role selection
-- [ ] `lib/actions/auth.ts` — add `registerStudent(name, email, password)` server action
-- [ ] `lib/actions/auth.ts` — add `registerGuardian(name, email, password)` server action (replaces `registerFamily`)
-- [ ] `lib/actions/auth.ts` — add `completeOAuthRegistration(role)` for Google post-signup
-- [ ] `app/register/page.tsx` — add "Guardian / Student" toggle
-- [ ] `app/register/complete/page.tsx` (new) — post-Google role selection page
-- [ ] `app/login/page.tsx` — role-based redirect (TEACHER → `/teacher/dashboard`, GUARDIAN → `/guardian/dashboard`, STUDENT → `/student/dashboard`)
-- [ ] `proxy.ts` — add `/student/*` and `/guardian/*` protection, add `/register/complete` to public routes
+- [x] Update `lib/auth.ts` — handle post-OAuth role selection
+- [x] `lib/actions/auth.ts` — add `registerStudent(name, email, password)` server action
+- [x] `lib/actions/auth.ts` — add `registerGuardian(name, email, password)` server action (replaces `registerFamily`)
+- [x] `lib/actions/auth.ts` — add `completeOAuthRegistration(role)` for Google post-signup
+- [x] `app/register/page.tsx` — add "Guardian / Student" toggle
+- [x] `app/register/complete/page.tsx` (new) — post-Google role selection page
+- [x] `app/login/page.tsx` — role-based redirect (TEACHER → `/teacher/dashboard`, GUARDIAN → `/guardian/dashboard`, STUDENT → `/student/dashboard`)
+- [x] `proxy.ts` — add `/student/*` and `/guardian/*` protection, add `/register/complete` to public routes
 
 **Link-code features (new):**
-- [ ] `lib/link-code.ts` — `generateCode()` (6-char from `ABCDEFGHJKLMNPQRSTUVWXYZ23456789`), `normalizeCode(input)` (uppercase + strip whitespace), `consumeCode(code, redeemerUserId)` (single transaction)
-- [ ] Server Action: `createLinkCode(studentId, kind)` — creates LinkCode row for Guardian inviting Student or Student inviting Guardian; enforces max 5 active per Student
-- [ ] Server Action: `redeemLinkCode(code)` — validates kind/role match, atomically sets `Student.userId` OR creates `StudentGuardian` row, marks code used
-- [ ] Server Action: `revokeLinkCode(code)` — generator can cancel before redemption
-- [ ] `app/guardian/students/new/page.tsx` — add child (creates Student row, optionally generates a CLAIM_STUDENT code on the spot)
-- [ ] `app/guardian/students/[id]/link/page.tsx` — generate CLAIM_STUDENT or CLAIM_GUARDIAN code, show as large text + QR
-- [ ] `app/guardian/link/page.tsx` — enter a CLAIM_GUARDIAN code received from a student
-- [ ] `app/student/link/page.tsx` — enter a CLAIM_STUDENT code received from a guardian
-- [ ] Optional `?code=XXXXXX` query param on `/register` to pre-fill link code during signup
-- [ ] Install `qrcode` npm package for server-side QR rendering
-- [ ] Per-route rate limit: 10/min on code generation, 20/min on redemption (per IP + per User)
+- [x] `lib/link-code.ts` — `generateCode()` (6-char from `ABCDEFGHJKLMNPQRSTUVWXYZ23456789`), `normalizeCode(input)` (uppercase + strip whitespace), `consumeCode(code, redeemerUserId)` (single transaction)
+- [x] Server Action: `createLinkCode(studentId, kind)` — creates LinkCode row for Guardian inviting Student or Student inviting Guardian; enforces max 5 active per Student
+- [x] Server Action: `redeemLinkCode(code)` — validates kind/role match, atomically sets `Student.userId` OR creates `StudentGuardian` row, marks code used
+- [x] Server Action: `revokeLinkCode(code)` — generator can cancel before redemption
+- [x] `app/guardian/students/new/page.tsx` — add child (creates Student row, optionally generates a CLAIM_STUDENT code on the spot)
+- [x] `app/guardian/students/[id]/link/page.tsx` — generate CLAIM_STUDENT or CLAIM_GUARDIAN code, show as large text + QR
+- [x] `app/guardian/link/page.tsx` — enter a CLAIM_GUARDIAN code received from a student
+- [x] `app/student/link/page.tsx` — enter a CLAIM_STUDENT code received from a guardian
+- [x] Optional `?code=XXXXXX` query param on `/register` to pre-fill link code during signup
+- [x] Install `qrcode` npm package for server-side QR rendering
+- [x] Per-route rate limit: 10/min on code generation, 20/min on redemption (per IP + per User)
 
 ### ✅ Phase 2 Success (Pending requests dashboard)
-- [ ] Teacher dashboard shows a "Pending Requests" section when at least one request exists
-- [ ] Each row shows the student's name and the class they requested
-- [ ] Approving a request removes it from the list and activates the enrollment
-- [ ] Rejecting a request removes it from the list
-- [ ] Section is hidden when there are no pending requests
+- [x] Teacher dashboard shows a "Pending Requests" section when at least one request exists
+- [x] Each row shows the student's name and the class they requested
+- [x] Approving a request removes it from the list and activates the enrollment
+- [x] Rejecting a request removes it from the list
+- [x] Section is hidden when there are no pending requests
 
 ### ✅ Phase 2 Success (Guardian-managed students)
 - [x] Teacher creates a group class → appears in class list
@@ -168,15 +168,15 @@ Teacher can create classes and manage guardian-linked students and independent s
 - [x] Teacher approves pending request → status becomes ACTIVE → student sees confirmed class
 
 ### Phase 2 Success (Multi-guardian + link codes)
-- [ ] Guardian creates a child (no login) → Student row created with one StudentGuardian link
-- [ ] Guardian generates a CLAIM_STUDENT code → child enters code at `/register` → child account created and linked to the existing Student row; original guardian still linked
-- [ ] Student generates a CLAIM_GUARDIAN code → existing guardian User redeems it → StudentGuardian row created; student still has own login
-- [ ] Two guardians link to the same Student → both see the same enrollments on their dashboards
-- [ ] Linked guardian and student both see the same data; either can act on enrollments
-- [ ] Expired code (>24h) is rejected with a clear error
-- [ ] Used code cannot be redeemed twice
-- [ ] Role-mismatched code rejected (e.g., a Guardian trying to redeem a CLAIM_STUDENT code)
-- [ ] Generating a 6th active code for the same Student is rejected
+- [x] Guardian creates a child (no login) → Student row created with one StudentGuardian link
+- [x] Guardian generates a CLAIM_STUDENT code → child enters code at `/register` → child account created and linked to the existing Student row; original guardian still linked
+- [x] Student generates a CLAIM_GUARDIAN code → existing guardian User redeems it → StudentGuardian row created; student still has own login
+- [x] Two guardians link to the same Student → both see the same enrollments on their dashboards
+- [x] Linked guardian and student both see the same data; either can act on enrollments
+- [x] Expired code (>24h) is rejected with a clear error
+- [x] Used code cannot be redeemed twice
+- [x] Role-mismatched code rejected (e.g., a Guardian trying to redeem a CLAIM_STUDENT code)
+- [x] Generating a 6th active code for the same Student is rejected
 
 ---
 
@@ -185,40 +185,40 @@ Teacher can create classes and manage guardian-linked students and independent s
 Guardian logs in to see all linked children's sessions. Independent student logs in to see their own sessions. Both surfaces query the same `Student` rows, so a linked child + guardian see identical data.
 
 **Guardian dashboard:**
-- [ ] `app/guardian/layout.tsx` — minimal nav, GUARDIAN auth guard
-- [ ] `app/guardian/dashboard/page.tsx` — upcoming sessions across all linked children as cards (grouped by child if >1)
-- [ ] `app/guardian/students/page.tsx` — list of linked children with status badges + "Link child by code" / "Add child" actions
-- [ ] `app/guardian/settings/page.tsx` — placeholder (locale, theme, install, link/unlink children)
+- [x] `app/guardian/layout.tsx` — minimal nav, GUARDIAN auth guard
+- [x] `app/guardian/dashboard/page.tsx` — upcoming sessions across all linked children as cards (grouped by child if >1)
+- [x] `app/guardian/students/page.tsx` — list of linked children with status badges + "Link child by code" / "Add child" actions
+- [x] `app/guardian/settings/page.tsx` — placeholder (locale, theme, install, link/unlink children)
 
 **Student dashboard (NEW):**
-- [ ] `app/student/layout.tsx` — student auth guard (STUDENT role required)
-- [ ] `app/student/dashboard/page.tsx` — upcoming sessions + pending requests as cards
-- [ ] `app/student/classes/page.tsx` — browse open classes, "Request to join" button
-- [ ] `app/student/settings/page.tsx` — placeholder (locale, theme, install, link/unlink guardian)
-- [ ] `lib/actions/student.ts` — `getStudentEnrollments()`, `requestEnrollment()`, `getOpenClasses()`
+- [x] `app/student/layout.tsx` — student auth guard (STUDENT role required)
+- [x] `app/student/dashboard/page.tsx` — upcoming sessions + pending requests as cards
+- [x] `app/student/classes/page.tsx` — browse open classes, "Request to join" button
+- [x] `app/student/settings/page.tsx` — placeholder (locale, theme, install, link/unlink guardian)
+- [x] `lib/actions/student.ts` — `getStudentEnrollments()`, `requestEnrollment()`, `getOpenClasses()`
 
 **Shared:**
-- [ ] `lib/auth-helpers.ts` — `canActOnStudent(studentId, userId)`: returns true if `student.userId === userId` OR a `StudentGuardian (studentId, userId)` row exists. Used in every guardian/student server action.
-- [ ] `components/schedule/SessionCard.tsx` — date, time, subject, status badge (ACTIVE | PENDING), child name (when guardian view + multiple children)
-- [ ] Seed script: create test guardian + 2 children + 1 co-guardian linked to one of them + test independent student + upcoming sessions
-- [ ] Light styling improvements to distinguish ACTIVE vs PENDING status
+- [x] `lib/auth-helpers.ts` — `canActOnStudent(studentId, userId)`: returns true if `student.userId === userId` OR a `StudentGuardian (studentId, userId)` row exists. Used in every guardian/student server action.
+- [x] `components/schedule/SessionCard.tsx` — date, time, subject, status badge (ACTIVE | PENDING), child name (when guardian view + multiple children)
+- [x] Seed script: create test guardian + 2 children + 1 co-guardian linked to one of them + test independent student + upcoming sessions
+- [x] Light styling improvements to distinguish ACTIVE vs PENDING status
 
 ### ✅ Phase 3 Success (Guardian)
-- [ ] Guardian logs in → sees upcoming sessions for *all* linked children as cards
-- [ ] Session cards show correct date, time, subject, and (if >1 child) which child the card belongs to
-- [ ] Empty state message shown when no sessions exist
-- [ ] Settings page loads without errors
+- [x] Guardian logs in → sees upcoming sessions for *all* linked children as cards
+- [x] Session cards show correct date, time, subject, and (if >1 child) which child the card belongs to
+- [x] Empty state message shown when no sessions exist
+- [x] Settings page loads without errors
 
 ### Phase 3 Success (Independent Student)
-- [ ] Student logs in → sees enrolled classes as cards (ACTIVE status)
-- [ ] Student sees pending requests with "Waiting for teacher confirmation" badge
-- [ ] Student browses open classes → can request to join
-- [ ] Student settings page loads without errors
+- [x] Student logs in → sees enrolled classes as cards (ACTIVE status)
+- [x] Student sees pending requests with "Waiting for teacher confirmation" badge
+- [x] Student browses open classes → can request to join
+- [x] Student settings page loads without errors
 
 ### Phase 3 Success (Linked guardian + student see same data)
-- [ ] Linked guardian and child both view the same upcoming sessions for that child
-- [ ] Either can request enrollment for the child → request appears on both dashboards
-- [ ] Two co-guardians of the same child see identical data
+- [x] Linked guardian and child both view the same upcoming sessions for that child
+- [x] Either can request enrollment for the child → request appears on both dashboards
+- [x] Two co-guardians of the same child see identical data
 
 ---
 

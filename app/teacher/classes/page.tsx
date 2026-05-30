@@ -49,7 +49,7 @@ export default async function ClassesPage() {
             </CardContent>
           </Card>
         ) : (
-          <ScheduleView classes={classes} teacherName={teacherName} />
+          <ScheduleView classes={classes} teacherName={teacherName} allowCreate />
         )}
       </div>
     </div>

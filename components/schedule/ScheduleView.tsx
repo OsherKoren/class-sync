@@ -15,9 +15,11 @@ type ViewMode = "list" | "week" | "day";
 export function ScheduleView({
   classes,
   teacherName,
+  allowCreate,
 }: {
   classes: ClassItem[];
   teacherName: string | null;
+  allowCreate?: boolean;
 }) {
   const t = useTranslations();
   const [view, setView] = useState<ViewMode>("week");
@@ -37,7 +39,7 @@ export function ScheduleView({
             onClick={() => setView(v)}
             className={cn(
               "px-4 py-1.5 text-sm transition-colors",
-              view === v ? "bg-primary text-primary-foreground" : "hover:bg-accent"
+              view === v ? "bg-primary text-primary-foreground" : "hover:bg-accent active:bg-accent/80"
             )}
           >
             {viewLabels[v]}
@@ -49,7 +51,7 @@ export function ScheduleView({
         <div className="grid gap-4">
           {classes.map((cls) => (
             <Link key={cls.id} href={`/teacher/classes/${cls.id}`}>
-              <Card className="hover:bg-accent transition-colors cursor-pointer">
+              <Card className="hover:bg-accent active:bg-accent/80 transition-colors cursor-pointer">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
@@ -91,8 +93,8 @@ export function ScheduleView({
         </div>
       )}
 
-      {view === "week" && <WeekView classes={classes} teacherName={teacherName} />}
-      {view === "day" && <DayView classes={classes} teacherName={teacherName} />}
+      {view === "week" && <WeekView classes={classes} teacherName={teacherName} allowCreate={allowCreate} />}
+      {view === "day" && <DayView classes={classes} teacherName={teacherName} allowCreate={allowCreate} />}
     </div>
   );
 }
