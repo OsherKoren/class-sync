@@ -99,6 +99,8 @@ Teacher can create classes and manage guardian-linked students and independent s
 - [x] `app/teacher/classes/[id]/page.tsx` — detail + enrolled students
 - [x] `app/teacher/classes/page.tsx` — class list
 - [x] `app/teacher/dashboard/page.tsx` — quick-access cards
+- [ ] `app/teacher/dashboard/page.tsx` — add "Pending Requests" section: fetch all PENDING enrollments across teacher's classes; show student name + class name + approve/reject buttons; hide section when empty
+- [ ] Server Action: `getPendingEnrollments()` — returns all PENDING enrollments for the logged-in teacher's classes (student name, class name, enrollmentId)
 - [x] `app/teacher/students/page.tsx` — students list (currently grouped by family — to be regrouped by Student with guardian column in refactor)
 - [x] `app/teacher/students/new/page.tsx` — add student + initial guardian form (currently "add family" — to be renamed in refactor)
 - [x] `app/teacher/students/[id]/page.tsx` — student detail + linked guardians + enroll button (currently "family detail" — to be renamed in refactor)
@@ -144,6 +146,13 @@ Teacher can create classes and manage guardian-linked students and independent s
 - [ ] Install `qrcode` npm package for server-side QR rendering
 - [ ] Per-route rate limit: 10/min on code generation, 20/min on redemption (per IP + per User)
 
+### ✅ Phase 2 Success (Pending requests dashboard)
+- [ ] Teacher dashboard shows a "Pending Requests" section when at least one request exists
+- [ ] Each row shows the student's name and the class they requested
+- [ ] Approving a request removes it from the list and activates the enrollment
+- [ ] Rejecting a request removes it from the list
+- [ ] Section is hidden when there are no pending requests
+
 ### ✅ Phase 2 Success (Guardian-managed students)
 - [x] Teacher creates a group class → appears in class list
 - [x] Teacher creates a student record with an initial guardian (guardian name + email) → appears in students page
@@ -152,9 +161,9 @@ Teacher can create classes and manage guardian-linked students and independent s
 - [x] Invalid form inputs show inline error messages
 
 ### Phase 2 Success (Independent students)
-- [ ] Independent student registers with email + password → lands on student dashboard
-- [ ] Independent student registers with Google → confirms "I'm a student" → lands on student dashboard
-- [ ] Teacher finds independent student by email → enrolls them in a class (ACTIVE status)
+- [x] Independent student registers with email + password → lands on student dashboard
+- [x] Independent student registers with Google → confirms "I'm a student" → lands on student dashboard
+- [x] Teacher finds independent student by email → enrolls them in a class (ACTIVE status)
 - [x] Independent student browses all classes → requests to join (creates PENDING enrollment)
 - [x] Teacher approves pending request → status becomes ACTIVE → student sees confirmed class
 

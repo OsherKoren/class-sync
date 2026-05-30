@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { auth, signOut } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,14 +9,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getStudentEnrollments } from "@/lib/actions/student";
-import { getTranslations, getLocale } from "next-intl/server";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { CancelEnrollmentButton } from "@/components/student/CancelEnrollmentButton";
+import { getTranslations } from "next-intl/server";
 
 export default async function StudentDashboard() {
   const session = await auth();
   const result = await getStudentEnrollments();
   const t = await getTranslations();
-  const locale = await getLocale();
 
   const enrollments = "error" in result ? [] : result.data;
   const active = enrollments.filter((e) => e.status === "ACTIVE");
@@ -32,22 +31,9 @@ export default async function StudentDashboard() {
               {t('student.dashboard.welcome', { name: session?.user?.name || '' })}
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <LanguageSwitcher current={locale} />
-            <Link href="/student/classes">
-              <Button variant="outline">{t('student.dashboard.findClasses')}</Button>
-            </Link>
-            <form
-              action={async () => {
-                "use server";
-                await signOut({ redirectTo: "/login" });
-              }}
-            >
-              <Button type="submit" variant="outline">
-                {t('common.signOut')}
-              </Button>
-            </form>
-          </div>
+          <Link href="/student/classes">
+            <Button variant="outline">{t('student.dashboard.findClasses')}</Button>
+          </Link>
         </div>
 
         {pending.length > 0 && (
@@ -70,11 +56,14 @@ export default async function StudentDashboard() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      {t(`days.${enrollment.class.dayOfWeek}` as `days.${number}`)} at{" "}
-                      {enrollment.class.startTime} • {enrollment.class.duration}{" "}
-                      {t('common.minutes')}
-                    </p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-muted-foreground">
+                        {t(`days.${enrollment.class.dayOfWeek}` as `days.${number}`)} at{" "}
+                        {enrollment.class.startTime} • {enrollment.class.duration}{" "}
+                        {t('common.minutes')}
+                      </p>
+                      <CancelEnrollmentButton classId={enrollment.classId} />
+                    </div>
                   </CardContent>
                 </Card>
               ))}

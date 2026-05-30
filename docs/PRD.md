@@ -56,6 +56,7 @@
 - **Manage Students:** Teacher can create student records and link guardians to them
 - **Add Students:** Teacher creates student records (with or without a login) OR finds independent students by email
 - **Two-Way Enrollment:** Teacher enrolls students directly (auto-confirmed) OR students request to join open classes (teacher approves/rejects)
+- **Pending Requests Dashboard:** Teacher dashboard surfaces all pending enrollment requests across all classes in one place, with inline approve/reject actions — no per-class navigation required
 - **View Enrollments:** Class detail page shows all enrolled students + pending requests
 - **Guardian-Student Link Codes:** Guardians and students generate single-use 6-character codes (with QR) to link accounts together, no email required
 - **Multi-Guardian Per Student:** A student can have one or more linked guardians (e.g., both parents, or a parent + grandparent)

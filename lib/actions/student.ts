@@ -187,6 +187,7 @@ export async function getOpenClasses(): Promise<
         duration: number;
         isOpen: boolean;
         maxCapacity: number | null;
+        enrollmentCount: number;
         spotsLeft: number | null;
         teacherName: string | null;
       }>;
@@ -229,10 +230,42 @@ export async function getOpenClasses(): Promise<
       duration: c.duration,
       isOpen: c.isOpen,
       maxCapacity: c.maxCapacity,
+      enrollmentCount: c._count.enrollments,
       spotsLeft: c.maxCapacity !== null ? Math.max(0, c.maxCapacity - c._count.enrollments) : null,
       teacherName: c.teacher.name,
     })),
   };
+}
+
+export async function cancelEnrollmentRequest(
+  classId: string
+): Promise<{ error: string } | { data: { success: true } }> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "STUDENT") {
+    return { error: "Unauthorized" };
+  }
+
+  const student = await db.student.findUnique({
+    where: { userId: session.user.id },
+    select: { id: true },
+  });
+
+  if (!student) return { error: "Student profile not found" };
+
+  const enrollment = await db.enrollment.findUnique({
+    where: { studentId_classId: { studentId: student.id, classId } },
+    select: { status: true },
+  });
+
+  if (!enrollment || enrollment.status !== "PENDING") {
+    return { error: "No pending request found for this class" };
+  }
+
+  await db.enrollment.delete({
+    where: { studentId_classId: { studentId: student.id, classId } },
+  });
+
+  return { data: { success: true } };
 }
 
 export async function requestEnrollment(

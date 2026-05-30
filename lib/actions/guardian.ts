@@ -273,6 +273,46 @@ export async function rejectEnrollment(
   return { data: { success: true } };
 }
 
+export async function getPendingEnrollments(): Promise<
+  | { error: string }
+  | {
+      data: Array<{
+        enrollmentId: string;
+        studentName: string;
+        className: string;
+        classId: string;
+      }>;
+    }
+> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "TEACHER") {
+    return { error: "Unauthorized" };
+  }
+
+  const enrollments = await db.enrollment.findMany({
+    where: {
+      status: "PENDING",
+      class: { teacherId: session.user.id },
+    },
+    select: {
+      id: true,
+      classId: true,
+      student: { select: { name: true } },
+      class: { select: { name: true } },
+    },
+    orderBy: { createdAt: "asc" },
+  });
+
+  return {
+    data: enrollments.map((e) => ({
+      enrollmentId: e.id,
+      studentName: e.student.name,
+      className: e.class.name,
+      classId: e.classId,
+    })),
+  };
+}
+
 export async function getTeacherStudents(): Promise<
   | { error: string }
   | {

@@ -39,7 +39,7 @@
     "6": "Saturday"
   },
   "home": {
-    "tagline": "Scheduling made simple for teachers and students",
+    "tagline": "Scheduling for teachers and students",
     "createAccount": "Create account"
   },
   "auth": {
@@ -97,6 +97,8 @@
       "classesDesc": "Manage your classes and students",
       "students": "Students",
       "studentsDesc": "View and manage enrolled families",
+      "pendingRequestsTitle": "Pending Requests",
+      "pendingRequestsClass": "for {className}",
       "reschedules": "Reschedules",
       "reschedulesDesc": "Offer new time slots and view voting results",
       "settings": "Settings",
@@ -273,7 +275,8 @@
       "noClasses": "You haven't enrolled in any classes yet.",
       "browseClasses": "Browse available classes",
       "activeTitle": "Active Classes",
-      "activeStatus": "Active"
+      "activeStatus": "Active",
+      "cancelRequest": "Cancel request"
     },
     "classes": {
       "backToDashboard": "← Back to dashboard",
@@ -288,6 +291,7 @@
       "request": "Request to join",
       "requesting": "Requesting…",
       "requested": "Requested",
+      "cancelRequest": "Cancel",
       "enrolled": "Enrolled",
       "spotsLeft": "{count} spots left",
       "classFull": "Class full",

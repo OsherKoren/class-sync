@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { requestEnrollment } from "@/lib/actions/student";
+import { requestEnrollment, cancelEnrollmentRequest } from "@/lib/actions/student";
 import { type StudentClass } from "@/lib/types";
 import { SUBJECT_KEYS, GRADE_KEYS } from "@/lib/classKeys";
 import { Card, CardContent } from "@/components/ui/card";
@@ -20,7 +20,7 @@ type OpenClass = {
   id: string; name: string; subject: string; type: string;
   level: string | null; grade: string | null; dayOfWeek: number;
   startTime: string; duration: number; isOpen: boolean;
-  maxCapacity: number | null; spotsLeft: number | null; teacherName: string | null;
+  maxCapacity: number | null; enrollmentCount: number; spotsLeft: number | null; teacherName: string | null;
 };
 
 type CancelTarget = { class: StudentClass; date: string };
@@ -31,10 +31,12 @@ export function StudentClassesClient({
   enrolledClasses,
   openClasses,
   initialAbsences,
+  initialPendingIds,
 }: {
   enrolledClasses: StudentClass[];
   openClasses: OpenClass[];
   initialAbsences: Array<{ classId: string; date: string }>;
+  initialPendingIds: string[];
 }) {
   const t = useTranslations();
   const [tab, setTab] = useState<Tab>("mine");
@@ -49,7 +51,8 @@ export function StudentClassesClient({
     return map;
   });
   const [requesting, setRequesting] = useState<string | null>(null);
-  const [requested, setRequested] = useState<Set<string>>(new Set());
+  const [requested, setRequested] = useState<Set<string>>(() => new Set(initialPendingIds));
+  const [cancellingRequest, setCancellingRequest] = useState<string | null>(null);
   const [requestError, setRequestError] = useState("");
   const [filters, setFilters] = useState<ClassFilterState>({ subject: "", grade: "", level: "", dayOfWeek: "" });
 
@@ -87,6 +90,17 @@ export function StudentClassesClient({
 
   function updateFilter(key: keyof ClassFilterState, value: string) {
     setFilters((prev) => ({ ...prev, [key]: value }));
+  }
+
+  async function handleCancelRequest(classId: string) {
+    setCancellingRequest(classId);
+    const result = await cancelEnrollmentRequest(classId);
+    if ("error" in result) {
+      setRequestError(result.error);
+    } else {
+      setRequested((prev) => { const next = new Set(prev); next.delete(classId); return next; });
+    }
+    setCancellingRequest(null);
   }
 
   async function handleRequest(classId: string) {
@@ -184,7 +198,8 @@ export function StudentClassesClient({
               onClear={() => setFilters({ subject: "", grade: "", level: "", dayOfWeek: "" })}
             />
             <AllClassesList classes={filteredClasses} enrolledIds={enrolledIds}
-              requesting={requesting} requested={requested} error={requestError} onRequest={handleRequest} />
+              requesting={requesting} requested={requested} error={requestError} onRequest={handleRequest}
+              cancellingRequest={cancellingRequest} onCancelRequest={handleCancelRequest} />
           </>
         )}
 

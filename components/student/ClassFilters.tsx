@@ -33,12 +33,17 @@ export function ClassFilters({
   const t = useTranslations("student.classes.filters");
   const hasActive = Object.values(filters).some((v) => v !== "");
 
+  function displayLabel(options: FilterOption[], value: string, fallback: string) {
+    if (!value) return fallback;
+    return options.find((o) => o.value === value)?.label ?? fallback;
+  }
+
   return (
     <div className="flex flex-wrap gap-2 mb-4">
-      {subjectOptions.length > 1 && (
-        <Select value={filters.subject || "all"} onValueChange={(v) => onChange("subject", v === null || v === null || v === "all" ? "" : v)}>
+      {subjectOptions.length >= 1 && (
+        <Select value={filters.subject || "all"} onValueChange={(v) => onChange("subject", v === "all" ? "" : (v ?? ""))}>
           <SelectTrigger className="w-40 h-8 text-sm">
-            <SelectValue placeholder={t("allSubjects")} />
+            <SelectValue>{displayLabel(subjectOptions, filters.subject, t("allSubjects"))}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t("allSubjects")}</SelectItem>
@@ -48,10 +53,10 @@ export function ClassFilters({
           </SelectContent>
         </Select>
       )}
-      {gradeOptions.length > 1 && (
-        <Select value={filters.grade || "all"} onValueChange={(v) => onChange("grade", v === null || v === "all" ? "" : v)}>
+      {gradeOptions.length >= 1 && (
+        <Select value={filters.grade || "all"} onValueChange={(v) => onChange("grade", v === "all" ? "" : (v ?? ""))}>
           <SelectTrigger className="w-32 h-8 text-sm">
-            <SelectValue placeholder={t("allGrades")} />
+            <SelectValue>{displayLabel(gradeOptions, filters.grade, t("allGrades"))}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t("allGrades")}</SelectItem>
@@ -61,10 +66,10 @@ export function ClassFilters({
           </SelectContent>
         </Select>
       )}
-      {levelOptions.length > 1 && (
-        <Select value={filters.level || "all"} onValueChange={(v) => onChange("level", v === null || v === "all" ? "" : v)}>
+      {levelOptions.length >= 1 && (
+        <Select value={filters.level || "all"} onValueChange={(v) => onChange("level", v === "all" ? "" : (v ?? ""))}>
           <SelectTrigger className="w-36 h-8 text-sm">
-            <SelectValue placeholder={t("allLevels")} />
+            <SelectValue>{displayLabel(levelOptions, filters.level, t("allLevels"))}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t("allLevels")}</SelectItem>
@@ -74,10 +79,10 @@ export function ClassFilters({
           </SelectContent>
         </Select>
       )}
-      {dayOptions.length > 1 && (
-        <Select value={filters.dayOfWeek || "all"} onValueChange={(v) => onChange("dayOfWeek", v === null || v === "all" ? "" : v)}>
+      {dayOptions.length >= 1 && (
+        <Select value={filters.dayOfWeek || "all"} onValueChange={(v) => onChange("dayOfWeek", v === "all" ? "" : (v ?? ""))}>
           <SelectTrigger className="w-36 h-8 text-sm">
-            <SelectValue placeholder={t("allDays")} />
+            <SelectValue>{displayLabel(dayOptions, filters.dayOfWeek, t("allDays"))}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t("allDays")}</SelectItem>

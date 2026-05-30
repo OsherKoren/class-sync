@@ -39,7 +39,7 @@
     "6": "שבת"
   },
   "home": {
-    "tagline": "ניהול שיעורים פשוט למורים ולתלמידים",
+    "tagline": "ניהול שיעורים למורים ולתלמידים",
     "createAccount": "הרשמה"
   },
   "auth": {
@@ -97,6 +97,8 @@
       "classesDesc": "נהל את הכיתות והתלמידים שלך",
       "students": "תלמידים",
       "studentsDesc": "צפה ונהל משפחות רשומות",
+      "pendingRequestsTitle": "בקשות ממתינות",
+      "pendingRequestsClass": "לכיתה {className}",
       "reschedules": "שינויי מועד",
       "reschedulesDesc": "הצע מועדים חדשים וראה תוצאות הצבעה",
       "settings": "הגדרות",
@@ -273,7 +275,8 @@
       "noClasses": "לא נרשמת לכיתות עדיין.",
       "browseClasses": "עיין בכיתות הזמינות",
       "activeTitle": "כיתות פעילות",
-      "activeStatus": "פעיל"
+      "activeStatus": "פעיל",
+      "cancelRequest": "בטל בקשה"
     },
     "classes": {
       "backToDashboard": "← חזרה ללוח הבקרה",
@@ -288,6 +291,7 @@
       "request": "בקש להצטרף",
       "requesting": "שולח בקשה…",
       "requested": "בקשה נשלחה",
+      "cancelRequest": "בטל",
       "enrolled": "רשום",
       "spotsLeft": "נותרו {count} מקומות",
       "classFull": "הכיתה מלאה",

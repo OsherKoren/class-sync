@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { SUBJECT_KEYS } from "@/lib/classKeys";
+import { SUBJECT_KEYS, GRADE_KEYS } from "@/lib/classKeys";
 
 type OpenClass = {
   id: string;
@@ -17,6 +17,8 @@ type OpenClass = {
   startTime: string;
   duration: number;
   isOpen: boolean;
+  maxCapacity: number | null;
+  enrollmentCount: number;
   spotsLeft: number | null;
   teacherName: string | null;
 };
@@ -26,15 +28,19 @@ export function AllClassesList({
   enrolledIds,
   requesting,
   requested,
+  cancellingRequest,
   error,
   onRequest,
+  onCancelRequest,
 }: {
   classes: OpenClass[];
   enrolledIds: Set<string>;
   requesting: string | null;
   requested: Set<string>;
+  cancellingRequest: string | null;
   error: string;
   onRequest: (classId: string) => void;
+  onCancelRequest: (classId: string) => void;
 }) {
   const t = useTranslations();
 
@@ -67,7 +73,13 @@ export function AllClassesList({
                     <p className="font-medium">{t(`classTypes.${cls.type}` as `classTypes.${string}`)}</p>
                     {(cls.grade || cls.level) && (
                       <p className="text-muted-foreground">
-                        {cls.grade && <span>{cls.grade}</span>}
+                        {cls.grade && (
+                          <span>
+                            {GRADE_KEYS.has(cls.grade)
+                              ? t(`teacher.createClass.grades.${cls.grade}` as `teacher.createClass.grades.${number}`)
+                              : cls.grade}
+                          </span>
+                        )}
                         {cls.grade && cls.level && " · "}
                         {cls.level && t(`classLevels.${cls.level}` as `classLevels.${string}`)}
                       </p>
@@ -95,24 +107,36 @@ export function AllClassesList({
               </CardHeader>
               <CardContent className="flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">
-                  {cls.duration} {t("common.minutesPerSession")}
+                  {cls.maxCapacity !== null
+                    ? `${cls.enrollmentCount}/${cls.maxCapacity}`
+                    : cls.enrollmentCount}{" "}
+                  {cls.enrollmentCount === 1 ? t("common.student") : t("common.students")}{" "}
+                  enrolled · {cls.duration} {t("common.minutesPerSession")}
                 </p>
                 {isEnrolled ? (
                   <span className="text-sm font-medium text-green-600 dark:text-green-400">
                     {t("student.classes.enrolled")}
                   </span>
+                ) : requested.has(cls.id) ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">{t("student.classes.requested")}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      disabled={cancellingRequest === cls.id}
+                      onClick={() => onCancelRequest(cls.id)}
+                    >
+                      {cancellingRequest === cls.id ? "…" : t("student.classes.cancelRequest")}
+                    </Button>
+                  </div>
                 ) : (
                   <Button
                     onClick={() => onRequest(cls.id)}
-                    disabled={requesting === cls.id || requested.has(cls.id) || !cls.isOpen}
+                    disabled={requesting === cls.id || !cls.isOpen}
                     variant={cls.isOpen ? "default" : "outline"}
                     size="sm"
                   >
-                    {requested.has(cls.id)
-                      ? t("student.classes.requested")
-                      : requesting === cls.id
-                      ? t("student.classes.requesting")
-                      : t("student.classes.request")}
+                    {requesting === cls.id ? t("student.classes.requesting") : t("student.classes.request")}
                   </Button>
                 )}
               </CardContent>
