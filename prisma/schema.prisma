@@ -188,12 +188,13 @@ model Class {
 }
 
 model Enrollment {
-  id        String             @id @default(cuid())
-  studentId String
-  classId   String
-  status    EnrollmentStatus   @default(PENDING)
-  student   Student            @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  class     Class              @relation(fields: [classId], references: [id], onDelete: Cascade)
+  id              String             @id @default(cuid())
+  studentId       String
+  classId         String
+  status          EnrollmentStatus   @default(PENDING)
+  rejectionReason String?
+  student         Student            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  class           Class              @relation(fields: [classId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 

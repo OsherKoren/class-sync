@@ -20,6 +20,7 @@ export default async function StudentDashboard() {
   const enrollments = "error" in result ? [] : result.data;
   const active = enrollments.filter((e) => e.status === "ACTIVE");
   const pending = enrollments.filter((e) => e.status === "PENDING");
+  const rejected = enrollments.filter((e) => e.status === "REJECTED");
 
   return (
     <div className="min-h-screen bg-background p-8">
@@ -71,7 +72,7 @@ export default async function StudentDashboard() {
           </div>
         )}
 
-        {active.length === 0 && pending.length === 0 ? (
+        {active.length === 0 && pending.length === 0 && rejected.length === 0 ? (
           <Card>
             <CardContent className="pt-6">
               <p className="text-center text-muted-foreground mb-4">
@@ -112,6 +113,38 @@ export default async function StudentDashboard() {
                           {t('common.minutes')}
                         </p>
                       </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {rejected.length > 0 && (
+              <div className="mt-8">
+                <h2 className="text-lg font-semibold mb-4">{t('student.dashboard.rejectedTitle')}</h2>
+                <div className="grid gap-4">
+                  {rejected.map((enrollment) => (
+                    <Card key={enrollment.enrollmentId}>
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <CardTitle>{enrollment.class.name}</CardTitle>
+                            <CardDescription>
+                              {enrollment.class.subject}
+                            </CardDescription>
+                          </div>
+                          <div className="px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 text-xs rounded-full">
+                            {t('student.dashboard.rejectedStatus')}
+                          </div>
+                        </div>
+                      </CardHeader>
+                      {enrollment.rejectionReason && (
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground">
+                            {t('student.dashboard.rejectedReason', { reason: enrollment.rejectionReason })}
+                          </p>
+                        </CardContent>
+                      )}
                     </Card>
                   ))}
                 </div>

@@ -263,6 +263,13 @@
       "alreadyEnrolled": "Enrolled",
       "enrolling": "Enrolling…",
       "enroll": "Enroll in this class"
+    },
+    "settings": {
+      "backToDashboard": "← Back to dashboard",
+      "title": "Settings",
+      "language": "Language",
+      "theme": "Theme",
+      "saving": "Saving…"
     }
   },
   "student": {
@@ -276,7 +283,10 @@
       "browseClasses": "Browse available classes",
       "activeTitle": "Active Classes",
       "activeStatus": "Active",
-      "cancelRequest": "Cancel request"
+      "cancelRequest": "Cancel request",
+      "rejectedTitle": "Rejected Requests",
+      "rejectedStatus": "Rejected",
+      "rejectedReason": "Reason: {reason}"
     },
     "classes": {
       "backToDashboard": "← Back to dashboard",
@@ -436,7 +446,12 @@
       "rejecting": "Rejecting…",
       "reject": "Reject",
       "approved": "Approved",
-      "rejected": "Rejected"
+      "rejected": "Rejected",
+      "rejectDialogTitle": "Reject enrollment",
+      "rejectDialogDesc": "You can optionally explain why the request was rejected. The student will see this reason.",
+      "reasonLabel": "Reason (optional)",
+      "reasonPlaceholder": "e.g., class is full, schedule conflict…",
+      "confirmReject": "Confirm rejection"
     },
     "openEnrollment": {
       "title": "Open Enrollment",

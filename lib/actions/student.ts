@@ -124,8 +124,10 @@ export async function getStudentEnrollments(): Promise<
   | { error: string }
   | {
       data: Array<{
+        enrollmentId: string;
         classId: string;
         status: string;
+        rejectionReason: string | null;
         class: {
           id: string;
           name: string;
@@ -148,8 +150,10 @@ export async function getStudentEnrollments(): Promise<
       id: true,
       enrollments: {
         select: {
+          id: true,
           classId: true,
           status: true,
+          rejectionReason: true,
           class: {
             select: {
               id: true,
@@ -169,7 +173,15 @@ export async function getStudentEnrollments(): Promise<
     return { error: "Student profile not found" };
   }
 
-  return { data: student.enrollments };
+  return {
+    data: student.enrollments.map((e) => ({
+      enrollmentId: e.id,
+      classId: e.classId,
+      status: e.status,
+      rejectionReason: e.rejectionReason,
+      class: e.class,
+    })),
+  };
 }
 
 export async function getOpenClasses(): Promise<

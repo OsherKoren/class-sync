@@ -248,12 +248,22 @@ export async function approveEnrollment(
   return { data: { success: true } };
 }
 
+const rejectSchema = z.object({
+  reason: z.string().max(500).optional(),
+});
+
 export async function rejectEnrollment(
-  enrollmentId: string
+  enrollmentId: string,
+  reason?: string
 ): Promise<{ error: string } | { data: { success: true } }> {
   const session = await auth();
   if (!session?.user?.id || session.user.role !== "TEACHER") {
     return { error: "Unauthorized" };
+  }
+
+  const parsed = rejectSchema.safeParse({ reason });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message };
   }
 
   const enrollment = await db.enrollment.findUnique({
@@ -267,7 +277,7 @@ export async function rejectEnrollment(
 
   await db.enrollment.update({
     where: { id: enrollmentId },
-    data: { status: "REJECTED" },
+    data: { status: "REJECTED", rejectionReason: parsed.data.reason ?? null },
   });
 
   return { data: { success: true } };

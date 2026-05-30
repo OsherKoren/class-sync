@@ -263,6 +263,13 @@
       "alreadyEnrolled": "רשום",
       "enrolling": "רושם…",
       "enroll": "הרשם לכיתה זו"
+    },
+    "settings": {
+      "backToDashboard": "← חזרה ללוח הבקרה",
+      "title": "הגדרות",
+      "language": "שפה",
+      "theme": "ערכת נושא",
+      "saving": "שומר…"
     }
   },
   "student": {
@@ -276,7 +283,10 @@
       "browseClasses": "עיין בכיתות הזמינות",
       "activeTitle": "כיתות פעילות",
       "activeStatus": "פעיל",
-      "cancelRequest": "בטל בקשה"
+      "cancelRequest": "בטל בקשה",
+      "rejectedTitle": "בקשות שנדחו",
+      "rejectedStatus": "נדחה",
+      "rejectedReason": "סיבה: {reason}"
     },
     "classes": {
       "backToDashboard": "← חזרה ללוח הבקרה",
@@ -436,7 +446,12 @@
       "rejecting": "דוחה…",
       "reject": "דחה",
       "approved": "אושר",
-      "rejected": "נדחה"
+      "rejected": "נדחה",
+      "rejectDialogTitle": "דחיית בקשת הרשמה",
+      "rejectDialogDesc": "ניתן להסביר למה הבקשה נדחתה. התלמיד יראה את הסיבה.",
+      "reasonLabel": "סיבה (אופציונלי)",
+      "reasonPlaceholder": "למשל, הכיתה מלאה, התנגשות בלוח זמנים…",
+      "confirmReject": "אשר דחייה"
     },
     "openEnrollment": {
       "title": "פתח הרשמה",
