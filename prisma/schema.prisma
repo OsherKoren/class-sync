@@ -1,0 +1,279 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  TEACHER
+  GUARDIAN
+  STUDENT
+}
+
+enum ClassType {
+  GROUP
+  PRIVATE
+}
+
+enum ClassLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum EnrollmentStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+}
+
+enum SessionStatus {
+  SCHEDULED
+  CANCELLED
+  COMPLETED
+  RESCHEDULED
+}
+
+enum OfferStatus {
+  OPEN
+  RESOLVED
+}
+
+enum LinkCodeKind {
+  CLAIM_STUDENT
+  CLAIM_GUARDIAN
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  role          Role      @default(GUARDIAN)
+  locale        String    @default("he")
+  theme         String    @default("system")
+
+  googleAccessToken       String?
+  googleRefreshToken      String?
+  googleTokenExpiry       DateTime?
+  designatedCalendarId    String?
+
+  registrationComplete    Boolean   @default(false)
+
+  passwordResetToken      String?    @unique
+  passwordResetExpiry     DateTime?
+
+  accounts          Account[]
+  sessions          Session[]
+  taughtClasses     Class[]
+  student           Student?
+  guardianOf        StudentGuardian[]
+  linkCodesCreated  LinkCode[]
+  pushSubscriptions PushSubscription[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+model Student {
+  id     String  @id @default(cuid())
+  name   String
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  guardians   StudentGuardian[]
+  enrollments Enrollment[]
+  votes       Vote[]
+  linkCodes   LinkCode[]
+  absences    SessionAbsence[]
+
+  createdAt DateTime @default(now())
+}
+
+model StudentGuardian {
+  studentId    String
+  guardianId   String
+  relationship String?
+  createdAt    DateTime @default(now())
+
+  student  Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  guardian User    @relation(fields: [guardianId], references: [id], onDelete: Cascade)
+
+  @@id([studentId, guardianId])
+  @@index([guardianId])
+}
+
+model LinkCode {
+  code        String       @id
+  kind        LinkCodeKind
+  studentId   String
+  student     Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  createdById String
+  createdBy   User         @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  expiresAt   DateTime
+  usedAt      DateTime?
+  usedById    String?
+
+  createdAt DateTime @default(now())
+
+  @@index([studentId])
+  @@index([expiresAt])
+}
+
+model Class {
+  id              String    @id @default(cuid())
+  name            String
+  subject         String
+  type            ClassType
+  dayOfWeek       Int
+  startTime       String
+  duration        Int
+  level           ClassLevel?
+  grade           String?
+  teacherId       String
+  teacher         User      @relation(fields: [teacherId], references: [id])
+  calendarEventId String?
+  isOpen          Boolean   @default(true)
+  maxCapacity     Int?
+
+  enrollments    Enrollment[]
+  lessonSessions LessonSession[]
+  absences       SessionAbsence[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Enrollment {
+  id              String             @id @default(cuid())
+  studentId       String
+  classId         String
+  status          EnrollmentStatus   @default(PENDING)
+  rejectionReason String?
+  student         Student            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  class           Class              @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([studentId, classId])
+}
+
+model LessonSession {
+  id              String        @id @default(cuid())
+  classId         String
+  class           Class         @relation(fields: [classId], references: [id], onDelete: Cascade)
+  scheduledAt     DateTime
+  status          SessionStatus @default(SCHEDULED)
+  calendarEventId String?
+
+  rescheduleOffers RescheduleOffer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RescheduleOffer {
+  id               String        @id @default(cuid())
+  lessonSessionId  String
+  lessonSession    LessonSession @relation(fields: [lessonSessionId], references: [id], onDelete: Cascade)
+  status           OfferStatus   @default(OPEN)
+  resolvedOptionId String?
+
+  options RescheduleOption[]
+  votes   Vote[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RescheduleOption {
+  id          String          @id @default(cuid())
+  offerId     String
+  offer       RescheduleOffer @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  scheduledAt DateTime
+  label       String
+
+  votes Vote[]
+}
+
+model Vote {
+  id        String           @id @default(cuid())
+  offerId   String
+  offer     RescheduleOffer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  optionId  String
+  option    RescheduleOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  studentId String
+  student   Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([offerId, studentId])
+}
+
+model SessionAbsence {
+  id        String   @id @default(cuid())
+  studentId String
+  classId   String
+  date      String   // "YYYY-MM-DD"
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([studentId, classId, date])
+  @@index([studentId])
+}
+
+model PushSubscription {
+  id       String @id @default(cuid())
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint String @unique
+  p256dh   String
+  auth     String
+
+  createdAt DateTime @default(now())
+}
