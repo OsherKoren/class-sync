@@ -239,6 +239,7 @@
 | 7 | i18n (Hebrew/English) | ✅ Complete |
 | 8 | Dark mode | Planned |
 | 9 | Deploy & polish | Planned |
+| 10 | AI assistant (v2) | Post-launch |
 
 ---
 
