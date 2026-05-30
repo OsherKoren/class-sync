@@ -241,7 +241,16 @@
       "pending": "Pending",
       "enrollSection": "Enroll in a class",
       "enrollDesc": "Select a class to enroll this student directly",
-      "enrolledSuccess": "{name} enrolled in {className} successfully."
+      "enrolledSuccess": "{name} enrolled in {className} successfully.",
+      "unenroll": "Remove",
+      "unenrolling": "Removing…",
+      "linkGuardianTitle": "Link guardian",
+      "linkGuardianDesc": "Find an existing guardian account by email and link them to this student.",
+      "searchGuardian": "Search",
+      "searchingGuardian": "Searching…",
+      "linkGuardianBtn": "Link guardian",
+      "linkingGuardian": "Linking…",
+      "guardianLinked": "Guardian linked successfully"
     },
     "enrollStudent": {
       "backToStudents": "← Back to students",

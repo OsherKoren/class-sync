@@ -241,7 +241,16 @@
       "pending": "ממתין",
       "enrollSection": "הרשם לכיתה",
       "enrollDesc": "בחר כיתה להרשמת התלמיד ישירות",
-      "enrolledSuccess": "{name} נרשם ל{className} בהצלחה."
+      "enrolledSuccess": "{name} נרשם ל{className} בהצלחה.",
+      "unenroll": "הסר",
+      "unenrolling": "מסיר…",
+      "linkGuardianTitle": "קשר אפוטרופוס",
+      "linkGuardianDesc": "מצא חשבון אפוטרופוס קיים לפי אימייל וקשר אותו לתלמיד זה.",
+      "searchGuardian": "חפש",
+      "searchingGuardian": "מחפש…",
+      "linkGuardianBtn": "קשר אפוטרופוס",
+      "linkingGuardian": "מקשר…",
+      "guardianLinked": "האפוטרופוס קושר בהצלחה"
     },
     "enrollStudent": {
       "backToStudents": "← חזרה לתלמידים",

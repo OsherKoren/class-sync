@@ -405,6 +405,81 @@ export async function getTeacherStudentsAll(): Promise<
   };
 }
 
+export async function unenrollStudent(
+  enrollmentId: string
+): Promise<{ error: string } | { data: { success: true } }> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "TEACHER") {
+    return { error: "Unauthorized" };
+  }
+
+  const enrollment = await db.enrollment.findUnique({
+    where: { id: enrollmentId },
+    select: { class: { select: { teacherId: true } } },
+  });
+
+  if (!enrollment || enrollment.class.teacherId !== session.user.id) {
+    return { error: "Enrollment not found or unauthorized" };
+  }
+
+  await db.enrollment.delete({ where: { id: enrollmentId } });
+
+  return { data: { success: true } };
+}
+
+export async function findGuardianByEmail(
+  email: string
+): Promise<{ error: string } | { data: { id: string; name: string | null; email: string } }> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "TEACHER") {
+    return { error: "Unauthorized" };
+  }
+
+  const user = await db.user.findUnique({
+    where: { email },
+    select: { id: true, name: true, email: true, role: true },
+  });
+
+  if (!user || user.role !== "GUARDIAN") {
+    return { error: "Guardian not found" };
+  }
+
+  return { data: { id: user.id, name: user.name, email: user.email } };
+}
+
+export async function linkGuardianToStudent(
+  guardianEmail: string,
+  studentId: string
+): Promise<{ error: string } | { data: { success: true } }> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "TEACHER") {
+    return { error: "Unauthorized" };
+  }
+
+  const guardian = await db.user.findUnique({
+    where: { email: guardianEmail },
+    select: { id: true, role: true },
+  });
+
+  if (!guardian || guardian.role !== "GUARDIAN") {
+    return { error: "Guardian not found" };
+  }
+
+  const existing = await db.studentGuardian.findUnique({
+    where: { studentId_guardianId: { studentId, guardianId: guardian.id } },
+  });
+
+  if (existing) {
+    return { error: "Guardian is already linked to this student" };
+  }
+
+  await db.studentGuardian.create({
+    data: { studentId, guardianId: guardian.id },
+  });
+
+  return { data: { success: true } };
+}
+
 export async function getTeacherStudentById(studentId: string): Promise<
   | { error: string }
   | {
