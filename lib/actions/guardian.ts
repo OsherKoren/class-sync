@@ -356,3 +356,123 @@ export async function getGuardianStudents(guardianId: string): Promise<
     },
   };
 }
+
+export async function getTeacherStudentsAll(): Promise<
+  | { error: string }
+  | {
+      data: Array<{
+        id: string;
+        name: string;
+        hasAccount: boolean;
+        guardians: Array<{ id: string; name: string | null; email: string }>;
+        activeEnrollments: number;
+        pendingEnrollments: number;
+      }>;
+    }
+> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "TEACHER") {
+    return { error: "Unauthorized" };
+  }
+
+  const students = await db.student.findMany({
+    select: {
+      id: true,
+      name: true,
+      userId: true,
+      guardians: {
+        select: {
+          guardian: { select: { id: true, name: true, email: true } },
+        },
+      },
+      enrollments: {
+        where: { status: { in: ["ACTIVE", "PENDING"] } },
+        select: { status: true },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return {
+    data: students.map((s) => ({
+      id: s.id,
+      name: s.name,
+      hasAccount: s.userId !== null,
+      guardians: s.guardians.map((sg) => sg.guardian),
+      activeEnrollments: s.enrollments.filter((e) => e.status === "ACTIVE").length,
+      pendingEnrollments: s.enrollments.filter((e) => e.status === "PENDING").length,
+    })),
+  };
+}
+
+export async function getTeacherStudentById(studentId: string): Promise<
+  | { error: string }
+  | {
+      data: {
+        id: string;
+        name: string;
+        hasAccount: boolean;
+        guardians: Array<{ id: string; name: string | null; email: string }>;
+        enrollments: Array<{
+          id: string;
+          status: string;
+          class: {
+            id: string;
+            name: string;
+            subject: string;
+            dayOfWeek: number;
+            startTime: string;
+            duration: number;
+          };
+        }>;
+      };
+    }
+> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "TEACHER") {
+    return { error: "Unauthorized" };
+  }
+
+  const student = await db.student.findUnique({
+    where: { id: studentId },
+    select: {
+      id: true,
+      name: true,
+      userId: true,
+      guardians: {
+        select: {
+          guardian: { select: { id: true, name: true, email: true } },
+        },
+      },
+      enrollments: {
+        select: {
+          id: true,
+          status: true,
+          class: {
+            select: {
+              id: true,
+              name: true,
+              subject: true,
+              dayOfWeek: true,
+              startTime: true,
+              duration: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      },
+    },
+  });
+
+  if (!student) return { error: "Student not found" };
+
+  return {
+    data: {
+      id: student.id,
+      name: student.name,
+      hasAccount: student.userId !== null,
+      guardians: student.guardians.map((sg) => sg.guardian),
+      enrollments: student.enrollments,
+    },
+  };
+}

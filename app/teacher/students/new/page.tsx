@@ -34,7 +34,7 @@ export default function AddGuardianPage() {
       return;
     }
 
-    router.push(`/teacher/students/${result.data.userId}`);
+    router.push(`/teacher/students`);
     router.refresh();
   }
 

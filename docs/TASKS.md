@@ -63,11 +63,11 @@ Prisma schema live on Neon; teacher, guardian, and student login working; abuse 
 - [x] Per-route limits: 10/min on auth, 5/min on votes, 20/min on push
 
 ### ✅ Phase 1 Success — check each after testing manually
-- [ ] Teacher logs in with Google → session exists → lands on `/teacher/dashboard`
-- [ ] Guardian self-registers with email + password → lands on `/guardian/dashboard`
-- [ ] Guardian logs in with Google → lands on `/guardian/dashboard`
-- [ ] Student self-registers (independent teen) → lands on `/student/dashboard`
-- [ ] Visiting `/teacher/dashboard` without a session → redirects to `/login`
+- [x] Teacher logs in with Google → session exists → lands on `/teacher/dashboard`
+- [x] Guardian self-registers with email + password → lands on `/guardian/dashboard`
+- [x] Guardian logs in with Google → lands on `/guardian/dashboard`
+- [x] Student self-registers (independent teen) → lands on `/student/dashboard`
+- [x] Visiting `/teacher/dashboard` without a session → redirects to `/login`
 - [ ] Tables visible in Neon dashboard (check via `npx prisma studio`)
 - [ ] Hitting login 11+ times/min from same IP → receives 429 response
 

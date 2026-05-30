@@ -11,6 +11,7 @@ import { DeleteClassSection } from "@/components/DeleteClassSection";
 import { getClassById } from "@/lib/actions/class";
 import { EnrollmentManagement } from "@/components/teacher/EnrollmentManagement";
 import { ToggleOpenEnrollment } from "@/components/teacher/ToggleOpenEnrollment";
+import { EnrollByEmail } from "@/components/teacher/EnrollByEmail";
 import { GRADE_KEYS, SUBJECT_KEYS } from "@/lib/classKeys";
 import { getTranslations } from "next-intl/server";
 
@@ -179,6 +180,8 @@ export default async function ClassDetailPage({
             )}
           </CardContent>
         </Card>
+
+        <EnrollByEmail classId={classData.id} />
 
         <DeleteClassSection classId={classData.id} />
       </div>

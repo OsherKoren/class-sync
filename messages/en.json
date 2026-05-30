@@ -4,9 +4,9 @@
     "PRIVATE": "Private"
   },
   "classLevels": {
-    "BEGINNER": "Beginner",
-    "INTERMEDIATE": "Intermediate",
-    "ADVANCED": "Advanced"
+    "BEGINNER": "Beginner Level",
+    "INTERMEDIATE": "Intermediate Level",
+    "ADVANCED": "Advanced Level"
   },
   "common": {
     "appName": "ClassSync",
@@ -14,6 +14,7 @@
     "signOut": "Sign out",
     "cancel": "Cancel",
     "loading": "Loading...",
+    "unnamed": "Unnamed",
     "somethingWentWrong": "Something went wrong. Please try again.",
     "backToDashboard": "← Back to dashboard",
     "minutes": "minutes",
@@ -135,9 +136,9 @@
       "level": "Level (optional)",
       "selectLevel": "Select level",
       "noLevel": "No level",
-      "beginner": "Beginner",
-      "intermediate": "Intermediate",
-      "advanced": "Advanced",
+      "beginner": "Beginner Level",
+      "intermediate": "Intermediate Level",
+      "advanced": "Advanced Level",
       "grade": "Grade",
       "selectGrade": "Select grade",
       "gradePlaceholder": "e.g., Grade 11, Mixed",
@@ -171,14 +172,38 @@
       "enrolledStudents": "Enrolled students",
       "enrolledDesc": "Students enrolled in this class",
       "noStudents": "No students enrolled yet.",
-      "goToStudents": "Go to students page to enroll"
+      "goToStudents": "Go to students page to enroll",
+      "enrollByEmail": "Enroll by email",
+      "enrollByEmailDesc": "Find an independent student by email and enroll them directly.",
+      "studentEmail": "Student email",
+      "searchStudent": "Search",
+      "searching": "Searching…",
+      "enrollingStudent": "Enrolling…",
+      "enrollStudentBtn": "Enroll student",
+      "enrolledSuccess": "{name} enrolled successfully."
     },
     "students": {
       "title": "Students",
       "subtitle": "Manage students and their guardians",
       "addGuardian": "Add guardian & student",
-      "noGuardians": "No guardians yet.",
-      "addFirst": "Add your first guardian"
+      "noStudents": "No students yet.",
+      "addFirst": "Add your first student",
+      "accountClaimed": "Account linked",
+      "noAccount": "No account",
+      "activeCount": "{count} active",
+      "pendingCount": "{count} pending",
+      "findByEmail": "Find student by email",
+      "findByEmailDesc": "Search for an independent student by their email address.",
+      "studentEmail": "Student email",
+      "search": "Search",
+      "searching": "Searching…",
+      "enrolledCount": "{count} enrolled",
+      "selectClass": "Select a class to enroll in",
+      "enroll": "Enroll",
+      "enrollInClass": "Enroll in {className}",
+      "enrolling": "Enrolling…",
+      "noClasses": "No classes yet. Create a class first.",
+      "enrolledSuccess": "{name} enrolled in {className} successfully."
     },
     "addGuardian": {
       "title": "Add guardian",
@@ -201,6 +226,22 @@
       "studentName": "Student name",
       "enrollInClass": "Enroll in class",
       "add": "Add"
+    },
+    "studentDetail": {
+      "backToStudents": "← Back to students",
+      "claimed": "Account linked",
+      "notClaimed": "No account",
+      "guardians": "Guardians",
+      "guardiansDesc": "Adults linked to this student",
+      "noGuardians": "No guardians linked",
+      "enrollments": "Enrollments",
+      "enrollmentsDesc": "Current class enrollments",
+      "noEnrollments": "Not enrolled in any classes yet",
+      "active": "Active",
+      "pending": "Pending",
+      "enrollSection": "Enroll in a class",
+      "enrollDesc": "Select a class to enroll this student directly",
+      "enrolledSuccess": "{name} enrolled in {className} successfully."
     },
     "enrollStudent": {
       "backToStudents": "← Back to students",
@@ -312,6 +353,20 @@
       "title": "Settings",
       "language": "Language",
       "saving": "Saving…"
+    },
+    "students": {
+      "title": "My Children",
+      "subtitle": "Manage your children's accounts and enrollments",
+      "backToDashboard": "← Back to dashboard",
+      "addChild": "Add child",
+      "noChildren": "No children linked yet.",
+      "addFirst": "Add your first child",
+      "notClaimed": "Not claimed",
+      "claimed": "Account linked",
+      "enrolledCount": "{count} active class(es)",
+      "pendingCount": "{count} pending",
+      "noEnrollments": "Not enrolled in any classes.",
+      "manageLinks": "Manage links"
     },
     "linkCodes": {
       "backToDashboard": "← Back to dashboard",

@@ -12,6 +12,7 @@
     "appName": "ClassSync",
     "signIn": "כניסה",
     "signOut": "יציאה",
+    "unnamed": "ללא שם",
     "cancel": "ביטול",
     "loading": "טוען...",
     "somethingWentWrong": "משהו השתבש. נסה שוב.",
@@ -171,14 +172,38 @@
       "enrolledStudents": "תלמידים רשומים",
       "enrolledDesc": "תלמידים הרשומים לכיתה זו",
       "noStudents": "אין תלמידים רשומים עדיין.",
-      "goToStudents": "עבור לדף התלמידים להרשמה"
+      "goToStudents": "עבור לדף התלמידים להרשמה",
+      "enrollByEmail": "הרשמה לפי אימייל",
+      "enrollByEmailDesc": "מצא תלמיד עצמאי לפי כתובת אימייל והרשם אותו ישירות.",
+      "studentEmail": "אימייל תלמיד",
+      "searchStudent": "חפש",
+      "searching": "מחפש…",
+      "enrollingStudent": "רושם…",
+      "enrollStudentBtn": "הרשם תלמיד",
+      "enrolledSuccess": "{name} נרשם בהצלחה."
     },
     "students": {
       "title": "תלמידים",
       "subtitle": "נהל תלמידים ואפוטרופוסים שלהם",
       "addGuardian": "הוסף אפוטרופוס ותלמיד",
-      "noGuardians": "אין אפוטרופוסים עדיין.",
-      "addFirst": "הוסף את האפוטרופוס הראשון שלך"
+      "noStudents": "אין תלמידים עדיין.",
+      "addFirst": "הוסף את התלמיד הראשון שלך",
+      "accountClaimed": "חשבון מקושר",
+      "noAccount": "ללא חשבון",
+      "activeCount": "{count} פעילות",
+      "pendingCount": "{count} ממתינות",
+      "findByEmail": "מצא תלמיד לפי אימייל",
+      "findByEmailDesc": "חפש תלמיד עצמאי לפי כתובת האימייל שלו.",
+      "studentEmail": "אימייל תלמיד",
+      "search": "חפש",
+      "searching": "מחפש…",
+      "enrolledCount": "{count} רשומים",
+      "selectClass": "בחר כיתה להרשמה",
+      "enroll": "הרשם",
+      "enrollInClass": "הרשם ל{className}",
+      "enrolling": "רושם…",
+      "noClasses": "אין כיתות עדיין. צור כיתה תחילה.",
+      "enrolledSuccess": "{name} נרשם ל{className} בהצלחה."
     },
     "addGuardian": {
       "title": "הוסף אפוטרופוס",
@@ -201,6 +226,22 @@
       "studentName": "שם התלמיד",
       "enrollInClass": "הרשם לכיתה",
       "add": "הוסף"
+    },
+    "studentDetail": {
+      "backToStudents": "← חזרה לתלמידים",
+      "claimed": "חשבון מקושר",
+      "notClaimed": "ללא חשבון",
+      "guardians": "אפוטרופוסים",
+      "guardiansDesc": "מבוגרים המקושרים לתלמיד זה",
+      "noGuardians": "אין אפוטרופוסים מקושרים",
+      "enrollments": "הרשמות",
+      "enrollmentsDesc": "הרשמות לכיתות",
+      "noEnrollments": "לא רשום לכיתות עדיין",
+      "active": "פעיל",
+      "pending": "ממתין",
+      "enrollSection": "הרשם לכיתה",
+      "enrollDesc": "בחר כיתה להרשמת התלמיד ישירות",
+      "enrolledSuccess": "{name} נרשם ל{className} בהצלחה."
     },
     "enrollStudent": {
       "backToStudents": "← חזרה לתלמידים",
@@ -312,6 +353,20 @@
       "title": "הגדרות",
       "language": "שפה",
       "saving": "שומר…"
+    },
+    "students": {
+      "title": "הילדים שלי",
+      "subtitle": "נהל את חשבונות הילדים והרשמותיהם",
+      "backToDashboard": "← חזרה ללוח הבקרה",
+      "addChild": "הוסף ילד",
+      "noChildren": "אין ילדים מקושרים עדיין.",
+      "addFirst": "הוסף את הילד הראשון שלך",
+      "notClaimed": "לא נתבע",
+      "claimed": "חשבון מקושר",
+      "enrolledCount": "{count} כיתות פעילות",
+      "pendingCount": "{count} ממתינות",
+      "noEnrollments": "לא רשום לכיתות.",
+      "manageLinks": "נהל קישורים"
     },
     "linkCodes": {
       "backToDashboard": "← חזרה ללוח הבקרה",

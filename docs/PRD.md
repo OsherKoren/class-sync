@@ -59,6 +59,7 @@
 - **View Enrollments:** Class detail page shows all enrolled students + pending requests
 - **Guardian-Student Link Codes:** Guardians and students generate single-use 6-character codes (with QR) to link accounts together, no email required
 - **Multi-Guardian Per Student:** A student can have one or more linked guardians (e.g., both parents, or a parent + grandparent)
+- **Session Cancellation:** Students can cancel a single upcoming session without dropping the class (recorded as a `SessionAbsence`)
 
 ### Phase 3 — Schedule View (Guardian & Student)
 - **Guardian Dashboard:** Guardian sees upcoming sessions across all linked children as cards
@@ -178,7 +179,6 @@
 - ✅ Dark mode
 
 ### Out of Scope (Future)
-- Attendance tracking
 - Payment/invoicing
 - Parent-teacher messaging
 - Homework assignments
@@ -236,7 +236,7 @@
 | 4 | Google Calendar sync | Planned |
 | 5 | Reschedule voting | Planned |
 | 6 | Push & PWA | Planned |
-| 7 | i18n (Hebrew/English) | Planned |
+| 7 | i18n (Hebrew/English) | ✅ Complete |
 | 8 | Dark mode | Planned |
 | 9 | Deploy & polish | Planned |
 
