@@ -69,11 +69,11 @@ export async function getMyStudents(): Promise<
     },
   });
 
-  const data = rows.map(({ student }) => ({
+  const data = rows.map(({ student }: (typeof rows)[number]) => ({
     id: student.id,
     name: student.name,
     hasAccount: student.userId !== null,
-    enrollments: student.enrollments.map((e) => ({
+    enrollments: student.enrollments.map((e: (typeof student.enrollments)[number]) => ({
       status: e.status,
       class: {
         id: e.class.id,

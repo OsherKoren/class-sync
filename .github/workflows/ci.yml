@@ -25,6 +25,9 @@ jobs:
         # npm install resolves those per-platform without failing the sync check.
         run: npm install --prefer-offline
 
+      - name: Generate Prisma client
+        run: npx prisma generate
+
       - name: Run ESLint
         run: npm run lint
 
@@ -98,6 +101,9 @@ jobs:
         # excludes Linux-only optional native binaries (e.g. @emnapi/runtime).
         # npm install resolves those per-platform without failing the sync check.
         run: npm install --prefer-offline
+
+      - name: Generate Prisma client
+        run: npx prisma generate
 
       - name: Build Next.js
         run: npm run build

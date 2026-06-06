@@ -184,7 +184,7 @@ export async function getTeacherClasses(): Promise<
   });
 
   return {
-    data: classes.map((c) => ({
+    data: classes.map((c: (typeof classes)[number]) => ({
       ...c,
       enrollmentCount: c._count.enrollments,
     })),
@@ -262,7 +262,7 @@ export async function getClassById(classId: string): Promise<
       duration: classRecord.duration,
       isOpen: classRecord.isOpen,
       maxCapacity: classRecord.maxCapacity,
-      enrollments: classRecord.enrollments.map((e) => ({
+      enrollments: classRecord.enrollments.map((e: (typeof classRecord.enrollments)[number]) => ({
         id: e.id,
         studentId: e.student.id,
         studentName: e.student.name,
