@@ -2,8 +2,11 @@ import { test, expect } from "@playwright/test";
 
 const BASE_URL = "http://localhost:3000";
 
+const enLocale = { name: "locale", value: "en", domain: "localhost", path: "/" };
+
 test.describe("Smoke Tests", () => {
-  test("register page should load", async ({ page }) => {
+  test("register page should load", async ({ page, context }) => {
+    await context.addCookies([enLocale]);
     await page.goto(`${BASE_URL}/register`);
 
     // Check page title
@@ -16,7 +19,8 @@ test.describe("Smoke Tests", () => {
     console.log("✅ Register page loads successfully");
   });
 
-  test("login page should load", async ({ page }) => {
+  test("login page should load", async ({ page, context }) => {
+    await context.addCookies([enLocale]);
     await page.goto(`${BASE_URL}/login`);
 
     // Check page title
