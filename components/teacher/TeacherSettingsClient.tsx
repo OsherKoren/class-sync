@@ -16,7 +16,13 @@ const THEMES = [
   { value: "system", Icon: Monitor, key: "themeSystem" },
 ] as const;
 
-export function TeacherSettingsClient({ initialLocale }: { initialLocale: string }) {
+export function TeacherSettingsClient({
+  initialLocale,
+  children,
+}: {
+  initialLocale: string;
+  children?: React.ReactNode;
+}) {
   const t = useTranslations();
   const { theme, setTheme } = useTheme();
   const [locale, setLocale] = useState(initialLocale);
@@ -82,6 +88,7 @@ export function TeacherSettingsClient({ initialLocale }: { initialLocale: string
               </div>
             </CardContent>
           </Card>
+          {children}
         </div>
       </div>
     </div>

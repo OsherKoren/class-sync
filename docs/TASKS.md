@@ -68,8 +68,8 @@ Prisma schema live on Neon; teacher, guardian, and student login working; abuse 
 - [x] Guardian logs in with Google → lands on `/guardian/dashboard`
 - [x] Student self-registers (independent teen) → lands on `/student/dashboard`
 - [x] Visiting `/teacher/dashboard` without a session → redirects to `/login`
-- [ ] Tables visible in Neon dashboard (check via `npx prisma studio`)
-- [ ] Hitting login 11+ times/min from same IP → receives 429 response
+- [x] Tables visible in Neon dashboard (check via `npx prisma studio`)
+- [x] Hitting login 11+ times/min from same IP → receives 429 response
 
 **→ Do not start Phase 2 until all Phase 1 boxes above are checked.**
 
@@ -226,13 +226,11 @@ Guardian logs in to see all linked children's sessions. Independent student logs
 
 Classes sync to the teacher's Google Calendar.
 
-- [ ] Google Cloud Console: OAuth app, Calendar scope, redirect URIs
-- [ ] Store access + refresh tokens in `User` after teacher login
-- [ ] `lib/google-calendar.ts`: `listCalendars`, `createEvent`, `updateEvent`,
-      `deleteEvent`
-- [ ] Teacher onboarding screen: list all visible calendars → teacher picks ONE
-      as the designated tutoring calendar → save `designatedCalendarId` to `User`
-- [ ] Class creation → recurring event written to designated calendar only
+- [x] Google Cloud Console: OAuth app, Calendar scope, redirect URIs
+- [x] Store access + refresh tokens in `User` after teacher login (via PrismaAdapter `Account` table; token refresh persisted via `oauth2.on("tokens")` in `lib/google-calendar.ts`)
+- [x] `lib/google-calendar.ts`: `listCalendars`, `createRecurringClassEvent`, `updateClassEvent`, `deleteClassEvent`
+- [x] Teacher onboarding screen: list all visible calendars → teacher picks ONE as the designated tutoring calendar → save `designatedCalendarId` to `User` (in teacher settings page via `CalendarSettings` component)
+- [x] Class creation → recurring event written to designated calendar only
 - [ ] Session cancel → event marked CANCELLED on designated calendar
 - [ ] Verify: no other calendar is read or written after onboarding
 

@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
+import { createRecurringClassEvent } from "@/lib/google-calendar";
 
 const classSchema = z.object({
   name: z.string().min(2, "Class name must be at least 2 characters"),
@@ -80,6 +81,28 @@ export async function createClass(
     },
     select: { id: true },
   });
+
+  // Sync to Google Calendar if the teacher has a designated calendar
+  const teacher = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { designatedCalendarId: true },
+  });
+
+  if (teacher?.designatedCalendarId) {
+    try {
+      const eventId = await createRecurringClassEvent(
+        session.user.id,
+        teacher.designatedCalendarId,
+        { name, subject, dayOfWeek, startTime, duration },
+      );
+      await db.class.update({
+        where: { id: classRecord.id },
+        data: { calendarEventId: eventId },
+      });
+    } catch (err) {
+      console.error("[calendar] Failed to create event for class:", classRecord.id, err);
+    }
+  }
 
   return { data: { id: classRecord.id } };
 }
