@@ -42,7 +42,7 @@ export async function getMyEnrolledClasses(): Promise<
   if (!student) return { error: "Student profile not found" };
 
   return {
-    data: student.enrollments.map((e) => ({
+    data: student.enrollments.map((e: (typeof student.enrollments)[number]) => ({
       classId: e.class.id,
       name: e.class.name,
       subject: e.class.subject,
@@ -174,7 +174,7 @@ export async function getStudentEnrollments(): Promise<
   }
 
   return {
-    data: student.enrollments.map((e) => ({
+    data: student.enrollments.map((e: (typeof student.enrollments)[number]) => ({
       enrollmentId: e.id,
       classId: e.classId,
       status: e.status,
@@ -230,7 +230,7 @@ export async function getOpenClasses(): Promise<
   });
 
   return {
-    data: classes.map((c) => ({
+    data: classes.map((c: (typeof classes)[number]) => ({
       id: c.id,
       name: c.name,
       subject: c.subject,

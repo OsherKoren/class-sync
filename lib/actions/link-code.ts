@@ -1,6 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
+import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { canActOnStudent } from "@/lib/auth-helpers";
@@ -86,7 +87,7 @@ export async function redeemLinkCode(
   if (!rateLimitOk) return { error: "Too many requests. Please try again later." };
 
   try {
-    const result = await db.$transaction(async (tx) => {
+    const result = await db.$transaction(async (tx: Prisma.TransactionClient) => {
       const linkCode = await tx.linkCode.findUnique({
         where: { code },
         select: {

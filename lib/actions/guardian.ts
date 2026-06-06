@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import bcrypt from "bcryptjs";
@@ -104,7 +105,7 @@ export async function enrollStudent(
     return { error: "Student is already enrolled in this class" };
   }
 
-  await db.$transaction(async (tx) => {
+  await db.$transaction(async (tx: Prisma.TransactionClient) => {
     await tx.enrollment.create({
       data: { studentId, classId, status: "ACTIVE" },
     });
@@ -191,7 +192,7 @@ export async function enrollStudentByEmail(
   }
 
   const studentId = user.student.id;
-  await db.$transaction(async (tx) => {
+  await db.$transaction(async (tx: Prisma.TransactionClient) => {
     await tx.enrollment.create({
       data: { studentId, classId, status: "ACTIVE" },
     });
@@ -228,7 +229,7 @@ export async function approveEnrollment(
     return { error: "Enrollment not found or unauthorized" };
   }
 
-  await db.$transaction(async (tx) => {
+  await db.$transaction(async (tx: Prisma.TransactionClient) => {
     await tx.enrollment.update({
       where: { id: enrollmentId },
       data: { status: "ACTIVE" },
@@ -319,7 +320,7 @@ export async function getPendingEnrollments(): Promise<
   });
 
   return {
-    data: enrollments.map((e) => ({
+    data: enrollments.map((e: (typeof enrollments)[number]) => ({
       enrollmentId: e.id,
       studentName: e.student.name,
       className: e.class.name,
@@ -359,11 +360,11 @@ export async function getTeacherStudents(): Promise<
   });
 
   return {
-    data: guardians.map((g) => ({
+    data: guardians.map((g: (typeof guardians)[number]) => ({
       guardianId: g.id,
       guardianName: g.name || "Unnamed",
       guardianEmail: g.email,
-      students: g.guardianOf.map((sg) => sg.student),
+      students: g.guardianOf.map((sg: (typeof g.guardianOf)[number]) => sg.student),
     })),
   };
 }
@@ -407,7 +408,7 @@ export async function getGuardianStudents(guardianId: string): Promise<
       guardianId: guardian.id,
       guardianName: guardian.name || "Unnamed",
       guardianEmail: guardian.email,
-      students: guardian.guardianOf.map((sg) => sg.student),
+      students: guardian.guardianOf.map((sg: (typeof guardian.guardianOf)[number]) => sg.student),
     },
   };
 }
@@ -449,13 +450,13 @@ export async function getTeacherStudentsAll(): Promise<
   });
 
   return {
-    data: students.map((s) => ({
+    data: students.map((s: (typeof students)[number]) => ({
       id: s.id,
       name: s.name,
       hasAccount: s.userId !== null,
-      guardians: s.guardians.map((sg) => sg.guardian),
-      activeEnrollments: s.enrollments.filter((e) => e.status === "ACTIVE").length,
-      pendingEnrollments: s.enrollments.filter((e) => e.status === "PENDING").length,
+      guardians: s.guardians.map((sg: (typeof s.guardians)[number]) => sg.guardian),
+      activeEnrollments: s.enrollments.filter((e: (typeof s.enrollments)[number]) => e.status === "ACTIVE").length,
+      pendingEnrollments: s.enrollments.filter((e: (typeof s.enrollments)[number]) => e.status === "PENDING").length,
     })),
   };
 }
@@ -601,7 +602,7 @@ export async function getTeacherStudentById(studentId: string): Promise<
       id: student.id,
       name: student.name,
       hasAccount: student.userId !== null,
-      guardians: student.guardians.map((sg) => sg.guardian),
+      guardians: student.guardians.map((sg: (typeof student.guardians)[number]) => sg.guardian),
       enrollments: student.enrollments,
     },
   };
