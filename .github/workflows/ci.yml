@@ -21,6 +21,19 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        continue-on-error: true
+
+      - name: Validate lock file sync
+        if: failure()
+        run: |
+          echo "❌ package-lock.json is out of sync with package.json"
+          echo ""
+          echo "To fix this locally, run:"
+          echo "  npm install"
+          echo "  git add package-lock.json"
+          echo "  git commit -m 'update package-lock.json'"
+          echo "  git push"
+          exit 1
 
       - name: Run ESLint
         run: npm run lint
@@ -56,6 +69,19 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        continue-on-error: true
+
+      - name: Validate lock file sync
+        if: failure()
+        run: |
+          echo "❌ package-lock.json is out of sync with package.json"
+          echo ""
+          echo "To fix this locally, run:"
+          echo "  npm install"
+          echo "  git add package-lock.json"
+          echo "  git commit -m 'update package-lock.json'"
+          echo "  git push"
+          exit 1
 
       - name: Setup test database
         env:
@@ -89,6 +115,19 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        continue-on-error: true
+
+      - name: Validate lock file sync
+        if: failure()
+        run: |
+          echo "❌ package-lock.json is out of sync with package.json"
+          echo ""
+          echo "To fix this locally, run:"
+          echo "  npm install"
+          echo "  git add package-lock.json"
+          echo "  git commit -m 'update package-lock.json'"
+          echo "  git push"
+          exit 1
 
       - name: Build Next.js
         run: npm run build
