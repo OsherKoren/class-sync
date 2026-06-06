@@ -66,6 +66,9 @@ jobs:
         # npm install resolves those per-platform without failing the sync check.
         run: npm install --prefer-offline
 
+      - name: Generate Prisma client
+        run: npx prisma generate
+
       - name: Setup test database
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/class_sync_test
