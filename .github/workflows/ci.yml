@@ -75,8 +75,15 @@ jobs:
         run: |
           npx prisma migrate deploy
 
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
       - name: Run smoke tests
         timeout-minutes: 10
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/class_sync_test
+          NEXTAUTH_SECRET: ci-test-secret
+          NEXTAUTH_URL: http://localhost:3000
         run: npm test tests/smoke.spec.ts
 
       - name: Upload test results
