@@ -247,10 +247,31 @@ Classes sync to the teacher's Google Calendar.
 
 ---
 
-## Phase 5 — Reschedule & Voting
+## Phase 5 — Reschedule, Voting & One-Time Enrollment
 
-Teacher offers new slots; guardians and students vote; teacher confirms.
+Teacher offers new slots; guardians and students vote; teacher confirms. Also covers class recurrence settings and one-time enrollment for trials and makeups.
 
+**Schema changes:**
+- [ ] Add `isRecurring Boolean @default(true)` to `Class` — `false` for one-off special sessions
+- [ ] Add `EnrollmentType` enum: `RECURRING | ONE_TIME`
+- [ ] Add `type EnrollmentType @default(RECURRING)` to `Enrollment`
+- [ ] Add `lessonSessionId String?` to `Enrollment` — required when `type = ONE_TIME`; references the specific session being attended
+- [ ] Add `@@index([lessonSessionId])` on `Enrollment`
+- [ ] `npx prisma db push` + `npx prisma generate`
+
+**Class recurrence (teacher):**
+- [ ] `app/teacher/classes/new/page.tsx` — add recurrence toggle: "Weekly (recurring)" / "One-time session"
+- [ ] Class list and detail pages — show recurrence badge so teacher can distinguish at a glance
+- [ ] One-time classes automatically close (`isOpen = false`) once their single `LessonSession` passes
+
+**One-time enrollment (student / guardian / teacher):**
+- [ ] Enrollment request UI — add "Enroll for one session" option with a date picker (lists upcoming `LessonSession` rows for that class)
+- [ ] Server Action: `requestOneTimeEnrollment(classId, lessonSessionId)` — creates `Enrollment` with `type: ONE_TIME` and the given session reference; checks session-level capacity (recurring enrollees + existing one-time enrollees for that date)
+- [ ] Server Action: `enrollStudentOneTime(studentId, classId, lessonSessionId)` — teacher direct-enroll variant, auto-confirmed
+- [ ] Session-level capacity helper: `getSessionAttendeeCount(lessonSessionId)` — counts active RECURRING enrollments + active ONE_TIME enrollments targeting that specific session
+- [ ] Session cards in guardian/student dashboard — ONE_TIME enrollments labelled "One-time visit" with the specific date
+
+**Reschedule & voting (existing plan):**
 - [ ] `app/teacher/reschedule/[sessionId]/page.tsx` — pick 1–2 new time slots
 - [ ] `app/teacher/reschedule/[offerId]/results/page.tsx` — live vote tally
 - [ ] `app/vote/[offerId]/page.tsx` — large Option A / Option B buttons (accessible to any User authorized on the underlying Student — guardian or student)
@@ -260,6 +281,11 @@ Teacher offers new slots; guardians and students vote; teacher confirms.
 - [ ] Unique DB constraint `@@unique([offerId, studentId])` prevents double-voting per student per offer
 
 ### ✅ Phase 5 Success
+- [ ] Teacher creates a recurring class → weekly sessions generated; class shows "Recurring" badge
+- [ ] Teacher creates a one-time class → single session only; class auto-closes after the session date
+- [ ] Student/guardian enrolls as "one-time" → picks a specific session date → enrollment appears on dashboard as "One-time visit — [date]"
+- [ ] One-time attendee counts toward capacity for that session only (not other sessions)
+- [ ] Student enrolls in another group's session as a makeup → appears correctly on dashboard; does not affect their regular class enrollment
 - [ ] Teacher creates offer with 2 options → `RescheduleOffer` row in DB
 - [ ] Guardian or student sees vote page with 2 large, clearly labelled buttons
 - [ ] Anyone authorized on a Student can vote once; voting twice updates (does not duplicate) the record
@@ -297,7 +323,58 @@ Browser push + service worker; install prompt flow.
 
 ---
 
-## Phase 7 — i18n: Hebrew + English
+## Phase 7 — WhatsApp Notifications (Twilio)
+
+Send WhatsApp messages to teachers, guardians, and students for key events. Complements web push — reaches users who haven't installed the PWA or haven't granted push permission.
+
+**Design decisions:**
+- Phone number is optional — users who don't add one simply won't receive WhatsApp messages
+- Explicit opt-in toggle required (legal requirement for business-initiated WhatsApp messages)
+- Messages sent via Twilio WhatsApp API; use Twilio Sandbox during development, approved number in production
+- Notifications target all Users linked to a Student (guardian(s) + student's own account if it exists)
+- Teacher notifications go to the single teacher User on the class
+- Group-level events (e.g. class cancelled) fan out to all enrolled students and their guardians
+
+**Prerequisites before starting:**
+- Twilio account → enable WhatsApp Sandbox → copy Account SID + Auth Token + `whatsapp:+14155238886` (sandbox number)
+- For production: submit WhatsApp Business profile + message templates for approval
+
+**Schema changes:**
+- [ ] Add `phone String?` to `User` model — international format, e.g. `+972501234567`
+- [ ] Add `whatsappOptIn Boolean @default(false)` to `User` model
+- [ ] `npx prisma db push` + `npx prisma generate`
+
+**Infrastructure:**
+- [ ] Install `twilio` npm package
+- [ ] Add env vars: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM` (sandbox or approved number)
+- [ ] `lib/whatsapp.ts` — `sendWhatsApp(to: string, message: string): Promise<void>` helper; no-ops if `to` is empty or opt-in is false; logs errors server-side without throwing
+
+**Settings UI:**
+- [ ] `app/*/settings/page.tsx` (teacher, guardian, student) — add phone number input + WhatsApp opt-in toggle
+- [ ] Server Action: `updateContactSettings(phone, whatsappOptIn)` — validates E.164 phone format with zod, saves to `User`
+
+**Notification triggers:**
+- [ ] Reschedule offer created → notify all guardians + students enrolled in the class
+- [ ] Session cancelled (no reschedule) → notify all enrolled guardians + students
+- [ ] Enrollment approved → notify the student's guardians + student's own account
+- [ ] Enrollment rejected → notify the student's guardians + student's own account
+- [ ] Student requests to join a class → notify the teacher
+- [ ] 24h session reminder (Vercel Cron, shared with Phase 6 cron job) → notify enrolled guardians + students
+
+**Helper:**
+- [ ] `lib/notifications.ts` — `notifyStudentAndGuardians(studentId, message)` and `notifyClassEnrollees(classId, message)` — fan out push + WhatsApp in parallel for all linked Users who have opted in
+
+### ✅ Phase 7 Success
+- [ ] User adds phone + enables WhatsApp opt-in in settings → saved to DB
+- [ ] Teacher creates a reschedule offer → all opted-in guardians and students in the class receive a WhatsApp message
+- [ ] Enrollment approved → opted-in guardian (or student) receives confirmation via WhatsApp
+- [ ] User with no phone or opt-in disabled → no message sent, no error thrown
+- [ ] Phone number stored in E.164 format; invalid formats rejected at save time
+- [ ] Cron reminder triggers WhatsApp for opted-in users in addition to push
+
+---
+
+## Phase 8 — i18n: Hebrew + English
 
 Full bilingual support with RTL layout.
 
@@ -309,7 +386,7 @@ Full bilingual support with RTL layout.
 - [ ] Language toggle in profile → saved to `User.locale`
 - [ ] Language toggle shortcut visible in nav
 
-### ✅ Phase 7 Success
+### ✅ Phase 8 Success
 - [ ] App loads in Hebrew RTL by default
 - [ ] Zero hardcoded strings — every label uses a translation key
 - [ ] Toggling to English flips layout to LTR and replaces all text
@@ -318,7 +395,7 @@ Full bilingual support with RTL layout.
 
 ---
 
-## Phase 8 — Light / Dark Theme
+## Phase 9 — Light / Dark Theme
 
 System-default theme with per-user override.
 
@@ -327,7 +404,7 @@ System-default theme with per-user override.
 - [ ] 3-way toggle (Light / System / Dark) in profile settings
 - [ ] Save choice to `User.theme`; restore on login
 
-### ✅ Phase 8 Success
+### ✅ Phase 9 Success
 - [ ] App matches OS theme on first visit (no manual choice needed)
 - [ ] User switches to Dark → preference saved → restored after re-login
 - [ ] All pages look correct in both light and dark mode
@@ -335,7 +412,7 @@ System-default theme with per-user override.
 
 ---
 
-## Phase 9 — Polish & Deploy
+## Phase 10 — Polish & Deploy
 
 Final UX pass and production deployment.
 
@@ -348,7 +425,7 @@ Final UX pass and production deployment.
 - [ ] Neon prod DB created, `prisma db push` run against it
 - [ ] Smoke test all critical flows on production URL
 
-### ✅ Phase 9 Success
+### ✅ Phase 10 Success
 - [ ] All pages load on mobile without horizontal scroll or overflow
 - [ ] Teacher full flow works end-to-end on production URL
 - [ ] Guardian + student full flow (vote + push notification) works on production URL
