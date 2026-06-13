@@ -8,10 +8,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { DeleteClassSection } from "@/components/DeleteClassSection";
-import { getClassById } from "@/lib/actions/class";
+import { getClassById, getCancelledSessionDates } from "@/lib/actions/class";
 import { EnrollmentManagement } from "@/components/teacher/EnrollmentManagement";
 import { ToggleOpenEnrollment } from "@/components/teacher/ToggleOpenEnrollment";
 import { EnrollByEmail } from "@/components/teacher/EnrollByEmail";
+import { UpcomingSessions } from "@/components/teacher/UpcomingSessions";
 import { GRADE_KEYS, SUBJECT_KEYS } from "@/lib/classKeys";
 import { getTranslations } from "next-intl/server";
 
@@ -21,8 +22,12 @@ export default async function ClassDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const result = await getClassById(id);
+  const [result, cancelledResult] = await Promise.all([
+    getClassById(id),
+    getCancelledSessionDates(id),
+  ]);
   const t = await getTranslations();
+  const cancelledDates = "data" in cancelledResult ? cancelledResult.data : [];
 
   if ("error" in result) {
     return (
@@ -55,7 +60,12 @@ export default async function ClassDetailPage({
           >
             {t('teacher.classDetail.backToClasses')}
           </Link>
-          <h1 className="text-3xl font-bold mb-2">{classData.name}</h1>
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-3xl font-bold">{classData.name}</h1>
+            <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${classData.isRecurring ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200" : "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-200"}`}>
+              {classData.isRecurring ? t("teacher.createClass.recurringBadge") : t("teacher.createClass.oneTimeBadge")}
+            </span>
+          </div>
           <p className="text-muted-foreground">{SUBJECT_KEYS.has(classData.subject) ? t(`teacher.createClass.subjects.${classData.subject}` as `teacher.createClass.subjects.${string}`) : classData.subject}</p>
         </div>
 
@@ -180,6 +190,14 @@ export default async function ClassDetailPage({
             )}
           </CardContent>
         </Card>
+
+        <UpcomingSessions
+          classId={classData.id}
+          dayOfWeek={classData.dayOfWeek}
+          startTime={classData.startTime}
+          isRecurring={classData.isRecurring}
+          initialCancelledDates={cancelledDates}
+        />
 
         <EnrollByEmail classId={classData.id} />
 

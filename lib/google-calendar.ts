@@ -121,3 +121,24 @@ export async function deleteClassEvent(
   const cal = await getCalendarClient(userId);
   await cal.events.delete({ calendarId, eventId });
 }
+
+// Deletes the specific occurrence of a recurring event that falls on `date` (YYYY-MM-DD).
+// Searches a full UTC-day window — safe for any timezone up to UTC+14.
+export async function cancelCalendarEventOccurrence(
+  userId: string,
+  calendarId: string,
+  eventId: string,
+  date: string,
+): Promise<void> {
+  const cal = await getCalendarClient(userId);
+  const instances = await cal.events.instances({
+    calendarId,
+    eventId,
+    timeMin: `${date}T00:00:00Z`,
+    timeMax: `${date}T23:59:59Z`,
+    maxResults: 1,
+  });
+  const instance = instances.data.items?.[0];
+  if (!instance?.id) return; // no occurrence on that date — nothing to cancel
+  await cal.events.delete({ calendarId, eventId: instance.id });
+}

@@ -231,17 +231,17 @@ Classes sync to the teacher's Google Calendar.
 - [x] `lib/google-calendar.ts`: `listCalendars`, `createRecurringClassEvent`, `updateClassEvent`, `deleteClassEvent`
 - [x] Teacher onboarding screen: list all visible calendars → teacher picks ONE as the designated tutoring calendar → save `designatedCalendarId` to `User` (in teacher settings page via `CalendarSettings` component)
 - [x] Class creation → recurring event written to designated calendar only
-- [ ] Session cancel → event marked CANCELLED on designated calendar
-- [ ] Verify: no other calendar is read or written after onboarding
+- [x] Session cancel → event marked CANCELLED on designated calendar
+- [x] Verify: no other calendar is read or written after onboarding
 
 ### ✅ Phase 4 Success
-- [ ] Teacher onboarding shows a calendar picker (lists work + any shared cals)
-- [ ] After picking, `designatedCalendarId` saved to DB
-- [ ] Creating a class → recurring event appears in the designated work calendar
-- [ ] The personal/private calendar is never read or modified by the app
-- [ ] Guardian and student dashboards show sessions from DB only — no Google Calendar data
-- [ ] Cancelling a session updates only the designated calendar
-- [ ] Token refresh works — teacher stays connected after 1 hour
+- [x] Teacher onboarding shows a calendar picker (lists work + any shared cals)
+- [x] After picking, `designatedCalendarId` saved to DB
+- [x] Creating a class → recurring event appears in the designated work calendar
+- [x] The personal/private calendar is never read or modified by the app
+- [x] Guardian and student dashboards show sessions from DB only — no Google Calendar data
+- [x] Cancelling a session updates only the designated calendar
+- [x] Token refresh works — teacher stays connected after 1 hour
 
 ---
 

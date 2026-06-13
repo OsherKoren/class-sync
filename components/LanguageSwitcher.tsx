@@ -1,15 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale } from "next-intl";
 import { updateLocale } from "@/lib/actions/settings";
 
 export function LanguageSwitcher({ current: currentProp }: { current?: string } = {}) {
-  const [current] = useState<string>(() => {
-    if (currentProp) return currentProp;
-    if (typeof document === "undefined") return "he";
-    const match = document.cookie.match(/(?:^|;\s*)locale=([^;]*)/);
-    return match ? match[1] : "he";
-  });
+  const localeFromContext = useLocale();
+  const current = currentProp ?? localeFromContext;
   const [saving, setSaving] = useState(false);
 
   async function switchTo(locale: "he" | "en") {
