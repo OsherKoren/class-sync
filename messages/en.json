@@ -519,5 +519,17 @@
       "closeBtn": "Close Enrollment",
       "openBtn": "Open Enrollment"
     }
+  },
+  "pwa": {
+    "installTitle": "Install ClassSync",
+    "installSubtitle": "Add to your home screen for quick access",
+    "installButton": "Install",
+    "iosInstall": "Tap the share icon, then choose \"Add to Home Screen\" to install the app",
+    "dismiss": "Dismiss",
+    "settingsTitle": "App & Notifications",
+    "alreadyInstalled": "App is installed on this device",
+    "enableNotifications": "Enable push notifications",
+    "notificationsEnabled": "Push notifications on",
+    "notSupported": "Push notifications are not supported on this browser"
   }
 }

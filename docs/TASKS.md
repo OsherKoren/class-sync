@@ -250,47 +250,47 @@ Classes sync to the teacher's Google Calendar.
 Teacher offers new slots; guardians and students vote; teacher confirms. Also covers class recurrence settings and one-time enrollment for trials and makeups.
 
 **Schema changes:**
-- [ ] Add `isRecurring Boolean @default(true)` to `Class` — `false` for one-off special sessions
-- [ ] Add `EnrollmentType` enum: `RECURRING | ONE_TIME`
-- [ ] Add `type EnrollmentType @default(RECURRING)` to `Enrollment`
-- [ ] Add `lessonSessionId String?` to `Enrollment` — required when `type = ONE_TIME`; references the specific session being attended
-- [ ] Add `@@index([lessonSessionId])` on `Enrollment`
-- [ ] `npx prisma db push` + `npx prisma generate`
+- [x] Add `isRecurring Boolean @default(true)` to `Class` — `false` for one-off special sessions
+- [x] Add `EnrollmentType` enum: `RECURRING | ONE_TIME`
+- [x] Add `type EnrollmentType @default(RECURRING)` to `Enrollment`
+- [x] Add `lessonSessionId String?` to `Enrollment` — required when `type = ONE_TIME`; references the specific session being attended
+- [x] Add `@@index([lessonSessionId])` on `Enrollment`
+- [x] `npx prisma db push` + `npx prisma generate`
 
 **Class recurrence (teacher):**
-- [ ] `app/teacher/classes/new/page.tsx` — add recurrence toggle: "Weekly (recurring)" / "One-time session"
-- [ ] Class list and detail pages — show recurrence badge so teacher can distinguish at a glance
-- [ ] One-time classes automatically close (`isOpen = false`) once their single `LessonSession` passes
+- [x] `app/teacher/classes/new/page.tsx` — add recurrence toggle: "Weekly (recurring)" / "One-time session"
+- [x] Class list and detail pages — show recurrence badge so teacher can distinguish at a glance
+- [x] One-time classes automatically close (`isOpen = false`) once their single `LessonSession` passes
 
 **One-time enrollment (student / guardian / teacher):**
-- [ ] Enrollment request UI — add "Enroll for one session" option with a date picker (lists upcoming `LessonSession` rows for that class)
-- [ ] Server Action: `requestOneTimeEnrollment(classId, lessonSessionId)` — creates `Enrollment` with `type: ONE_TIME` and the given session reference; checks session-level capacity (recurring enrollees + existing one-time enrollees for that date)
-- [ ] Server Action: `enrollStudentOneTime(studentId, classId, lessonSessionId)` — teacher direct-enroll variant, auto-confirmed
-- [ ] Session-level capacity helper: `getSessionAttendeeCount(lessonSessionId)` — counts active RECURRING enrollments + active ONE_TIME enrollments targeting that specific session
-- [ ] Session cards in guardian/student dashboard — ONE_TIME enrollments labelled "One-time visit" with the specific date
+- [x] Enrollment request UI — add "Enroll for one session" option with a date picker (lists upcoming `LessonSession` rows for that class)
+- [x] Server Action: `requestOneTimeEnrollment(classId, lessonSessionId)` — creates `Enrollment` with `type: ONE_TIME` and the given session reference; checks session-level capacity (recurring enrollees + existing one-time enrollees for that date)
+- [x] Server Action: `enrollStudentOneTime(studentId, classId, lessonSessionId)` — teacher direct-enroll variant, auto-confirmed
+- [x] Session-level capacity helper: `getSessionAttendeeCount(lessonSessionId)` — counts active RECURRING enrollments + active ONE_TIME enrollments targeting that specific session
+- [x] Session cards in guardian/student dashboard — ONE_TIME enrollments labelled "One-time visit" with the specific date
 
 **Reschedule & voting (existing plan):**
-- [ ] `app/teacher/reschedule/[sessionId]/page.tsx` — pick 1–2 new time slots
-- [ ] `app/teacher/reschedule/[offerId]/results/page.tsx` — live vote tally
-- [ ] `app/vote/[offerId]/page.tsx` — large Option A / Option B buttons (accessible to any User authorized on the underlying Student — guardian or student)
-- [ ] Server Actions: `createRescheduleOffer`, `submitVote`, `resolveOffer`
-- [ ] `submitVote` records vote under `studentId`, not the acting User — so a co-guardian voting after the other guardian (or after the student) updates the same vote rather than duplicating
-- [ ] On resolve: update Google Calendar event to winning time slot
-- [ ] Unique DB constraint `@@unique([offerId, studentId])` prevents double-voting per student per offer
+- [x] `app/teacher/reschedule/[sessionId]/page.tsx` — pick 1–2 new time slots
+- [x] `app/teacher/reschedule/[offerId]/results/page.tsx` — live vote tally
+- [x] `app/vote/[offerId]/page.tsx` — large Option A / Option B buttons (accessible to any User authorized on the underlying Student — guardian or student)
+- [x] Server Actions: `createRescheduleOffer`, `submitVote`, `resolveOffer`
+- [x] `submitVote` records vote under `studentId`, not the acting User — so a co-guardian voting after the other guardian (or after the student) updates the same vote rather than duplicating
+- [x] On resolve: update Google Calendar event to winning time slot
+- [x] Unique DB constraint `@@unique([offerId, studentId])` prevents double-voting per student per offer
 
 ### ✅ Phase 5 Success
-- [ ] Teacher creates a recurring class → weekly sessions generated; class shows "Recurring" badge
-- [ ] Teacher creates a one-time class → single session only; class auto-closes after the session date
-- [ ] Student/guardian enrolls as "one-time" → picks a specific session date → enrollment appears on dashboard as "One-time visit — [date]"
-- [ ] One-time attendee counts toward capacity for that session only (not other sessions)
-- [ ] Student enrolls in another group's session as a makeup → appears correctly on dashboard; does not affect their regular class enrollment
-- [ ] Teacher creates offer with 2 options → `RescheduleOffer` row in DB
-- [ ] Guardian or student sees vote page with 2 large, clearly labelled buttons
-- [ ] Anyone authorized on a Student can vote once; voting twice updates (does not duplicate) the record
-- [ ] When a guardian votes and then the linked student (or co-guardian) votes again, only the latest choice is counted
-- [ ] Vote tally on teacher results page reflects current counts
-- [ ] Teacher resolves offer → Google Calendar event moves to winning time
-- [ ] Resolved offer page shows the confirmed slot; voting buttons disabled
+- [x] Teacher creates a recurring class → weekly sessions generated; class shows "Recurring" badge
+- [x] Teacher creates a one-time class → single session only; class auto-closes after the session date
+- [x] Student/guardian enrolls as "one-time" → picks a specific session date → enrollment appears on dashboard as "One-time visit — [date]"
+- [x] One-time attendee counts toward capacity for that session only (not other sessions)
+- [x] Student enrolls in another group's session as a makeup → appears correctly on dashboard; does not affect their regular class enrollment
+- [x] Teacher creates offer with 2 options → `RescheduleOffer` row in DB
+- [x] Guardian or student sees vote page with 2 large, clearly labelled buttons
+- [x] Anyone authorized on a Student can vote once; voting twice updates (does not duplicate) the record
+- [x] When a guardian votes and then the linked student (or co-guardian) votes again, only the latest choice is counted
+- [x] Vote tally on teacher results page reflects current counts
+- [x] Teacher resolves offer → Google Calendar event moves to winning time
+- [x] Resolved offer page shows the confirmed slot; voting buttons disabled
 
 ---
 
@@ -298,26 +298,26 @@ Teacher offers new slots; guardians and students vote; teacher confirms. Also co
 
 Browser push + service worker; install prompt flow.
 
-- [ ] Generate VAPID keys → add to `.env.local`
-- [ ] `public/manifest.json` — name, icons (192 + 512), `display: standalone`
-- [ ] `app/sw.ts` — serwist service worker
-- [ ] `app/api/push/subscribe/route.ts` — save subscription to DB
-- [ ] `app/api/push/send/route.ts` — send via web-push
-- [ ] `hooks/usePwaInstall.ts` — capture `beforeinstallprompt`, iOS detection,
+- [x] Generate VAPID keys → add to `.env.local`
+- [x] `public/manifest.json` — name, icons (192 + 512), `display: standalone`
+- [x] `app/sw.ts` — serwist service worker
+- [x] `app/api/push/subscribe/route.ts` — save subscription to DB
+- [x] `app/api/push/send/route.ts` — send via web-push (`lib/push.ts` helpers used directly from server actions)
+- [x] `hooks/usePwaInstall.ts` — capture `beforeinstallprompt`, iOS detection,
       check `display-mode: standalone`
-- [ ] `components/pwa/InstallBanner.tsx` — bottom-sheet on first login
-- [ ] `components/pwa/InstallButton.tsx` — persistent in settings page
-- [ ] Vercel Cron: `app/api/cron/reminders/route.ts` — 24h + 1h push reminders
-- [ ] Trigger push to all Users linked to enrolled students (guardian + student themselves) when reschedule offer is created
+- [x] `components/pwa/InstallBanner.tsx` — bottom-sheet on first login
+- [x] `components/pwa/InstallButton.tsx` — persistent in settings page
+- [x] Vercel Cron: `app/api/cron/reminders/route.ts` — 24h + 1h push reminders
+- [x] Trigger push to all Users linked to enrolled students (guardian + student themselves) when reschedule offer is created
 
 ### ✅ Phase 6 Success
-- [ ] Android Chrome: install banner appears after first login
-- [ ] Dismissing banner re-shows it on next login (not installed yet)
-- [ ] Install button visible in settings at all times
-- [ ] iOS Safari: custom instruction banner shown (no native prompt)
-- [ ] Once installed (`standalone`), no install prompts shown anywhere
-- [ ] Guardian (and linked student, if any) receives push when teacher creates a reschedule offer
-- [ ] Reminder push fires ~24h before an upcoming session
+- [x] Android Chrome: install banner appears after first login
+- [x] Dismissing banner re-shows it on next login (not installed yet)
+- [x] Install button visible in settings at all times
+- [x] iOS Safari: custom instruction banner shown (no native prompt)
+- [x] Once installed (`standalone`), no install prompts shown anywhere
+- [x] Guardian (and linked student, if any) receives push when teacher creates a reschedule offer
+- [x] Reminder push fires ~24h before an upcoming session
 
 ---
 

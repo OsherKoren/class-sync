@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { updateLocale } from "@/lib/actions/settings";
 import { cn } from "@/lib/utils";
+import { InstallButton } from "@/components/pwa/InstallButton";
 
 const THEMES = [
   { value: "light", Icon: Sun, key: "themeLight" },
@@ -96,6 +97,8 @@ export function StudentSettingsClient({ initialLocale }: { initialLocale: string
               </Link>
             </CardContent>
           </Card>
+
+          <InstallButton />
         </div>
       </div>
     </div>

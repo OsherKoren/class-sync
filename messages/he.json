@@ -519,5 +519,17 @@
       "closeBtn": "סגור הרשמה",
       "openBtn": "פתח הרשמה"
     }
+  },
+  "pwa": {
+    "installTitle": "התקן את ClassSync",
+    "installSubtitle": "הוסף למסך הבית לגישה מהירה",
+    "installButton": "התקן",
+    "iosInstall": "לחץ על אייקון השיתוף ובחר «הוסף למסך הבית» כדי להתקין את האפליקציה",
+    "dismiss": "סגור",
+    "settingsTitle": "אפליקציה והתראות",
+    "alreadyInstalled": "האפליקציה מותקנת במכשיר זה",
+    "enableNotifications": "הפעל התראות",
+    "notificationsEnabled": "התראות פועלות",
+    "notSupported": "התראות אינן נתמכות בדפדפן זה"
   }
 }

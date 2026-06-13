@@ -18,6 +18,12 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ClassSync",
   description: "Class scheduling for students and teachers",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "ClassSync",
+  },
 };
 
 export default async function RootLayout({
