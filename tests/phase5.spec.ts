@@ -11,7 +11,6 @@ const GUARDIAN_JWT =
 
 // Known DB IDs from seeding
 const RECURRING_CLASS_ID = "cmqc6qptz00015g5cqfh8th9u"; // Phase5 Recurring Math (Thu 16:00)
-const GUARDIAN_STUDENT_ID = "cmqc67u230001k85cldbgov7v";
 
 async function setSession(context: BrowserContext, jwt: string) {
   await context.addCookies([

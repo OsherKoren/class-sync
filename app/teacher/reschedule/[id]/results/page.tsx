@@ -1,4 +1,4 @@
-import { getRescheduleOffer, resolveOffer } from "@/lib/actions/reschedule";
+import { getRescheduleOffer } from "@/lib/actions/reschedule";
 import { redirect } from "next/navigation";
 import { ResolveOfferClient } from "@/components/teacher/ResolveOfferClient";
 import { getTranslations } from "next-intl/server";
