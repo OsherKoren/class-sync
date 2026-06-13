@@ -9,8 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { createRescheduleOffer } from "@/lib/actions/reschedule";
 
-type Option = { label: string; scheduledAt: string };
-
 export function RescheduleForm({
   sessionId,
   classId,
@@ -20,31 +18,24 @@ export function RescheduleForm({
 }) {
   const t = useTranslations("teacher.reschedule");
   const router = useRouter();
-  const [options, setOptions] = useState<Option[]>([{ label: "", scheduledAt: "" }]);
+  const [label, setLabel] = useState("");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  function updateOption(index: number, field: keyof Option, value: string) {
-    setOptions((prev) => prev.map((o, i) => (i === index ? { ...o, [field]: value } : o)));
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!label.trim() || !date || !time) {
+      setError(t("fillRequired"));
+      return;
+    }
     setSubmitting(true);
     setError("");
 
-    const valid = options.filter((o) => o.label.trim() && o.scheduledAt);
-    if (valid.length === 0) {
-      setError("Please fill in at least one option.");
-      setSubmitting(false);
-      return;
-    }
-
     const result = await createRescheduleOffer(sessionId, {
-      options: valid.map((o) => ({
-        label: o.label.trim(),
-        scheduledAt: new Date(o.scheduledAt).toISOString(),
-      })),
+      label: label.trim(),
+      scheduledAt: new Date(`${date}T${time}`).toISOString(),
     });
 
     if ("error" in result) {
@@ -59,60 +50,43 @@ export function RescheduleForm({
   return (
     <Card>
       <CardContent className="pt-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {options.map((opt, idx) => (
-            <div key={idx} className="space-y-3 border rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">
-                  {idx === 0 ? t("option1Label") : t("option2Label")}
-                </span>
-                {idx === 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setOptions((prev) => prev.slice(0, 1))}
-                  >
-                    {t("removeOption")}
-                  </Button>
-                )}
-              </div>
-              <div>
-                <Label htmlFor={`label-${idx}`}>
-                  {idx === 0 ? t("option1Label") : t("option2Label")}
-                </Label>
-                <Input
-                  id={`label-${idx}`}
-                  value={opt.label}
-                  onChange={(e) => updateOption(idx, "label", e.target.value)}
-                  placeholder={idx === 0 ? "e.g., Monday 10:00" : "e.g., Wednesday 16:00"}
-                  required={idx === 0}
-                />
-              </div>
-              <div>
-                <Label htmlFor={`date-${idx}`}>
-                  {idx === 0 ? t("option1Date") : t("option2Date")}
-                </Label>
-                <Input
-                  id={`date-${idx}`}
-                  type="datetime-local"
-                  value={opt.scheduledAt}
-                  onChange={(e) => updateOption(idx, "scheduledAt", e.target.value)}
-                  required={idx === 0}
-                />
-              </div>
-            </div>
-          ))}
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <Label htmlFor="label">{t("slotLabel")}</Label>
+            <Input
+              id="label"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              placeholder={t("slotLabelPlaceholder")}
+              required
+            />
+          </div>
 
-          {options.length === 1 && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOptions((prev) => [...prev, { label: "", scheduledAt: "" }])}
-            >
-              {t("addOption")}
-            </Button>
-          )}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label htmlFor="date">{t("optionDate")}</Label>
+              <Input
+                id="date"
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="time">{t("optionTime")}</Label>
+              <Input
+                id="time"
+                type="text"
+                inputMode="numeric"
+                placeholder="HH:MM"
+                pattern="^([01]\d|2[0-3]):[0-5]\d$"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                required
+              />
+            </div>
+          </div>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
 
