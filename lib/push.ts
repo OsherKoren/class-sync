@@ -1,13 +1,20 @@
 import webpush from "web-push";
 import { db } from "@/lib/db";
 
-webpush.setVapidDetails(
-  process.env.VAPID_SUBJECT!,
-  process.env.NEXT_PUBLIC_VAPID_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
+let vapidReady = false;
+
+function ensureVapid() {
+  if (vapidReady) return;
+  webpush.setVapidDetails(
+    process.env.VAPID_SUBJECT!,
+    process.env.NEXT_PUBLIC_VAPID_KEY!,
+    process.env.VAPID_PRIVATE_KEY!
+  );
+  vapidReady = true;
+}
 
 export async function sendPushToUser(userId: string, payload: { title: string; body: string }) {
+  ensureVapid();
   const subscriptions = await db.pushSubscription.findMany({
     where: { userId },
     select: { id: true, endpoint: true, p256dh: true, auth: true },
