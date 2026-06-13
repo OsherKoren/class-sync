@@ -19,9 +19,9 @@ export default async function VotePage({
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-lg">
-        <h1 className="text-2xl font-bold mb-2">{t("vote.title")}</h1>
+        <h1 className="text-2xl font-bold mb-2">{t("teacher.vote.title")}</h1>
         <p className="text-muted-foreground mb-2">{offer.lessonSession.className}</p>
-        <p className="text-sm text-muted-foreground mb-8">{t("vote.intro")}</p>
+        <p className="text-sm text-muted-foreground mb-8">{t("teacher.vote.intro")}</p>
         <VoteClient offer={offer} />
       </div>
     </div>
