@@ -212,12 +212,13 @@ model Enrollment {
 }
 
 model LessonSession {
-  id              String        @id @default(cuid())
-  classId         String
-  class           Class         @relation(fields: [classId], references: [id], onDelete: Cascade)
-  scheduledAt     DateTime
-  status          SessionStatus @default(SCHEDULED)
-  calendarEventId String?
+  id                  String        @id @default(cuid())
+  classId             String
+  class               Class         @relation(fields: [classId], references: [id], onDelete: Cascade)
+  scheduledAt         DateTime
+  originalScheduledAt DateTime?
+  status              SessionStatus @default(SCHEDULED)
+  calendarEventId     String?
 
   rescheduleOffers    RescheduleOffer[]
   oneTimeEnrollments  Enrollment[]

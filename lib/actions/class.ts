@@ -8,7 +8,7 @@ import {
   cancelCalendarEventOccurrence,
 } from "@/lib/google-calendar";
 
-const classSchema = z.object({
+const classSchemaBase = z.object({
   name: z.string().min(2, "Class name must be at least 2 characters"),
   subject: z.string().min(2, "Subject must be at least 2 characters"),
   type: z.enum(["GROUP", "PRIVATE"]),
@@ -22,7 +22,9 @@ const classSchema = z.object({
   duration: z.number().min(30, "Duration must be at least 30 minutes"),
   isOpen: z.boolean().optional(),
   maxCapacity: z.number().int().min(1).optional().nullable(),
-}).superRefine((d, ctx) => {
+});
+
+const classSchema = classSchemaBase.superRefine((d, ctx) => {
   if (d.isRecurring && d.dayOfWeek === undefined) {
     ctx.addIssue({ code: "custom", path: ["dayOfWeek"], message: "Day of week is required for recurring classes" });
   }
@@ -140,7 +142,7 @@ export async function updateClass(
     return { error: "Unauthorized" };
   }
 
-  const parsed = classSchema.partial().safeParse(input);
+  const parsed = classSchemaBase.partial().safeParse(input);
   if (!parsed.success) {
     return { error: parsed.error.issues[0].message };
   }
@@ -453,11 +455,88 @@ export async function findOrCreateLessonSession(
   if (existing) return { data: { sessionId: existing.id } };
 
   const created = await db.lessonSession.create({
-    data: { classId, scheduledAt, status: "SCHEDULED" },
+    data: { classId, scheduledAt, originalScheduledAt: scheduledAt, status: "SCHEDULED" },
     select: { id: true },
   });
 
   return { data: { sessionId: created.id } };
+}
+
+export type RescheduledSessionInfo = {
+  originalDate: string;
+  proposedScheduledAt: string;
+  offerId: string;
+  confirmed: boolean;
+};
+
+export async function getRescheduledSessions(classId: string): Promise<
+  { error: string } | { data: RescheduledSessionInfo[] }
+> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "TEACHER") {
+    return { error: "Unauthorized" };
+  }
+
+  const classRecord = await db.class.findUnique({
+    where: { id: classId },
+    select: { teacherId: true },
+  });
+
+  if (!classRecord || classRecord.teacherId !== session.user.id) {
+    return { error: "Class not found or unauthorized" };
+  }
+
+  // Sessions with an OPEN offer (pending vote) — status still SCHEDULED
+  const openSessions = await db.lessonSession.findMany({
+    where: {
+      classId,
+      originalScheduledAt: { not: null },
+      rescheduleOffers: { some: { status: "OPEN" } },
+    },
+    select: {
+      originalScheduledAt: true,
+      rescheduleOffers: {
+        where: { status: "OPEN" },
+        select: { id: true, options: { select: { scheduledAt: true }, take: 1 } },
+        take: 1,
+      },
+    },
+  });
+
+  // Sessions already confirmed (RESCHEDULED status)
+  const resolvedSessions = await db.lessonSession.findMany({
+    where: { classId, status: "RESCHEDULED", originalScheduledAt: { not: null } },
+    select: {
+      originalScheduledAt: true,
+      scheduledAt: true,
+      rescheduleOffers: {
+        where: { status: "RESOLVED" },
+        select: { id: true },
+        take: 1,
+      },
+    },
+  });
+
+  const result: RescheduledSessionInfo[] = [
+    ...openSessions
+      .filter((s) => s.rescheduleOffers[0]?.options[0])
+      .map((s) => ({
+        originalDate: s.originalScheduledAt!.toISOString().slice(0, 10),
+        proposedScheduledAt: s.rescheduleOffers[0].options[0].scheduledAt.toISOString(),
+        offerId: s.rescheduleOffers[0].id,
+        confirmed: false,
+      })),
+    ...resolvedSessions
+      .filter((s) => s.rescheduleOffers[0])
+      .map((s) => ({
+        originalDate: s.originalScheduledAt!.toISOString().slice(0, 10),
+        proposedScheduledAt: s.scheduledAt.toISOString(),
+        offerId: s.rescheduleOffers[0].id,
+        confirmed: true,
+      })),
+  ];
+
+  return { data: result };
 }
 
 export async function getSessionAttendeeCount(

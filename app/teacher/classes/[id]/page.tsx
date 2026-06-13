@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { DeleteClassSection } from "@/components/DeleteClassSection";
-import { getClassById, getCancelledSessionDates } from "@/lib/actions/class";
+import { getClassById, getCancelledSessionDates, getRescheduledSessions } from "@/lib/actions/class";
 import { EnrollmentManagement } from "@/components/teacher/EnrollmentManagement";
 import { ToggleOpenEnrollment } from "@/components/teacher/ToggleOpenEnrollment";
 import { EnrollByEmail } from "@/components/teacher/EnrollByEmail";
@@ -22,12 +22,14 @@ export default async function ClassDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [result, cancelledResult] = await Promise.all([
+  const [result, cancelledResult, rescheduledResult] = await Promise.all([
     getClassById(id),
     getCancelledSessionDates(id),
+    getRescheduledSessions(id),
   ]);
   const t = await getTranslations();
   const cancelledDates = "data" in cancelledResult ? cancelledResult.data : [];
+  const rescheduledSessions = "data" in rescheduledResult ? rescheduledResult.data : [];
 
   if ("error" in result) {
     return (
@@ -197,6 +199,7 @@ export default async function ClassDetailPage({
           startTime={classData.startTime}
           isRecurring={classData.isRecurring}
           initialCancelledDates={cancelledDates}
+          initialRescheduledSessions={rescheduledSessions}
         />
 
         <EnrollByEmail classId={classData.id} />

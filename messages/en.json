@@ -199,7 +199,11 @@
       "cancelConfirmYes": "Yes, cancel it",
       "cancelConfirmNo": "Keep it",
       "rescheduleSession": "Reschedule",
-      "rescheduling": "Opening…"
+      "rescheduling": "Opening…",
+      "sessionPendingVote": "Pending vote →",
+      "sessionRescheduled": "Rescheduled →",
+      "viewResults": "View results",
+      "confirmSlot": "Confirm slot"
     },
     "reschedule": {
       "title": "Reschedule session",

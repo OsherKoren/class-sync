@@ -199,7 +199,11 @@
       "cancelConfirmYes": "כן, בטל",
       "cancelConfirmNo": "השאר אותו",
       "rescheduleSession": "שנה מועד",
-      "rescheduling": "פותח…"
+      "rescheduling": "פותח…",
+      "sessionPendingVote": "ממתין להצבעה →",
+      "sessionRescheduled": "שונה מועד →",
+      "viewResults": "צפה בתוצאות",
+      "confirmSlot": "אשר מועד"
     },
     "reschedule": {
       "title": "שינוי מועד שיעור",
