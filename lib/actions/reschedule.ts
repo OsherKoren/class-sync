@@ -4,7 +4,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { updateClassEvent } from "@/lib/google-calendar";
-import { sendPushToClassEnrollees } from "@/lib/push";
+import { notifyClassEnrollees } from "@/lib/notifications";
 
 const offerSchema = z.object({
   label: z.string().min(1).max(100),
@@ -48,10 +48,11 @@ export async function createRescheduleOffer(
     select: { id: true, lessonSession: { select: { classId: true, class: { select: { name: true } } } } },
   });
 
-  sendPushToClassEnrollees(offer.lessonSession.classId, {
-    title: `ClassSync — ${offer.lessonSession.class.name}`,
-    body: "The teacher proposed a new session time. Tap to vote.",
-  }).catch((err) => console.error("[push] reschedule offer notification failed:", err));
+  notifyClassEnrollees(
+    offer.lessonSession.classId,
+    { title: `ClassSync — ${offer.lessonSession.class.name}`, body: "The teacher proposed a new session time. Tap to vote." },
+    `A new time has been proposed for ${offer.lessonSession.class.name}. Open the app to vote.`
+  ).catch((err) => console.error("[notify] reschedule offer failed:", err));
 
   return { data: { offerId: offer.id } };
 }

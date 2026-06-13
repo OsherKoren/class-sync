@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
+import { cookies } from 'next/headers';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +34,9 @@ export default async function RootLayout({
 }>) {
   const locale = await getLocale();
   const messages = await getMessages();
+  const cookieStore = await cookies();
+  const themeCookie = cookieStore.get("theme")?.value;
+  const initialTheme = themeCookie === "light" || themeCookie === "dark" || themeCookie === "system" ? themeCookie : "system";
 
   return (
     <html
@@ -43,7 +47,7 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
-          <Providers>{children}</Providers>
+          <Providers defaultTheme={initialTheme}>{children}</Providers>
         </NextIntlClientProvider>
       </body>
     </html>

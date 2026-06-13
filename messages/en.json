@@ -520,6 +520,17 @@
       "openBtn": "Open Enrollment"
     }
   },
+  "whatsapp": {
+    "title": "WhatsApp Notifications",
+    "description": "Add your phone number to receive notifications via WhatsApp.",
+    "phone": "Phone number",
+    "phonePlaceholder": "+972501234567",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "optIn": "Send me WhatsApp notifications",
+    "phoneRequired": "Enter a phone number above to enable WhatsApp notifications"
+  },
   "pwa": {
     "installTitle": "Install ClassSync",
     "installSubtitle": "Add to your home screen for quick access",

@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
+import { notifyUser } from "@/lib/notifications";
 import { type StudentClass } from "@/lib/types";
 
 export async function getMyEnrolledClasses(): Promise<
@@ -290,12 +291,17 @@ export async function requestEnrollment(
 
   const student = await db.student.findUnique({
     where: { userId: session.user.id },
-    select: { id: true },
+    select: { id: true, name: true },
   });
 
   if (!student) {
     return { error: "Student profile not found" };
   }
+
+  const classRecord = await db.class.findUnique({
+    where: { id: classId },
+    select: { name: true, teacherId: true },
+  });
 
   const existing = await db.enrollment.findUnique({
     where: { studentId_classId: { studentId: student.id, classId } },
@@ -308,6 +314,13 @@ export async function requestEnrollment(
         where: { studentId_classId: { studentId: student.id, classId } },
         data: { status: "PENDING", rejectionReason: null },
       });
+      if (classRecord) {
+        notifyUser(
+          classRecord.teacherId,
+          { title: `ClassSync — ${classRecord.name}`, body: `${student.name} re-requested to join.` },
+          `${student.name} requested to join ${classRecord.name}.`
+        ).catch((err) => console.error("[notify] requestEnrollment:", err));
+      }
       return { data: { success: true } };
     }
     return { error: "You have already requested this class" };
@@ -320,6 +333,14 @@ export async function requestEnrollment(
       status: "PENDING",
     },
   });
+
+  if (classRecord) {
+    notifyUser(
+      classRecord.teacherId,
+      { title: `ClassSync — ${classRecord.name}`, body: `${student.name} requested to join.` },
+      `${student.name} requested to join ${classRecord.name}.`
+    ).catch((err) => console.error("[notify] requestEnrollment:", err));
+  }
 
   return { data: { success: true } };
 }

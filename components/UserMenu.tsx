@@ -3,7 +3,7 @@
 import { signOut } from "next-auth/react";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
-import { updateLocale } from "@/lib/actions/settings";
+import { updateLocale, updateTheme } from "@/lib/actions/settings";
 import { useState } from "react";
 import { LogOut, Sun, Moon, Monitor } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -100,7 +100,7 @@ export function UserMenu({ name, email, image, currentLocale }: UserMenuProps) {
             {THEMES.map(({ value, Icon }) => (
               <button
                 key={value}
-                onClick={() => setTheme(value)}
+                onClick={() => { setTheme(value); updateTheme(value).catch(console.error); }}
                 title={t(`theme${value.charAt(0).toUpperCase() + value.slice(1)}` as "themeLight" | "themeDark" | "themeSystem")}
                 className={cn(
                   "p-1.5 rounded-md transition-colors",

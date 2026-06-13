@@ -520,6 +520,17 @@
       "openBtn": "פתח הרשמה"
     }
   },
+  "whatsapp": {
+    "title": "התראות WhatsApp",
+    "description": "הוסף מספר טלפון לקבלת התראות דרך WhatsApp.",
+    "phone": "מספר טלפון",
+    "phonePlaceholder": "+972501234567",
+    "save": "שמור",
+    "saving": "שומר…",
+    "saved": "נשמר",
+    "optIn": "שלח לי התראות WhatsApp",
+    "phoneRequired": "הזן מספר טלפון למעלה כדי להפעיל התראות WhatsApp"
+  },
   "pwa": {
     "installTitle": "התקן את ClassSync",
     "installSubtitle": "הוסף למסך הבית לגישה מהירה",

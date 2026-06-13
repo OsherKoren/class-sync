@@ -17,9 +17,9 @@ function ServiceWorkerRegistrar() {
   return null;
 }
 
-export function Providers({ children }: { children: ReactNode }) {
+export function Providers({ children, defaultTheme = "system" }: { children: ReactNode; defaultTheme?: string }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <ThemeProvider attribute="class" defaultTheme={defaultTheme} enableSystem disableTransitionOnChange>
       <SessionProvider>
         <ServiceWorkerRegistrar />
         {children}

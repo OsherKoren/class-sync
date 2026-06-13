@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { sendPushToStudentAndGuardians } from "@/lib/push";
+import { notifyStudentAndGuardians } from "@/lib/notifications";
 
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
@@ -39,10 +39,11 @@ export async function GET(req: NextRequest) {
     const body = isIn24h ? "Your session starts in 24 hours" : "Your session starts in 1 hour";
 
     for (const e of session.class.enrollments) {
-      await sendPushToStudentAndGuardians(e.studentId, {
-        title: `ClassSync — ${session.class.name}`,
-        body,
-      });
+      await notifyStudentAndGuardians(
+        e.studentId,
+        { title: `ClassSync — ${session.class.name}`, body },
+        `Reminder: ${session.class.name} starts ${isIn24h ? "in 24 hours" : "in 1 hour"}.`
+      );
       sent++;
     }
   }

@@ -102,7 +102,7 @@ export function CalendarSettings({ initialStatus }: Props) {
                     <div className="text-sm">
                       <span className="font-medium">{cal.summary}</span>
                       {cal.primary && (
-                        <span className="ml-2 text-xs text-muted-foreground">(primary)</span>
+                        <span className="ms-2 text-xs text-muted-foreground">(primary)</span>
                       )}
                     </div>
                     <Button

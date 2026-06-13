@@ -6,6 +6,7 @@ import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import bcrypt from "bcryptjs";
+import { notifyStudentAndGuardians } from "@/lib/notifications";
 
 const guardianSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -220,8 +221,9 @@ export async function approveEnrollment(
   const enrollment = await db.enrollment.findUnique({
     where: { id: enrollmentId },
     select: {
+      studentId: true,
       classId: true,
-      class: { select: { teacherId: true, maxCapacity: true } },
+      class: { select: { name: true, teacherId: true, maxCapacity: true } },
     },
   });
 
@@ -247,6 +249,12 @@ export async function approveEnrollment(
     }
   });
 
+  notifyStudentAndGuardians(
+    enrollment.studentId,
+    { title: `ClassSync — ${enrollment.class.name}`, body: "Your enrollment was approved!" },
+    `Your enrollment in ${enrollment.class.name} was approved.`
+  ).catch((err) => console.error("[notify] approveEnrollment:", err));
+
   return { data: { success: true } };
 }
 
@@ -270,7 +278,10 @@ export async function rejectEnrollment(
 
   const enrollment = await db.enrollment.findUnique({
     where: { id: enrollmentId },
-    select: { class: { select: { teacherId: true } } },
+    select: {
+      studentId: true,
+      class: { select: { name: true, teacherId: true } },
+    },
   });
 
   if (!enrollment || enrollment.class.teacherId !== session.user.id) {
@@ -285,6 +296,16 @@ export async function rejectEnrollment(
   revalidatePath("/student/dashboard");
   revalidatePath("/student/classes");
   revalidatePath("/teacher/dashboard");
+
+  const rejectMsg = parsed.data.reason
+    ? `Your enrollment in ${enrollment.class.name} was not approved. Reason: ${parsed.data.reason}`
+    : `Your enrollment in ${enrollment.class.name} was not approved.`;
+
+  notifyStudentAndGuardians(
+    enrollment.studentId,
+    { title: `ClassSync — ${enrollment.class.name}`, body: "Your enrollment request was not approved." },
+    rejectMsg
+  ).catch((err) => console.error("[notify] rejectEnrollment:", err));
 
   return { data: { success: true } };
 }

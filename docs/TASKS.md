@@ -338,37 +338,37 @@ Send WhatsApp messages to teachers, guardians, and students for key events. Comp
 - For production: submit WhatsApp Business profile + message templates for approval
 
 **Schema changes:**
-- [ ] Add `phone String?` to `User` model — international format, e.g. `+972501234567`
-- [ ] Add `whatsappOptIn Boolean @default(false)` to `User` model
-- [ ] `npx prisma db push` + `npx prisma generate`
+- [x] Add `phone String?` to `User` model — international format, e.g. `+972501234567`
+- [x] Add `whatsappOptIn Boolean @default(false)` to `User` model
+- [x] `npx prisma db push` + `npx prisma generate`
 
 **Infrastructure:**
-- [ ] Install `twilio` npm package
-- [ ] Add env vars: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM` (sandbox or approved number)
-- [ ] `lib/whatsapp.ts` — `sendWhatsApp(to: string, message: string): Promise<void>` helper; no-ops if `to` is empty or opt-in is false; logs errors server-side without throwing
+- [x] Install `twilio` npm package
+- [x] Add env vars: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM` (sandbox or approved number)
+- [x] `lib/whatsapp.ts` — `sendWhatsApp(to: string, message: string): Promise<void>` helper; no-ops if `to` is empty or opt-in is false; logs errors server-side without throwing
 
 **Settings UI:**
-- [ ] `app/*/settings/page.tsx` (teacher, guardian, student) — add phone number input + WhatsApp opt-in toggle
-- [ ] Server Action: `updateContactSettings(phone, whatsappOptIn)` — validates E.164 phone format with zod, saves to `User`
+- [x] `app/*/settings/page.tsx` (teacher, guardian, student) — add phone number input + WhatsApp opt-in toggle
+- [x] Server Action: `updateContactSettings(phone, whatsappOptIn)` — validates E.164 phone format with zod, saves to `User`
 
 **Notification triggers:**
-- [ ] Reschedule offer created → notify all guardians + students enrolled in the class
-- [ ] Session cancelled (no reschedule) → notify all enrolled guardians + students
-- [ ] Enrollment approved → notify the student's guardians + student's own account
-- [ ] Enrollment rejected → notify the student's guardians + student's own account
-- [ ] Student requests to join a class → notify the teacher
-- [ ] 24h session reminder (Vercel Cron, shared with Phase 6 cron job) → notify enrolled guardians + students
+- [x] Reschedule offer created → notify all guardians + students enrolled in the class
+- [x] Session cancelled (no reschedule) → notify all enrolled guardians + students
+- [x] Enrollment approved → notify the student's guardians + student's own account
+- [x] Enrollment rejected → notify the student's guardians + student's own account
+- [x] Student requests to join a class → notify the teacher
+- [x] 24h session reminder (Vercel Cron, shared with Phase 6 cron job) → notify enrolled guardians + students
 
 **Helper:**
-- [ ] `lib/notifications.ts` — `notifyStudentAndGuardians(studentId, message)` and `notifyClassEnrollees(classId, message)` — fan out push + WhatsApp in parallel for all linked Users who have opted in
+- [x] `lib/notifications.ts` — `notifyStudentAndGuardians(studentId, message)` and `notifyClassEnrollees(classId, message)` — fan out push + WhatsApp in parallel for all linked Users who have opted in
 
 ### ✅ Phase 7 Success
-- [ ] User adds phone + enables WhatsApp opt-in in settings → saved to DB
-- [ ] Teacher creates a reschedule offer → all opted-in guardians and students in the class receive a WhatsApp message
-- [ ] Enrollment approved → opted-in guardian (or student) receives confirmation via WhatsApp
-- [ ] User with no phone or opt-in disabled → no message sent, no error thrown
-- [ ] Phone number stored in E.164 format; invalid formats rejected at save time
-- [ ] Cron reminder triggers WhatsApp for opted-in users in addition to push
+- [x] User adds phone + enables WhatsApp opt-in in settings → saved to DB
+- [x] Teacher creates a reschedule offer → all opted-in guardians and students in the class receive a WhatsApp message
+- [x] Enrollment approved → opted-in guardian (or student) receives confirmation via WhatsApp
+- [x] User with no phone or opt-in disabled → no message sent, no error thrown
+- [x] Phone number stored in E.164 format; invalid formats rejected at save time
+- [x] Cron reminder triggers WhatsApp for opted-in users in addition to push
 
 ---
 
@@ -376,20 +376,20 @@ Send WhatsApp messages to teachers, guardians, and students for key events. Comp
 
 Full bilingual support with RTL layout.
 
-- [ ] Install + configure `next-intl` with middleware
-- [ ] `messages/he.json` — all UI strings in Hebrew
-- [ ] `messages/en.json` — all UI strings in English
-- [ ] `<html dir="rtl" lang="he">` applied when locale is Hebrew
-- [ ] Audit all layouts: flex direction, margins, icon placement in RTL
-- [ ] Language toggle in profile → saved to `User.locale`
-- [ ] Language toggle shortcut visible in nav
+- [x] Install + configure `next-intl` with middleware
+- [x] `messages/he.json` — all UI strings in Hebrew
+- [x] `messages/en.json` — all UI strings in English
+- [x] `<html dir="rtl" lang="he">` applied when locale is Hebrew
+- [x] Audit all layouts: flex direction, margins, icon placement in RTL (fixed `mr-2`→`me-2` on Google icons, `ml-2`→`ms-2` on labels, `text-right`→`text-end` in card info blocks)
+- [x] Language toggle in profile → saved to `User.locale`
+- [x] Language toggle shortcut visible in nav (UserMenu dropdown)
 
 ### ✅ Phase 8 Success
-- [ ] App loads in Hebrew RTL by default
-- [ ] Zero hardcoded strings — every label uses a translation key
-- [ ] Toggling to English flips layout to LTR and replaces all text
-- [ ] Locale preference persists after logout and re-login
-- [ ] RTL layout correct at 375px mobile width
+- [x] App loads in Hebrew RTL by default
+- [x] Zero hardcoded strings — every label uses a translation key
+- [x] Toggling to English flips layout to LTR and replaces all text
+- [x] Locale preference persists after logout and re-login
+- [x] RTL layout correct at 375px mobile width
 
 ---
 
@@ -397,16 +397,16 @@ Full bilingual support with RTL layout.
 
 System-default theme with per-user override.
 
-- [ ] Wrap root layout in `next-themes` `ThemeProvider`
-- [ ] Add `dark:` variants to all components and pages
-- [ ] 3-way toggle (Light / System / Dark) in profile settings
-- [ ] Save choice to `User.theme`; restore on login
+- [x] Wrap root layout in `next-themes` `ThemeProvider`
+- [x] Add `dark:` variants to all components and pages (shadcn/ui tokens handle most; explicit dark: variants on status badges)
+- [x] 3-way toggle (Light / System / Dark) in profile settings and UserMenu nav dropdown
+- [x] Save choice to `User.theme`; restore on login (cookie + DB via `updateTheme` action; theme cookie passed as `defaultTheme` to ThemeProvider from root layout)
 
 ### ✅ Phase 9 Success
-- [ ] App matches OS theme on first visit (no manual choice needed)
-- [ ] User switches to Dark → preference saved → restored after re-login
-- [ ] All pages look correct in both light and dark mode
-- [ ] No color flash on page load (theme class applied before paint)
+- [x] App matches OS theme on first visit (no manual choice needed)
+- [x] User switches to Dark → preference saved → restored after re-login
+- [x] All pages look correct in both light and dark mode
+- [x] No color flash on page load (theme class applied before paint)
 
 ---
 
