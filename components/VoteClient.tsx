@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { submitVote } from "@/lib/actions/reschedule";
 import type { RescheduleOfferData } from "@/lib/actions/reschedule";
+import { Loader2 } from "lucide-react";
 
 function formatDT(iso: string) {
   return new Date(iso).toLocaleString(undefined, {
@@ -74,7 +75,7 @@ export function VoteClient({ offer }: { offer: RescheduleOfferData }) {
           disabled={submitting}
           onClick={() => handleVote(true)}
         >
-          <span className="text-2xl">✅</span>
+          {submitting ? <Loader2 className="h-6 w-6 animate-spin" /> : <span className="text-2xl">✅</span>}
           <span className="font-semibold">{t("yes")}</span>
           <span className="text-xs opacity-70">{t("yesHint")}</span>
         </Button>
@@ -85,7 +86,7 @@ export function VoteClient({ offer }: { offer: RescheduleOfferData }) {
           disabled={submitting}
           onClick={() => handleVote(false)}
         >
-          <span className="text-2xl">❌</span>
+          {submitting ? <Loader2 className="h-6 w-6 animate-spin" /> : <span className="text-2xl">❌</span>}
           <span className="font-semibold">{t("no")}</span>
           <span className="text-xs opacity-70">{t("noHint")}</span>
         </Button>

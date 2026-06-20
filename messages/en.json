@@ -27,7 +27,11 @@
     "theme": "Theme",
     "themeLight": "Light",
     "themeDark": "Dark",
-    "themeSystem": "System"
+    "themeSystem": "System",
+    "errorTitle": "Something went wrong",
+    "errorDescription": "An unexpected error occurred. You can try again or go back.",
+    "tryAgain": "Try again",
+    "goBack": "Go back"
   },
   "days": {
     "0": "Sunday",

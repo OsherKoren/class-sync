@@ -17,6 +17,7 @@ import {
 import { createClass } from "@/lib/actions/class";
 import { GRADE_KEYS } from "@/lib/classKeys";
 import { useTranslations } from "next-intl";
+import { Loader2 } from "lucide-react";
 
 const gradeNums = [4, 5, 6, 7, 8, 9, 10];
 
@@ -343,6 +344,7 @@ export function CreateClassForm({
 
               <div className="flex gap-4">
                 <Button type="submit" disabled={loading || !name || !subject || !grade || (!isRecurring && !sessionDate)}>
+                  {loading && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                   {loading ? t("teacher.createClass.creating") : t("teacher.createClass.create")}
                 </Button>
                 <Link href="/teacher/classes">

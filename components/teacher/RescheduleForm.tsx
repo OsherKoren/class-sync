@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { createRescheduleOffer } from "@/lib/actions/reschedule";
+import { Loader2 } from "lucide-react";
 
 export function RescheduleForm({
   sessionId,
@@ -92,6 +93,7 @@ export function RescheduleForm({
 
           <div className="flex gap-3">
             <Button type="submit" disabled={submitting}>
+              {submitting && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
               {submitting ? t("submitting") : t("submit")}
             </Button>
             <Button

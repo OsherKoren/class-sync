@@ -27,7 +27,11 @@
     "theme": "ערכת נושא",
     "themeLight": "בהיר",
     "themeDark": "כהה",
-    "themeSystem": "מערכת"
+    "themeSystem": "מערכת",
+    "errorTitle": "משהו השתבש",
+    "errorDescription": "אירעה שגיאה בלתי צפויה. אפשר לנסות שוב או לחזור אחורה.",
+    "tryAgain": "נסה שוב",
+    "goBack": "חזרה"
   },
   "days": {
     "0": "ראשון",
