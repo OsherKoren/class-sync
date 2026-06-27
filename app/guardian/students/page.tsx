@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CalendarArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -70,11 +71,21 @@ export default async function GuardianStudentsPage() {
                             : t("guardian.students.notClaimed")}
                         </span>
                       </div>
-                      <Link href={`/guardian/students/${student.id}/link`}>
-                        <Button variant="outline" size="sm">
-                          {t("guardian.students.manageLinks")}
-                        </Button>
-                      </Link>
+                      <div className="flex gap-2">
+                        {active.length > 0 && (
+                          <a href={`/api/ical/${student.id}`} download>
+                            <Button variant="outline" size="sm">
+                              <CalendarArrowDown className="me-2 h-4 w-4" />
+                              {t("guardian.students.downloadCalendar")}
+                            </Button>
+                          </a>
+                        )}
+                        <Link href={`/guardian/students/${student.id}/link`}>
+                          <Button variant="outline" size="sm">
+                            {t("guardian.students.manageLinks")}
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent>

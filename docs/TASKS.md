@@ -418,8 +418,8 @@ Final UX pass and production deployment.
 - [x] Loading states: skeleton loaders on lists, spinners on submit buttons
 - [x] Empty states: friendly message on every list page when no data
 - [x] `error.tsx` boundary files on all route groups
-- [ ] Vercel project created — GitHub repo connected, auto-deploy on push
-- [ ] All env vars added to Vercel dashboard
+- [x] Vercel project created — GitHub repo connected, auto-deploy on push
+- [x] All env vars added to Vercel dashboard
 - [ ] Neon prod DB created, `prisma db push` run against it *(deferred — pilot uses dev DB)*
 - [ ] Smoke test all critical flows on production URL
 
@@ -429,3 +429,29 @@ Final UX pass and production deployment.
 - [ ] Guardian + student full flow (vote + push notification) works on production URL
 - [ ] Zero console errors in production build
 - [ ] App installable as PWA from the production URL on Android + iOS
+
+---
+
+## Phase 11 — iCal Calendar Export
+
+Students and guardians can download their schedule as an `.ics` file, importable into any calendar app (Google, Apple, Outlook). No Google account connection required.
+
+**Design decisions:**
+- One `.ics` file per student containing all active enrollments
+- Recurring classes export as a `RRULE:FREQ=WEEKLY` event — one import covers all future sessions
+- One-time enrollments export as a single dated event
+- Endpoint is session-protected — only the student or their guardian can download
+- Floating time (no timezone suffix) — calendar app treats it as local time
+- **Reschedule caveat:** if a session is rescheduled, the already-imported `.ics` does not auto-update — user must re-download after the reschedule resolves
+
+- [ ] `lib/ical.ts` — `buildIcal(events)` helper: generates valid `.ics` string with `VEVENT` blocks; handles recurring (`RRULE`) and one-time events; escapes special characters
+- [ ] `app/api/ical/[studentId]/route.ts` — `GET` handler: auth + `canActOnStudent` check; fetches all ACTIVE enrollments; maps recurring → RRULE event, ONE_TIME → single dated event; returns `.ics` file with correct `Content-Type` and `Content-Disposition`
+- [ ] "Download Calendar" button on student dashboard
+- [ ] "Download Calendar" button on guardian's student list (per child)
+
+### ✅ Phase 11 Success
+- [ ] Student clicks "Download Calendar" → `.ics` file downloads
+- [ ] Importing into Google Calendar → all recurring classes appear as weekly repeating events
+- [ ] One-time enrollment appears as a single event on the correct date
+- [ ] Unauthenticated request to the endpoint returns 401
+- [ ] Guardian can download `.ics` for each linked child separately
