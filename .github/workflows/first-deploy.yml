@@ -16,7 +16,7 @@ env:
 
 jobs:
   first-deploy:
-    name: Deploy to Production
+    name: First Deploy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -51,7 +51,7 @@ jobs:
           TWILIO_WHATSAPP_FROM: ${{ secrets.TWILIO_WHATSAPP_FROM }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
 
-      - name: Deploy to Production
+      - name: Deploy
         id: deploy
         run: |
           DEPLOY_URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
