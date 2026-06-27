@@ -39,6 +39,7 @@ yarn-error.log*
 .claude/settings.local.json
 .claude/**/__pycache__/
 .claude/**/*.pyc
+.claude/scheduled_tasks.lock
 
 # playwright
 playwright-report/

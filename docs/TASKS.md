@@ -414,13 +414,13 @@ System-default theme with per-user override.
 
 Final UX pass and production deployment.
 
-- [ ] Mobile audit: every page at 375px and 430px viewport
-- [ ] Loading states: skeleton loaders on lists, spinners on submit buttons
-- [ ] Empty states: friendly message on every list page when no data
-- [ ] `error.tsx` boundary files on all route groups
+- [x] Mobile audit: every page at 375px and 430px viewport
+- [x] Loading states: skeleton loaders on lists, spinners on submit buttons
+- [x] Empty states: friendly message on every list page when no data
+- [x] `error.tsx` boundary files on all route groups
 - [ ] Vercel project created — GitHub repo connected, auto-deploy on push
 - [ ] All env vars added to Vercel dashboard
-- [ ] Neon prod DB created, `prisma db push` run against it
+- [ ] Neon prod DB created, `prisma db push` run against it *(deferred — pilot uses dev DB)*
 - [ ] Smoke test all critical flows on production URL
 
 ### ✅ Phase 10 Success
