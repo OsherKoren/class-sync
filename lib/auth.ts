@@ -38,8 +38,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       profile(profile) {
-        const role =
-          process.env.TEACHER_EMAIL?.split(",").map(e => e.trim()).includes(profile.email ?? "") ? "TEACHER" : "GUARDIAN";
+        const teacherEmails = process.env.TEACHER_EMAIL?.split(",").map(e => e.trim()).filter(Boolean) ?? [];
+        const role = profile.email && teacherEmails.includes(profile.email) ? "TEACHER" : "GUARDIAN";
         return {
           id: profile.sub,
           name: profile.name,

@@ -1,4 +1,6 @@
 const BYDAY = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"] as const;
+// 1970-01-01 was a Thursday (day 4) — used as a fixed anchor for stable DTSTART computation.
+const EPOCH_DOW = 4;
 
 export interface ICalEvent {
   uid: string;
@@ -17,29 +19,33 @@ function escape(s: string) {
     .replace(/\n/g, "\\n");
 }
 
-export function fmtICalDate(d: Date): string {
+// Format a DTSTART/DTEND value from a UTC date (date part only) and a "HH:mm" local time string.
+export function fmtICalDateTime(utcDate: Date, timeStr: string): string {
+  const [h, m] = timeStr.split(":").map(Number);
   return [
-    d.getFullYear(),
-    String(d.getMonth() + 1).padStart(2, "0"),
-    String(d.getDate()).padStart(2, "0"),
+    utcDate.getUTCFullYear(),
+    String(utcDate.getUTCMonth() + 1).padStart(2, "0"),
+    String(utcDate.getUTCDate()).padStart(2, "0"),
     "T",
-    String(d.getHours()).padStart(2, "0"),
-    String(d.getMinutes()).padStart(2, "0"),
+    String(h).padStart(2, "0"),
+    String(m).padStart(2, "0"),
     "00",
   ].join("");
 }
 
-// Returns the next date that falls on `dayOfWeek` (0=Sun…6=Sat) at `timeStr` ("HH:mm").
-// If today is that weekday but the time has already passed, returns next week.
-export function nextWeekdayDate(dayOfWeek: number, timeStr: string): Date {
+// Add minutes to a "HH:mm" time string, returning a new "HH:mm" string.
+export function addMinutesToTime(timeStr: string, minutes: number): string {
   const [h, m] = timeStr.split(":").map(Number);
-  const now = new Date();
-  const d = new Date(now);
-  d.setHours(h, m, 0, 0);
-  let diff = (dayOfWeek - now.getDay() + 7) % 7;
-  if (diff === 0 && d <= now) diff = 7;
-  d.setDate(d.getDate() + diff);
-  return d;
+  const total = h * 60 + m + minutes;
+  return `${String(Math.floor(total / 60) % 24).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+}
+
+// Returns a deterministic UTC anchor date for the given weekday (0=Sun…6=Sat).
+// Same input always returns the same date regardless of current time, preventing
+// duplicate calendar entries when users re-download the .ics file.
+export function nextWeekdayDate(dayOfWeek: number): Date {
+  const diff = (dayOfWeek - EPOCH_DOW + 7) % 7;
+  return new Date(Date.UTC(1970, 0, 1 + diff));
 }
 
 export function weekdayToken(dayOfWeek: number): string {
@@ -61,13 +67,13 @@ export function buildIcal(events: ICalEvent[]): string {
       `UID:${ev.uid}`,
       `SUMMARY:${escape(ev.summary)}`,
       ...(ev.description ? [`DESCRIPTION:${escape(ev.description)}`] : []),
-      `DTSTART:${ev.dtstart}`,
-      `DTEND:${ev.dtend}`,
+      `DTSTART;TZID=Asia/Jerusalem:${ev.dtstart}`,
+      `DTEND;TZID=Asia/Jerusalem:${ev.dtend}`,
       ...(ev.rrule ? [`RRULE:${ev.rrule}`] : []),
       "END:VEVENT",
     );
   }
 
   lines.push("END:VCALENDAR");
-  return lines.join("\r\n");
+  return lines.join("\r\n") + "\r\n";
 }

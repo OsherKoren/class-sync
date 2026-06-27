@@ -467,7 +467,8 @@
       "enrolledCount": "{count} כיתות פעילות",
       "pendingCount": "{count} ממתינות",
       "noEnrollments": "לא רשום לכיתות.",
-      "manageLinks": "נהל קישורים"
+      "manageLinks": "נהל קישורים",
+      "downloadCalendar": "הורד יומן"
     },
     "linkCodes": {
       "backToDashboard": "← חזרה ללוח הבקרה",

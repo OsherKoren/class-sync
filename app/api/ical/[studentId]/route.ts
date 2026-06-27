@@ -4,7 +4,8 @@ import { db } from "@/lib/db";
 import { canActOnStudent } from "@/lib/auth-helpers";
 import {
   buildIcal,
-  fmtICalDate,
+  fmtICalDateTime,
+  addMinutesToTime,
   nextWeekdayDate,
   weekdayToken,
   type ICalEvent,
@@ -56,39 +57,43 @@ export async function GET(
     return new NextResponse("Not Found", { status: 404 });
   }
 
-  const events: ICalEvent[] = student.enrollments.map((enrollment) => {
-    const cls = enrollment.class;
+  const events: ICalEvent[] = student.enrollments
+    .map((enrollment): ICalEvent | null => {
+      const cls = enrollment.class;
 
-    if (enrollment.type === "ONE_TIME" && enrollment.lessonSession) {
-      const start = new Date(enrollment.lessonSession.scheduledAt);
-      const end = new Date(start.getTime() + cls.duration * 60_000);
+      if (enrollment.type === "ONE_TIME") {
+        if (!enrollment.lessonSession) return null;
+        const scheduledDate = new Date(enrollment.lessonSession.scheduledAt);
+        const endTime = addMinutesToTime(cls.startTime, cls.duration);
+        return {
+          uid: `classsync-one-time-${enrollment.id}`,
+          summary: `${cls.name} (${cls.subject})`,
+          description: "One-time session",
+          dtstart: fmtICalDateTime(scheduledDate, cls.startTime),
+          dtend: fmtICalDateTime(scheduledDate, endTime),
+        };
+      }
+
+      const anchorDate = nextWeekdayDate(cls.dayOfWeek);
+      const endTime = addMinutesToTime(cls.startTime, cls.duration);
       return {
-        uid: `classsync-one-time-${enrollment.id}`,
+        uid: `classsync-recurring-${cls.id}-${studentId}`,
         summary: `${cls.name} (${cls.subject})`,
-        description: "One-time session",
-        dtstart: fmtICalDate(start),
-        dtend: fmtICalDate(end),
+        dtstart: fmtICalDateTime(anchorDate, cls.startTime),
+        dtend: fmtICalDateTime(anchorDate, endTime),
+        rrule: `FREQ=WEEKLY;BYDAY=${weekdayToken(cls.dayOfWeek)}`,
       };
-    }
-
-    const start = nextWeekdayDate(cls.dayOfWeek, cls.startTime);
-    const end = new Date(start.getTime() + cls.duration * 60_000);
-    return {
-      uid: `classsync-recurring-${cls.id}-${studentId}`,
-      summary: `${cls.name} (${cls.subject})`,
-      dtstart: fmtICalDate(start),
-      dtend: fmtICalDate(end),
-      rrule: `FREQ=WEEKLY;BYDAY=${weekdayToken(cls.dayOfWeek)}`,
-    };
-  });
+    })
+    .filter((ev): ev is ICalEvent => ev !== null);
 
   const ical = buildIcal(events);
   const filename = `${student.name.replace(/\s+/g, "_")}_schedule.ics`;
+  const safeFilename = filename.replace(/"/g, '\\"');
 
   return new NextResponse(ical, {
     headers: {
       "Content-Type": "text/calendar; charset=utf-8",
-      "Content-Disposition": `attachment; filename="${filename}"`,
+      "Content-Disposition": `attachment; filename="${safeFilename}"`,
     },
   });
 }

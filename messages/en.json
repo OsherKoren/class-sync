@@ -467,7 +467,8 @@
       "enrolledCount": "{count} active class(es)",
       "pendingCount": "{count} pending",
       "noEnrollments": "Not enrolled in any classes.",
-      "manageLinks": "Manage links"
+      "manageLinks": "Manage links",
+      "downloadCalendar": "Download Calendar"
     },
     "linkCodes": {
       "backToDashboard": "← Back to dashboard",

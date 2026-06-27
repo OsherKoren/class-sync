@@ -10,16 +10,17 @@ export async function GET(req: NextRequest) {
 
   const now = new Date();
   const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-  const in25h = new Date(now.getTime() + 25 * 60 * 60 * 1000);
-  const in1h = new Date(now.getTime() + 60 * 60 * 1000);
-  const in65min = new Date(now.getTime() + 65 * 60 * 1000);
+  const in48h = new Date(now.getTime() + 48 * 60 * 60 * 1000);
 
+  // With once-daily execution at 08:00 UTC, use full-day lookahead windows:
+  // "today" covers sessions starting in the next 0–24 h (today's classes).
+  // "tomorrow" covers sessions starting in the next 24–48 h (tomorrow's classes).
   const sessions = await db.lessonSession.findMany({
     where: {
       status: "SCHEDULED",
       OR: [
-        { scheduledAt: { gte: in24h, lte: in25h } },
-        { scheduledAt: { gte: in1h, lte: in65min } },
+        { scheduledAt: { gte: in24h, lte: in48h } },
+        { scheduledAt: { gte: now, lt: in24h } },
       ],
     },
     select: {
@@ -35,14 +36,14 @@ export async function GET(req: NextRequest) {
 
   let sent = 0;
   for (const session of sessions) {
-    const isIn24h = session.scheduledAt >= in24h;
-    const body = isIn24h ? "Your session starts in 24 hours" : "Your session starts in 1 hour";
+    const isTomorrow = session.scheduledAt >= in24h;
+    const body = isTomorrow ? "Your session starts tomorrow" : "Your session starts today";
 
     for (const e of session.class.enrollments) {
       await notifyStudentAndGuardians(
         e.studentId,
         { title: `ClassSync — ${session.class.name}`, body },
-        `Reminder: ${session.class.name} starts ${isIn24h ? "in 24 hours" : "in 1 hour"}.`
+        `Reminder: ${session.class.name} starts ${isTomorrow ? "tomorrow" : "today"}.`
       );
       sent++;
     }
