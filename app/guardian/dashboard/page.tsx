@@ -14,14 +14,14 @@ export default async function GuardianDashboard() {
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">{t('guardian.dashboard.title')}</h1>
             <p className="text-muted-foreground">
               {t('guardian.dashboard.welcome', { name: session?.user?.name || '' })}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap gap-2">
             <Link href="/guardian/classes">
               <Button variant="outline">{t('guardian.dashboard.viewSchedule')}</Button>
             </Link>

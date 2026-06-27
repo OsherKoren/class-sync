@@ -68,8 +68,8 @@ Prisma schema live on Neon; teacher, guardian, and student login working; abuse 
 - [x] Guardian logs in with Google → lands on `/guardian/dashboard`
 - [x] Student self-registers (independent teen) → lands on `/student/dashboard`
 - [x] Visiting `/teacher/dashboard` without a session → redirects to `/login`
-- [ ] Tables visible in Neon dashboard (check via `npx prisma studio`)
-- [ ] Hitting login 11+ times/min from same IP → receives 429 response
+- [x] Tables visible in Neon dashboard (check via `npx prisma studio`)
+- [x] Hitting login 11+ times/min from same IP → receives 429 response
 
 **→ Do not start Phase 2 until all Phase 1 boxes above are checked.**
 
@@ -226,47 +226,71 @@ Guardian logs in to see all linked children's sessions. Independent student logs
 
 Classes sync to the teacher's Google Calendar.
 
-- [ ] Google Cloud Console: OAuth app, Calendar scope, redirect URIs
-- [ ] Store access + refresh tokens in `User` after teacher login
-- [ ] `lib/google-calendar.ts`: `listCalendars`, `createEvent`, `updateEvent`,
-      `deleteEvent`
-- [ ] Teacher onboarding screen: list all visible calendars → teacher picks ONE
-      as the designated tutoring calendar → save `designatedCalendarId` to `User`
-- [ ] Class creation → recurring event written to designated calendar only
-- [ ] Session cancel → event marked CANCELLED on designated calendar
-- [ ] Verify: no other calendar is read or written after onboarding
+- [x] Google Cloud Console: OAuth app, Calendar scope, redirect URIs
+- [x] Store access + refresh tokens in `User` after teacher login (via PrismaAdapter `Account` table; token refresh persisted via `oauth2.on("tokens")` in `lib/google-calendar.ts`)
+- [x] `lib/google-calendar.ts`: `listCalendars`, `createRecurringClassEvent`, `updateClassEvent`, `deleteClassEvent`
+- [x] Teacher onboarding screen: list all visible calendars → teacher picks ONE as the designated tutoring calendar → save `designatedCalendarId` to `User` (in teacher settings page via `CalendarSettings` component)
+- [x] Class creation → recurring event written to designated calendar only
+- [x] Session cancel → event marked CANCELLED on designated calendar
+- [x] Verify: no other calendar is read or written after onboarding
 
 ### ✅ Phase 4 Success
-- [ ] Teacher onboarding shows a calendar picker (lists work + any shared cals)
-- [ ] After picking, `designatedCalendarId` saved to DB
-- [ ] Creating a class → recurring event appears in the designated work calendar
-- [ ] The personal/private calendar is never read or modified by the app
-- [ ] Guardian and student dashboards show sessions from DB only — no Google Calendar data
-- [ ] Cancelling a session updates only the designated calendar
-- [ ] Token refresh works — teacher stays connected after 1 hour
+- [x] Teacher onboarding shows a calendar picker (lists work + any shared cals)
+- [x] After picking, `designatedCalendarId` saved to DB
+- [x] Creating a class → recurring event appears in the designated work calendar
+- [x] The personal/private calendar is never read or modified by the app
+- [x] Guardian and student dashboards show sessions from DB only — no Google Calendar data
+- [x] Cancelling a session updates only the designated calendar
+- [x] Token refresh works — teacher stays connected after 1 hour
 
 ---
 
-## Phase 5 — Reschedule & Voting
+## Phase 5 — Reschedule, Voting & One-Time Enrollment
 
-Teacher offers new slots; guardians and students vote; teacher confirms.
+Teacher offers new slots; guardians and students vote; teacher confirms. Also covers class recurrence settings and one-time enrollment for trials and makeups.
 
-- [ ] `app/teacher/reschedule/[sessionId]/page.tsx` — pick 1–2 new time slots
-- [ ] `app/teacher/reschedule/[offerId]/results/page.tsx` — live vote tally
-- [ ] `app/vote/[offerId]/page.tsx` — large Option A / Option B buttons (accessible to any User authorized on the underlying Student — guardian or student)
-- [ ] Server Actions: `createRescheduleOffer`, `submitVote`, `resolveOffer`
-- [ ] `submitVote` records vote under `studentId`, not the acting User — so a co-guardian voting after the other guardian (or after the student) updates the same vote rather than duplicating
-- [ ] On resolve: update Google Calendar event to winning time slot
-- [ ] Unique DB constraint `@@unique([offerId, studentId])` prevents double-voting per student per offer
+**Schema changes:**
+- [x] Add `isRecurring Boolean @default(true)` to `Class` — `false` for one-off special sessions
+- [x] Add `EnrollmentType` enum: `RECURRING | ONE_TIME`
+- [x] Add `type EnrollmentType @default(RECURRING)` to `Enrollment`
+- [x] Add `lessonSessionId String?` to `Enrollment` — required when `type = ONE_TIME`; references the specific session being attended
+- [x] Add `@@index([lessonSessionId])` on `Enrollment`
+- [x] `npx prisma db push` + `npx prisma generate`
+
+**Class recurrence (teacher):**
+- [x] `app/teacher/classes/new/page.tsx` — add recurrence toggle: "Weekly (recurring)" / "One-time session"
+- [x] Class list and detail pages — show recurrence badge so teacher can distinguish at a glance
+- [x] One-time classes automatically close (`isOpen = false`) once their single `LessonSession` passes
+
+**One-time enrollment (student / guardian / teacher):**
+- [x] Enrollment request UI — add "Enroll for one session" option with a date picker (lists upcoming `LessonSession` rows for that class)
+- [x] Server Action: `requestOneTimeEnrollment(classId, lessonSessionId)` — creates `Enrollment` with `type: ONE_TIME` and the given session reference; checks session-level capacity (recurring enrollees + existing one-time enrollees for that date)
+- [x] Server Action: `enrollStudentOneTime(studentId, classId, lessonSessionId)` — teacher direct-enroll variant, auto-confirmed
+- [x] Session-level capacity helper: `getSessionAttendeeCount(lessonSessionId)` — counts active RECURRING enrollments + active ONE_TIME enrollments targeting that specific session
+- [x] Session cards in guardian/student dashboard — ONE_TIME enrollments labelled "One-time visit" with the specific date
+
+**Reschedule & voting (existing plan):**
+- [x] `app/teacher/reschedule/[sessionId]/page.tsx` — pick 1–2 new time slots
+- [x] `app/teacher/reschedule/[offerId]/results/page.tsx` — live vote tally
+- [x] `app/vote/[offerId]/page.tsx` — large Option A / Option B buttons (accessible to any User authorized on the underlying Student — guardian or student)
+- [x] Server Actions: `createRescheduleOffer`, `submitVote`, `resolveOffer`
+- [x] `submitVote` records vote under `studentId`, not the acting User — so a co-guardian voting after the other guardian (or after the student) updates the same vote rather than duplicating
+- [x] On resolve: update Google Calendar event to winning time slot
+- [x] Unique DB constraint `@@unique([offerId, studentId])` prevents double-voting per student per offer
 
 ### ✅ Phase 5 Success
-- [ ] Teacher creates offer with 2 options → `RescheduleOffer` row in DB
-- [ ] Guardian or student sees vote page with 2 large, clearly labelled buttons
-- [ ] Anyone authorized on a Student can vote once; voting twice updates (does not duplicate) the record
-- [ ] When a guardian votes and then the linked student (or co-guardian) votes again, only the latest choice is counted
-- [ ] Vote tally on teacher results page reflects current counts
-- [ ] Teacher resolves offer → Google Calendar event moves to winning time
-- [ ] Resolved offer page shows the confirmed slot; voting buttons disabled
+- [x] Teacher creates a recurring class → weekly sessions generated; class shows "Recurring" badge
+- [x] Teacher creates a one-time class → single session only; class auto-closes after the session date
+- [x] Student/guardian enrolls as "one-time" → picks a specific session date → enrollment appears on dashboard as "One-time visit — [date]"
+- [x] One-time attendee counts toward capacity for that session only (not other sessions)
+- [x] Student enrolls in another group's session as a makeup → appears correctly on dashboard; does not affect their regular class enrollment
+- [x] Teacher creates offer with 2 options → `RescheduleOffer` row in DB
+- [x] Guardian or student sees vote page with 2 large, clearly labelled buttons
+- [x] Anyone authorized on a Student can vote once; voting twice updates (does not duplicate) the record
+- [x] When a guardian votes and then the linked student (or co-guardian) votes again, only the latest choice is counted
+- [x] Vote tally on teacher results page reflects current counts
+- [x] Teacher resolves offer → Google Calendar event moves to winning time
+- [x] Resolved offer page shows the confirmed slot; voting buttons disabled
 
 ---
 
@@ -274,68 +298,119 @@ Teacher offers new slots; guardians and students vote; teacher confirms.
 
 Browser push + service worker; install prompt flow.
 
-- [ ] Generate VAPID keys → add to `.env.local`
-- [ ] `public/manifest.json` — name, icons (192 + 512), `display: standalone`
-- [ ] `app/sw.ts` — serwist service worker
-- [ ] `app/api/push/subscribe/route.ts` — save subscription to DB
-- [ ] `app/api/push/send/route.ts` — send via web-push
-- [ ] `hooks/usePwaInstall.ts` — capture `beforeinstallprompt`, iOS detection,
+- [x] Generate VAPID keys → add to `.env.local`
+- [x] `public/manifest.json` — name, icons (192 + 512), `display: standalone`
+- [x] `app/sw.ts` — serwist service worker
+- [x] `app/api/push/subscribe/route.ts` — save subscription to DB
+- [x] `app/api/push/send/route.ts` — send via web-push (`lib/push.ts` helpers used directly from server actions)
+- [x] `hooks/usePwaInstall.ts` — capture `beforeinstallprompt`, iOS detection,
       check `display-mode: standalone`
-- [ ] `components/pwa/InstallBanner.tsx` — bottom-sheet on first login
-- [ ] `components/pwa/InstallButton.tsx` — persistent in settings page
-- [ ] Vercel Cron: `app/api/cron/reminders/route.ts` — 24h + 1h push reminders
-- [ ] Trigger push to all Users linked to enrolled students (guardian + student themselves) when reschedule offer is created
+- [x] `components/pwa/InstallBanner.tsx` — bottom-sheet on first login
+- [x] `components/pwa/InstallButton.tsx` — persistent in settings page
+- [x] Vercel Cron: `app/api/cron/reminders/route.ts` — 24h + 1h push reminders
+- [x] Trigger push to all Users linked to enrolled students (guardian + student themselves) when reschedule offer is created
 
 ### ✅ Phase 6 Success
-- [ ] Android Chrome: install banner appears after first login
-- [ ] Dismissing banner re-shows it on next login (not installed yet)
-- [ ] Install button visible in settings at all times
-- [ ] iOS Safari: custom instruction banner shown (no native prompt)
-- [ ] Once installed (`standalone`), no install prompts shown anywhere
-- [ ] Guardian (and linked student, if any) receives push when teacher creates a reschedule offer
-- [ ] Reminder push fires ~24h before an upcoming session
+- [x] Android Chrome: install banner appears after first login
+- [x] Dismissing banner re-shows it on next login (not installed yet)
+- [x] Install button visible in settings at all times
+- [x] iOS Safari: custom instruction banner shown (no native prompt)
+- [x] Once installed (`standalone`), no install prompts shown anywhere
+- [x] Guardian (and linked student, if any) receives push when teacher creates a reschedule offer
+- [x] Reminder push fires ~24h before an upcoming session
 
 ---
 
-## Phase 7 — i18n: Hebrew + English
+## Phase 7 — WhatsApp Notifications (Twilio)
+
+Send WhatsApp messages to teachers, guardians, and students for key events. Complements web push — reaches users who haven't installed the PWA or haven't granted push permission.
+
+**Design decisions:**
+- Phone number is optional — users who don't add one simply won't receive WhatsApp messages
+- Explicit opt-in toggle required (legal requirement for business-initiated WhatsApp messages)
+- Messages sent via Twilio WhatsApp API; use Twilio Sandbox during development, approved number in production
+- Notifications target all Users linked to a Student (guardian(s) + student's own account if it exists)
+- Teacher notifications go to the single teacher User on the class
+- Group-level events (e.g. class cancelled) fan out to all enrolled students and their guardians
+
+**Prerequisites before starting:**
+- Twilio account → enable WhatsApp Sandbox → copy Account SID + Auth Token + `whatsapp:+14155238886` (sandbox number)
+- For production: submit WhatsApp Business profile + message templates for approval
+
+**Schema changes:**
+- [x] Add `phone String?` to `User` model — international format, e.g. `+972501234567`
+- [x] Add `whatsappOptIn Boolean @default(false)` to `User` model
+- [x] `npx prisma db push` + `npx prisma generate`
+
+**Infrastructure:**
+- [x] Install `twilio` npm package
+- [x] Add env vars: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM` (sandbox or approved number)
+- [x] `lib/whatsapp.ts` — `sendWhatsApp(to: string, message: string): Promise<void>` helper; no-ops if `to` is empty or opt-in is false; logs errors server-side without throwing
+
+**Settings UI:**
+- [x] `app/*/settings/page.tsx` (teacher, guardian, student) — add phone number input + WhatsApp opt-in toggle
+- [x] Server Action: `updateContactSettings(phone, whatsappOptIn)` — validates E.164 phone format with zod, saves to `User`
+
+**Notification triggers:**
+- [x] Reschedule offer created → notify all guardians + students enrolled in the class
+- [x] Session cancelled (no reschedule) → notify all enrolled guardians + students
+- [x] Enrollment approved → notify the student's guardians + student's own account
+- [x] Enrollment rejected → notify the student's guardians + student's own account
+- [x] Student requests to join a class → notify the teacher
+- [x] 24h session reminder (Vercel Cron, shared with Phase 6 cron job) → notify enrolled guardians + students
+
+**Helper:**
+- [x] `lib/notifications.ts` — `notifyStudentAndGuardians(studentId, message)` and `notifyClassEnrollees(classId, message)` — fan out push + WhatsApp in parallel for all linked Users who have opted in
+
+### ✅ Phase 7 Success
+- [x] User adds phone + enables WhatsApp opt-in in settings → saved to DB
+- [x] Teacher creates a reschedule offer → all opted-in guardians and students in the class receive a WhatsApp message
+- [x] Enrollment approved → opted-in guardian (or student) receives confirmation via WhatsApp
+- [x] User with no phone or opt-in disabled → no message sent, no error thrown
+- [x] Phone number stored in E.164 format; invalid formats rejected at save time
+- [x] Cron reminder triggers WhatsApp for opted-in users in addition to push
+
+---
+
+## Phase 8 — i18n: Hebrew + English
 
 Full bilingual support with RTL layout.
 
-- [ ] Install + configure `next-intl` with middleware
-- [ ] `messages/he.json` — all UI strings in Hebrew
-- [ ] `messages/en.json` — all UI strings in English
-- [ ] `<html dir="rtl" lang="he">` applied when locale is Hebrew
-- [ ] Audit all layouts: flex direction, margins, icon placement in RTL
-- [ ] Language toggle in profile → saved to `User.locale`
-- [ ] Language toggle shortcut visible in nav
+- [x] Install + configure `next-intl` with middleware
+- [x] `messages/he.json` — all UI strings in Hebrew
+- [x] `messages/en.json` — all UI strings in English
+- [x] `<html dir="rtl" lang="he">` applied when locale is Hebrew
+- [x] Audit all layouts: flex direction, margins, icon placement in RTL (fixed `mr-2`→`me-2` on Google icons, `ml-2`→`ms-2` on labels, `text-right`→`text-end` in card info blocks)
+- [x] Language toggle in profile → saved to `User.locale`
+- [x] Language toggle shortcut visible in nav (UserMenu dropdown)
 
-### ✅ Phase 7 Success
-- [ ] App loads in Hebrew RTL by default
-- [ ] Zero hardcoded strings — every label uses a translation key
-- [ ] Toggling to English flips layout to LTR and replaces all text
-- [ ] Locale preference persists after logout and re-login
-- [ ] RTL layout correct at 375px mobile width
+### ✅ Phase 8 Success
+- [x] App loads in Hebrew RTL by default
+- [x] Zero hardcoded strings — every label uses a translation key
+- [x] Toggling to English flips layout to LTR and replaces all text
+- [x] Locale preference persists after logout and re-login
+- [x] RTL layout correct at 375px mobile width
 
 ---
 
-## Phase 8 — Light / Dark Theme
+## Phase 9 — Light / Dark Theme
 
 System-default theme with per-user override.
 
-- [ ] Wrap root layout in `next-themes` `ThemeProvider`
-- [ ] Add `dark:` variants to all components and pages
-- [ ] 3-way toggle (Light / System / Dark) in profile settings
-- [ ] Save choice to `User.theme`; restore on login
+- [x] Wrap root layout in `next-themes` `ThemeProvider`
+- [x] Add `dark:` variants to all components and pages (shadcn/ui tokens handle most; explicit dark: variants on status badges)
+- [x] 3-way toggle (Light / System / Dark) in profile settings and UserMenu nav dropdown
+- [x] Save choice to `User.theme`; restore on login (cookie + DB via `updateTheme` action; theme cookie passed as `defaultTheme` to ThemeProvider from root layout)
 
-### ✅ Phase 8 Success
-- [ ] App matches OS theme on first visit (no manual choice needed)
-- [ ] User switches to Dark → preference saved → restored after re-login
-- [ ] All pages look correct in both light and dark mode
-- [ ] No color flash on page load (theme class applied before paint)
+### ✅ Phase 9 Success
+- [x] App matches OS theme on first visit (no manual choice needed)
+- [x] User switches to Dark → preference saved → restored after re-login
+- [x] All pages look correct in both light and dark mode
+- [x] No color flash on page load (theme class applied before paint)
 
 ---
 
-## Phase 9 — Polish & Deploy
+## Phase 10 — Polish & Deploy
 
 Final UX pass and production deployment.
 
@@ -348,7 +423,7 @@ Final UX pass and production deployment.
 - [ ] Neon prod DB created, `prisma db push` run against it
 - [ ] Smoke test all critical flows on production URL
 
-### ✅ Phase 9 Success
+### ✅ Phase 10 Success
 - [ ] All pages load on mobile without horizontal scroll or overflow
 - [ ] Teacher full flow works end-to-end on production URL
 - [ ] Guardian + student full flow (vote + push notification) works on production URL

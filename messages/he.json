@@ -27,7 +27,11 @@
     "theme": "ערכת נושא",
     "themeLight": "בהיר",
     "themeDark": "כהה",
-    "themeSystem": "מערכת"
+    "themeSystem": "מערכת",
+    "errorTitle": "משהו השתבש",
+    "errorDescription": "אירעה שגיאה בלתי צפויה. אפשר לנסות שוב או לחזור אחורה.",
+    "tryAgain": "נסה שוב",
+    "goBack": "חזרה"
   },
   "days": {
     "0": "ראשון",
@@ -151,6 +155,12 @@
       "duration": "משך (דקות)",
       "maxCapacity": "מקסימום תלמידים (אופציונלי)",
       "maxCapacityHint": "הכיתה תיסגר אוטומטית כשתגיע לקיבולת",
+      "recurrenceLabel": "תדירות",
+      "recurring": "שבועי (חוזר)",
+      "oneTime": "שיעור חד-פעמי",
+      "sessionDate": "תאריך השיעור",
+      "recurringBadge": "חוזר",
+      "oneTimeBadge": "חד-פעמי",
       "creating": "יוצר…",
       "create": "צור כיתה",
       "grades": {
@@ -182,7 +192,57 @@
       "searching": "מחפש…",
       "enrollingStudent": "רושם…",
       "enrollStudentBtn": "הרשם תלמיד",
-      "enrolledSuccess": "{name} נרשם בהצלחה."
+      "enrolledSuccess": "{name} נרשם בהצלחה.",
+      "upcomingSessions": "שיעורים קרובים",
+      "upcomingSessionsDesc": "בטל מופע בודד מבלי למחוק את הכיתה החוזרת.",
+      "cancelSession": "בטל",
+      "cancelling": "מבטל…",
+      "sessionCancelled": "בוטל",
+      "cancelConfirmTitle": "לבטל שיעור זה?",
+      "cancelConfirmBody": "השיעור ב-{date} יבוטל ויוסר מלוח השנה של Google. לא ניתן לבטל פעולה זו.",
+      "cancelConfirmYes": "כן, בטל",
+      "cancelConfirmNo": "השאר אותו",
+      "rescheduleSession": "שנה מועד",
+      "rescheduling": "פותח…",
+      "sessionPendingVote": "ממתין להצבעה →",
+      "sessionRescheduled": "שונה מועד →",
+      "viewResults": "צפה בתוצאות",
+      "confirmSlot": "אשר מועד"
+    },
+    "reschedule": {
+      "title": "שינוי מועד שיעור",
+      "subtitle": "הצע מועד חדש. תלמידים ואפוטרופוסים יאשרו זמינות.",
+      "sessionLabel": "שיעור לשינוי מועד",
+      "slotLabel": "תווית",
+      "slotLabelPlaceholder": "למשל: יום שני 10:00",
+      "optionDate": "תאריך",
+      "optionTime": "שעה (HH:MM)",
+      "fillRequired": "נא למלא את כל השדות.",
+      "submit": "שלח לתלמידים",
+      "submitting": "שולח…",
+      "backToClass": "← חזרה לכיתה",
+      "resultsTitle": "תוצאות זמינות",
+      "proposedSlot": "מועד מוצע",
+      "canAttend": "יכולים",
+      "cannotAttend": "לא יכולים",
+      "resolve": "אשר מועד זה",
+      "resolving": "מאשר…",
+      "resolved": "אושר — {label}",
+      "noVotes": "אין תגובות עדיין"
+    },
+    "vote": {
+      "title": "האם תוכל להגיע?",
+      "intro": "המורה מציע מועד חדש לשיעור. הודע לו אם תוכל להגיע.",
+      "proposedSlot": "מועד מוצע",
+      "yes": "כן, אני יכול",
+      "yesHint": "אהיה שם",
+      "no": "לא, אני לא יכול",
+      "noHint": "יש לי התנגשות",
+      "votedYes": "אמרת שתוכל להגיע",
+      "votedNo": "אמרת שלא תוכל להגיע",
+      "change": "שנה תגובה",
+      "resolved": "המורה אישר: {label}",
+      "closed": "ההצבעה סגורה"
     },
     "students": {
       "title": "תלמידים",
@@ -463,5 +523,28 @@
       "closeBtn": "סגור הרשמה",
       "openBtn": "פתח הרשמה"
     }
+  },
+  "whatsapp": {
+    "title": "התראות WhatsApp",
+    "description": "הוסף מספר טלפון לקבלת התראות דרך WhatsApp.",
+    "phone": "מספר טלפון",
+    "phonePlaceholder": "+972501234567",
+    "save": "שמור",
+    "saving": "שומר…",
+    "saved": "נשמר",
+    "optIn": "שלח לי התראות WhatsApp",
+    "phoneRequired": "הזן מספר טלפון למעלה כדי להפעיל התראות WhatsApp"
+  },
+  "pwa": {
+    "installTitle": "התקן את ClassSync",
+    "installSubtitle": "הוסף למסך הבית לגישה מהירה",
+    "installButton": "התקן",
+    "iosInstall": "לחץ על אייקון השיתוף ובחר «הוסף למסך הבית» כדי להתקין את האפליקציה",
+    "dismiss": "סגור",
+    "settingsTitle": "אפליקציה והתראות",
+    "alreadyInstalled": "האפליקציה מותקנת במכשיר זה",
+    "enableNotifications": "הפעל התראות",
+    "notificationsEnabled": "התראות פועלות",
+    "notSupported": "התראות אינן נתמכות בדפדפן זה"
   }
 }

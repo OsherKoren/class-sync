@@ -61,7 +61,7 @@ export function ScheduleView({
                         {teacherName && <span className="block">{teacherName}</span>}
                       </CardDescription>
                     </div>
-                    <div className="text-right text-sm">
+                    <div className="text-end text-sm">
                       <p className="font-medium">
                         {t(`classTypes.${cls.type}` as `classTypes.${string}`)}
                       </p>

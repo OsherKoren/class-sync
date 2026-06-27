@@ -7,8 +7,9 @@ import { useTranslations } from "next-intl";
 import { Sun, Moon, Monitor } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { updateLocale } from "@/lib/actions/settings";
+import { updateLocale, updateTheme } from "@/lib/actions/settings";
 import { cn } from "@/lib/utils";
+import { InstallButton } from "@/components/pwa/InstallButton";
 
 const THEMES = [
   { value: "light", Icon: Sun, key: "themeLight" },
@@ -16,7 +17,13 @@ const THEMES = [
   { value: "system", Icon: Monitor, key: "themeSystem" },
 ] as const;
 
-export function TeacherSettingsClient({ initialLocale }: { initialLocale: string }) {
+export function TeacherSettingsClient({
+  initialLocale,
+  children,
+}: {
+  initialLocale: string;
+  children?: React.ReactNode;
+}) {
   const t = useTranslations();
   const { theme, setTheme } = useTheme();
   const [locale, setLocale] = useState(initialLocale);
@@ -72,7 +79,7 @@ export function TeacherSettingsClient({ initialLocale }: { initialLocale: string
                   <Button
                     key={value}
                     variant={theme === value ? "default" : "outline"}
-                    onClick={() => setTheme(value)}
+                    onClick={() => { setTheme(value); updateTheme(value).catch(console.error); }}
                     className={cn("gap-2")}
                   >
                     <Icon className="h-4 w-4" />
@@ -82,6 +89,8 @@ export function TeacherSettingsClient({ initialLocale }: { initialLocale: string
               </div>
             </CardContent>
           </Card>
+          {children}
+          <InstallButton />
         </div>
       </div>
     </div>

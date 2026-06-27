@@ -30,6 +30,13 @@ export async function proxy(req: NextRequest) {
     if (!ok) return new NextResponse("Too Many Requests", { status: 429 });
   }
 
+  // /vote/* requires any authenticated session (guardian, student, or teacher)
+  if (pathname.startsWith("/vote")) {
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    if (!token) return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.next();
+  }
+
   const isProtected =
     pathname.startsWith("/teacher") ||
     pathname.startsWith("/guardian") ||

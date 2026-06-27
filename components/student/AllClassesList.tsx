@@ -73,7 +73,7 @@ export function AllClassesList({
                       {cls.teacherName && <span className="block">{cls.teacherName}</span>}
                     </CardDescription>
                   </div>
-                  <div className="text-right text-sm space-y-1">
+                  <div className="text-end text-sm space-y-1">
                     <p className="font-medium">{t(`classTypes.${cls.type}` as `classTypes.${string}`)}</p>
                     {(cls.grade || cls.level) && (
                       <p className="text-muted-foreground">

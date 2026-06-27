@@ -27,7 +27,11 @@
     "theme": "Theme",
     "themeLight": "Light",
     "themeDark": "Dark",
-    "themeSystem": "System"
+    "themeSystem": "System",
+    "errorTitle": "Something went wrong",
+    "errorDescription": "An unexpected error occurred. You can try again or go back.",
+    "tryAgain": "Try again",
+    "goBack": "Go back"
   },
   "days": {
     "0": "Sunday",
@@ -151,6 +155,12 @@
       "duration": "Duration (minutes)",
       "maxCapacity": "Max students (optional)",
       "maxCapacityHint": "Class closes automatically when full",
+      "recurrenceLabel": "Recurrence",
+      "recurring": "Weekly (recurring)",
+      "oneTime": "One-time session",
+      "sessionDate": "Session date",
+      "recurringBadge": "Recurring",
+      "oneTimeBadge": "One-time",
       "creating": "Creating…",
       "create": "Create class",
       "grades": {
@@ -182,7 +192,57 @@
       "searching": "Searching…",
       "enrollingStudent": "Enrolling…",
       "enrollStudentBtn": "Enroll student",
-      "enrolledSuccess": "{name} enrolled successfully."
+      "enrolledSuccess": "{name} enrolled successfully.",
+      "upcomingSessions": "Upcoming Sessions",
+      "upcomingSessionsDesc": "Cancel a specific occurrence without deleting the recurring class.",
+      "cancelSession": "Cancel",
+      "cancelling": "Cancelling…",
+      "sessionCancelled": "Cancelled",
+      "cancelConfirmTitle": "Cancel this session?",
+      "cancelConfirmBody": "The session on {date} will be cancelled and removed from your Google Calendar. This cannot be undone.",
+      "cancelConfirmYes": "Yes, cancel it",
+      "cancelConfirmNo": "Keep it",
+      "rescheduleSession": "Reschedule",
+      "rescheduling": "Opening…",
+      "sessionPendingVote": "Pending vote →",
+      "sessionRescheduled": "Rescheduled →",
+      "viewResults": "View results",
+      "confirmSlot": "Confirm slot"
+    },
+    "reschedule": {
+      "title": "Reschedule session",
+      "subtitle": "Propose a new time slot. Students and guardians will confirm availability.",
+      "sessionLabel": "Session being rescheduled",
+      "slotLabel": "Label",
+      "slotLabelPlaceholder": "e.g. Monday 10:00",
+      "optionDate": "Date",
+      "optionTime": "Time (HH:MM)",
+      "fillRequired": "Please fill in all fields.",
+      "submit": "Send to students",
+      "submitting": "Sending…",
+      "backToClass": "← Back to class",
+      "resultsTitle": "Availability results",
+      "proposedSlot": "Proposed new time",
+      "canAttend": "Can attend",
+      "cannotAttend": "Cannot attend",
+      "resolve": "Confirm this slot",
+      "resolving": "Confirming…",
+      "resolved": "Confirmed — {label}",
+      "noVotes": "No responses yet"
+    },
+    "vote": {
+      "title": "Can you make it?",
+      "intro": "The teacher proposes a new time for the class. Let them know if you can attend.",
+      "proposedSlot": "Proposed time",
+      "yes": "Yes, I can make it",
+      "yesHint": "I'll be there",
+      "no": "No, I can't make it",
+      "noHint": "I have a conflict",
+      "votedYes": "You said you can attend",
+      "votedNo": "You said you cannot attend",
+      "change": "Change response",
+      "resolved": "The teacher confirmed: {label}",
+      "closed": "Voting is closed"
     },
     "students": {
       "title": "Students",
@@ -463,5 +523,28 @@
       "closeBtn": "Close Enrollment",
       "openBtn": "Open Enrollment"
     }
+  },
+  "whatsapp": {
+    "title": "WhatsApp Notifications",
+    "description": "Add your phone number to receive notifications via WhatsApp.",
+    "phone": "Phone number",
+    "phonePlaceholder": "+972501234567",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "optIn": "Send me WhatsApp notifications",
+    "phoneRequired": "Enter a phone number above to enable WhatsApp notifications"
+  },
+  "pwa": {
+    "installTitle": "Install ClassSync",
+    "installSubtitle": "Add to your home screen for quick access",
+    "installButton": "Install",
+    "iosInstall": "Tap the share icon, then choose \"Add to Home Screen\" to install the app",
+    "dismiss": "Dismiss",
+    "settingsTitle": "App & Notifications",
+    "alreadyInstalled": "App is installed on this device",
+    "enableNotifications": "Enable push notifications",
+    "notificationsEnabled": "Push notifications on",
+    "notSupported": "Push notifications are not supported on this browser"
   }
 }

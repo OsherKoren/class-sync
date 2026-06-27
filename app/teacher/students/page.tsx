@@ -58,7 +58,7 @@ export default async function StudentsPage() {
               <Link key={student.id} href={`/teacher/students/${student.id}`}>
                 <Card className="hover:bg-accent transition-colors cursor-pointer">
                   <CardHeader className="py-4">
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                       <div className="flex items-center gap-3 min-w-0">
                         <CardTitle className="text-base">{student.name}</CardTitle>
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
@@ -71,7 +71,7 @@ export default async function StudentsPage() {
                             : t("teacher.students.noAccount")}
                         </span>
                       </div>
-                      <div className="flex items-center gap-4 text-sm shrink-0">
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
                         {student.activeEnrollments > 0 && (
                           <span className="text-muted-foreground">
                             {t("teacher.students.activeCount", { count: student.activeEnrollments })}

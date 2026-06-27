@@ -17,6 +17,7 @@ import {
 import { createClass } from "@/lib/actions/class";
 import { GRADE_KEYS } from "@/lib/classKeys";
 import { useTranslations } from "next-intl";
+import { Loader2 } from "lucide-react";
 
 const gradeNums = [4, 5, 6, 7, 8, 9, 10];
 
@@ -34,7 +35,9 @@ export function CreateClassForm({
   const [grade, setGrade] = useState("");
   const [gradeCustom, setGradeCustom] = useState(false);
   const [subjectCustom, setSubjectCustom] = useState(false);
+  const [isRecurring, setIsRecurring] = useState(true);
   const [dayOfWeek, setDayOfWeek] = useState(defaultDay.toString());
+  const [sessionDate, setSessionDate] = useState("");
   const [startTime, setStartTime] = useState(defaultStartTime);
   const [duration, setDuration] = useState("45");
   const [maxCapacity, setMaxCapacity] = useState("4");
@@ -61,7 +64,9 @@ export function CreateClassForm({
         type,
         level: level || undefined,
         grade,
-        dayOfWeek: parseInt(dayOfWeek),
+        isRecurring,
+        dayOfWeek: isRecurring ? parseInt(dayOfWeek) : undefined,
+        sessionDate: isRecurring ? undefined : sessionDate,
         startTime,
         duration: parseInt(duration),
         maxCapacity: type === "GROUP" && maxCapacity ? parseInt(maxCapacity) : undefined,
@@ -244,21 +249,54 @@ export function CreateClassForm({
                   )}
                 </div>
 
-                <div>
-                  <Label htmlFor="dayOfWeek">{t("teacher.createClass.day")}</Label>
-                  <Select value={dayOfWeek} onValueChange={(v) => { if (v !== null) setDayOfWeek(v); }}>
-                    <SelectTrigger id="dayOfWeek">
-                      <span>{t(`days.${dayOfWeek}` as `days.${number}`)}</span>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[0, 1, 2, 3, 4, 5, 6].map((index) => (
-                        <SelectItem key={index} value={index.toString()}>
-                          {t(`days.${index}` as `days.${number}`)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="col-span-2">
+                  <Label>{t("teacher.createClass.recurrenceLabel")}</Label>
+                  <div className="flex border rounded-md overflow-hidden text-sm mt-1">
+                    <button
+                      type="button"
+                      onClick={() => setIsRecurring(true)}
+                      className={`flex-1 px-3 py-2 transition-colors ${isRecurring ? "bg-primary text-primary-foreground font-medium" : "bg-background text-muted-foreground hover:bg-accent"}`}
+                    >
+                      {t("teacher.createClass.recurring")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsRecurring(false)}
+                      className={`flex-1 px-3 py-2 transition-colors border-l ${!isRecurring ? "bg-primary text-primary-foreground font-medium" : "bg-background text-muted-foreground hover:bg-accent"}`}
+                    >
+                      {t("teacher.createClass.oneTime")}
+                    </button>
+                  </div>
                 </div>
+
+                {isRecurring ? (
+                  <div>
+                    <Label htmlFor="dayOfWeek">{t("teacher.createClass.day")}</Label>
+                    <Select value={dayOfWeek} onValueChange={(v) => { if (v !== null) setDayOfWeek(v); }}>
+                      <SelectTrigger id="dayOfWeek">
+                        <span>{t(`days.${dayOfWeek}` as `days.${number}`)}</span>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[0, 1, 2, 3, 4, 5, 6].map((index) => (
+                          <SelectItem key={index} value={index.toString()}>
+                            {t(`days.${index}` as `days.${number}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ) : (
+                  <div>
+                    <Label htmlFor="sessionDate">{t("teacher.createClass.sessionDate")}</Label>
+                    <Input
+                      id="sessionDate"
+                      type="date"
+                      value={sessionDate}
+                      onChange={(e) => setSessionDate(e.target.value)}
+                      required={!isRecurring}
+                    />
+                  </div>
+                )}
 
                 <div>
                   <Label htmlFor="startTime">{t("teacher.createClass.startTime")}</Label>
@@ -305,7 +343,8 @@ export function CreateClassForm({
               {error && <p className="text-sm text-destructive">{error}</p>}
 
               <div className="flex gap-4">
-                <Button type="submit" disabled={loading || !name || !subject || !grade}>
+                <Button type="submit" disabled={loading || !name || !subject || !grade || (!isRecurring && !sessionDate)}>
+                  {loading && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                   {loading ? t("teacher.createClass.creating") : t("teacher.createClass.create")}
                 </Button>
                 <Link href="/teacher/classes">
