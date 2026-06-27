@@ -9,6 +9,9 @@ on:
     types: [completed]
     branches: [main]
 
+permissions:
+  contents: write
+
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -48,7 +51,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            github.rest.repos.createCommitComment({
+            await github.rest.repos.createCommitComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               commit_sha: '${{ github.event.workflow_run.head_sha }}',

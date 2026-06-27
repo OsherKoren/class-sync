@@ -337,6 +337,7 @@
       "title": "הכיתות שלי",
       "welcome": "שלום, {name}",
       "findClasses": "מצא כיתות",
+      "downloadCalendar": "הורד יומן",
       "pendingTitle": "ממתין לאישור",
       "pendingStatus": "ממתין לאישור",
       "noClasses": "לא נרשמת לכיתות עדיין.",
@@ -418,6 +419,7 @@
       "addChildBtn": "הוסף ילד",
       "enterCode": "הכנס קוד הזמנה",
       "manageLinks": "נהל קישורים",
+      "downloadCalendar": "הורד יומן",
       "notClaimed": "התלמיד טרם קשר את חשבונו",
       "notEnrolled": "לא רשום לכיתות.",
       "pending": "ממתין"
@@ -465,7 +467,8 @@
       "enrolledCount": "{count} כיתות פעילות",
       "pendingCount": "{count} ממתינות",
       "noEnrollments": "לא רשום לכיתות.",
-      "manageLinks": "נהל קישורים"
+      "manageLinks": "נהל קישורים",
+      "downloadCalendar": "הורד יומן"
     },
     "linkCodes": {
       "backToDashboard": "← חזרה ללוח הבקרה",

@@ -124,6 +124,7 @@ export async function cancelOneSession(
 export async function getStudentEnrollments(): Promise<
   | { error: string }
   | {
+      studentId: string;
       data: Array<{
         enrollmentId: string;
         classId: string;
@@ -175,6 +176,7 @@ export async function getStudentEnrollments(): Promise<
   }
 
   return {
+    studentId: student.id,
     data: student.enrollments.map((e: (typeof student.enrollments)[number]) => ({
       enrollmentId: e.id,
       classId: e.classId,

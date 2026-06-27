@@ -7,13 +7,16 @@ name: First Deploy (Manual)
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
 jobs:
   first-deploy:
-    name: Deploy to Production
+    name: First Deploy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -48,7 +51,7 @@ jobs:
           TWILIO_WHATSAPP_FROM: ${{ secrets.TWILIO_WHATSAPP_FROM }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
 
-      - name: Deploy to Production
+      - name: Deploy
         id: deploy
         run: |
           DEPLOY_URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})

@@ -337,6 +337,7 @@
       "title": "My Classes",
       "welcome": "Welcome, {name}",
       "findClasses": "Find classes",
+      "downloadCalendar": "Download Calendar",
       "pendingTitle": "Pending Approval",
       "pendingStatus": "Awaiting approval",
       "noClasses": "You haven't enrolled in any classes yet.",
@@ -418,6 +419,7 @@
       "addChildBtn": "Add a child",
       "enterCode": "Enter invite code",
       "manageLinks": "Manage links",
+      "downloadCalendar": "Download Calendar",
       "notClaimed": "Student hasn't claimed their account yet",
       "notEnrolled": "Not enrolled in any classes.",
       "pending": "Pending"
@@ -465,7 +467,8 @@
       "enrolledCount": "{count} active class(es)",
       "pendingCount": "{count} pending",
       "noEnrollments": "Not enrolled in any classes.",
-      "manageLinks": "Manage links"
+      "manageLinks": "Manage links",
+      "downloadCalendar": "Download Calendar"
     },
     "linkCodes": {
       "backToDashboard": "← Back to dashboard",

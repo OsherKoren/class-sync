@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
+import { CalendarArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,6 +18,7 @@ export default async function StudentDashboard() {
   const result = await getStudentEnrollments();
   const t = await getTranslations();
 
+  const studentId = "error" in result ? null : result.studentId;
   const enrollments = "error" in result ? [] : result.data;
   const active = enrollments.filter((e) => e.status === "ACTIVE");
   const pending = enrollments.filter((e) => e.status === "PENDING");
@@ -32,9 +34,19 @@ export default async function StudentDashboard() {
               {t('student.dashboard.welcome', { name: session?.user?.name || '' })}
             </p>
           </div>
-          <Link href="/student/classes">
-            <Button variant="outline">{t('student.dashboard.findClasses')}</Button>
-          </Link>
+          <div className="flex gap-2">
+            {studentId && active.length > 0 && (
+              <a href={`/api/ical/${studentId}`} download>
+                <Button variant="outline" size="sm">
+                  <CalendarArrowDown className="me-2 h-4 w-4" />
+                  {t('student.dashboard.downloadCalendar')}
+                </Button>
+              </a>
+            )}
+            <Link href="/student/classes">
+              <Button variant="outline">{t('student.dashboard.findClasses')}</Button>
+            </Link>
+          </div>
         </div>
 
         {pending.length > 0 && (
