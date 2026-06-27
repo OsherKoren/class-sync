@@ -39,7 +39,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       profile(profile) {
         const role =
-          profile.email === process.env.TEACHER_EMAIL ? "TEACHER" : "GUARDIAN";
+          process.env.TEACHER_EMAIL?.split(",").map(e => e.trim()).includes(profile.email ?? "") ? "TEACHER" : "GUARDIAN";
         return {
           id: profile.sub,
           name: profile.name,
